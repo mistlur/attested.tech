@@ -1,7 +1,7 @@
 export default function Head() {
   return (
     <>
-      <title>My Next.js App</title>
+      <title>ATTESTED.TECH</title>
     </>
   );
 }

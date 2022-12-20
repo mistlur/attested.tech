@@ -1,3 +1,9 @@
+import DidBuilder from "../components/dids/Builder";
+
 export default async function Page() {
-  return <div className="badge badge-primary">primary</div>;
+  return (
+    <div>
+      <DidBuilder />
+    </div>
+  );
 }

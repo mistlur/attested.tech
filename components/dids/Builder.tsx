@@ -6,10 +6,12 @@ import { updateDidDocument as updateDidDocumentDAO } from "../../lib/dao";
 import {
   didDocumentDecoder,
   didDocumentEncoder,
+  KeyVm,
+  LogicDocument,
   newVerificationMaterial,
-  representVerificationMaterial,
 } from "../../lib/verificationMaterialBuilder";
-import { getCompleteDid, getDidUri } from "../../lib/did";
+import produce from "immer";
+import { getCompleteDid } from "../../lib/did";
 
 export default function DidBuilder({
   id,
@@ -20,35 +22,13 @@ export default function DidBuilder({
   name: string;
   document: Record<string, any>;
 }) {
-  const [didDocument, setDidDocument] = useState(
+  const [didDocument, setDidDocument] = useState<LogicDocument>(
     didDocumentDecoder(documentSchema.parse(document))
   );
   const [isDidDocumentValid, setIsDidDocumentValid] = useState(
     documentSchema.safeParse(document).success
   );
   const [validationError, setValidationError] = useState<string>("");
-  const [isRepresentationJwk, setIsRepresentationJwk] =
-    useState<boolean>(false);
-
-  //   const updateDidDocument = (doc: string) => {
-  //     const res = documentSchema.safeParse(JSON.parse(doc));
-  //     setIsDidDocumentValid(res.success);
-  //     if (res.success) setDidDocument(res.data);
-  //     else {
-  //       setValidationError(JSON.stringify(res.error, null, 2));
-  //     }
-  //   };
-
-  const updateToDidDocument = (property: Record<string, any>) => {
-    const newDoc = { ...didDocument, ...property };
-    const res = documentSchema.safeParse(newDoc);
-    setIsDidDocumentValid(res.success);
-    if (res.success)
-      setDidDocument(didDocumentDecoder(documentSchema.parse(res.data)));
-    else {
-      setValidationError(JSON.stringify(res.error, null, 2));
-    }
-  };
 
   return (
     <>
@@ -64,9 +44,13 @@ export default function DidBuilder({
               className="dropdown-content menu p-2 shadow bg-base-300 rounded-box w-96"
             >
               <li
-                onClick={async () =>
-                  updateToDidDocument({ controller: getCompleteDid(id) })
-                }
+                onClick={() => {
+                  setDidDocument(
+                    produce(didDocument, (draft) => {
+                      draft.controller = getCompleteDid(id);
+                    })
+                  );
+                }}
               >
                 <div>DID Subject</div>
               </li>
@@ -79,36 +63,79 @@ export default function DidBuilder({
           </div>
           <button
             className="btn"
-            onClick={async () =>
-              updateToDidDocument({
-                verificationMethod: [
-                  ...didDocument.verificationMethods,
-                  await representVerificationMaterial(
-                    isRepresentationJwk ? "JsonWebKey2020" : "P256Key2021",
-                    id,
-                    await newVerificationMaterial()
-                  ),
-                ],
-              })
-            }
+            onClick={async () => {
+              const newKey = await newVerificationMaterial(id, true);
+              setDidDocument(
+                produce(didDocument, (draft) => {
+                  draft.verificationMethods = [
+                    ...didDocument.verificationMethods,
+                    newKey,
+                  ];
+                })
+              );
+            }}
           >
             Add VerificationMethod
           </button>
-          {didDocument.verificationMethods.map((vm, index) => (
-            <div className="bg-primary text-xs p-16 flex flex-col" key={index}>
-              <div>{vm.id}</div>
-              <div>
-                <input
-                  type="checkbox"
-                  className="toggle toggle-info"
-                  checked={isRepresentationJwk}
-                  onChange={() => setIsRepresentationJwk(!isRepresentationJwk)}
-                />
+          <div className="flex flex-col gap-y-4">
+            {didDocument.verificationMethods.map((vm, index) => (
+              <div
+                className="bg-base-200 text-xs p-8 gap-y-2 flex flex-col"
+                key={index}
+              >
+                <div>{(vm as KeyVm).keyType}</div>
+                {"keyMaterial" in didDocument.verificationMethods[index] ? (
+                  <div className="flex gap-x-4">
+                    <button
+                      className="btn"
+                      onClick={() => {
+                        setDidDocument(
+                          produce(didDocument, (draft) => {
+                            // @ts-ignore
+                            draft.verificationMethods[index].representation =
+                              "Multibase";
+                          })
+                        );
+                      }}
+                    >
+                      Use Multibase
+                    </button>
+                    <button
+                      className="btn"
+                      onClick={() => {
+                        setDidDocument(
+                          produce(didDocument, (draft) => {
+                            // @ts-ignore
+                            draft.verificationMethods[index].representation =
+                              "JsonWebKey2020";
+                          })
+                        );
+                      }}
+                    >
+                      Use JWK
+                    </button>
+                  </div>
+                ) : (
+                  <></>
+                )}
+                <button
+                  className="btn btn-outline btn-error"
+                  onClick={() => {
+                    setDidDocument(
+                      produce(didDocument, (draft) => {
+                        // @ts-ignore
+                        draft.verificationMethods.splice(index, 1);
+                      })
+                    );
+                  }}
+                >
+                  Delete
+                </button>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
           <button
-            className="btn btn-block"
+            className="btn btn-block btn-success"
             onClick={async () => await updateDidDocumentDAO(id, didDocument)}
           >
             Save
@@ -117,14 +144,7 @@ export default function DidBuilder({
         <div className="w-1/2 p-4">
           <div className="bg-zinc-800 text-lime-500">
             <pre className="p-4 text-xs overflow-scroll">
-              {JSON.stringify(
-                didDocumentEncoder(
-                  didDocument,
-                  isRepresentationJwk ? "JsonWebKey2020" : "wd"
-                ),
-                null,
-                2
-              )}
+              {JSON.stringify(didDocumentEncoder(didDocument), null, 2)}
             </pre>
           </div>
           {isDidDocumentValid ? (

@@ -18,6 +18,8 @@
     "elliptic": "^6.5.4",
     "eslint": "8.29.0",
     "eslint-config-next": "13.0.7",
+    "immer": "^9.0.16",
+    "jwk-thumbprint": "^0.1.4",
     "multiformats": "^10.0.3",
     "next": "13.0.7",
     "react": "18.2.0",

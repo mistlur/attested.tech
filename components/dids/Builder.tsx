@@ -6,6 +6,7 @@ import { updateDidDocument as updateDidDocumentDAO } from "../../lib/dao";
 import {
   didDocumentDecoder,
   didDocumentEncoder,
+  encodeVerificationMethod,
   KeyVm,
   LogicDocument,
   newVerificationMaterial,
@@ -83,59 +84,66 @@ export default function DidBuilder({
                 className="bg-base-200 text-xs p-8 gap-y-2 flex flex-col"
                 key={index}
               >
-                <div>{(vm as KeyVm).keyType}</div>
-                {"keyMaterial" in didDocument.verificationMethods[index] ? (
-                  <div className="flex gap-x-4">
+                <div>{encodeVerificationMethod(vm).id}</div>
+                <div>{encodeVerificationMethod(vm).type}</div>
+                <div className="collapse">
+                  <input type="checkbox" />
+                  <div className="collapse-title">Edit Method</div>
+                  <div className="collapse-content bg-base-300">
+                    {"keyMaterial" in didDocument.verificationMethods[index] ? (
+                      <div className="flex gap-x-4">
+                        <button
+                          className="btn btn-xs"
+                          onClick={() => {
+                            setDidDocument(
+                              produce(didDocument, (draft) => {
+                                // prettier-ignore
+                                // @ts-ignore
+                                draft.verificationMethods[index].representation = "Multibase";
+                              })
+                            );
+                          }}
+                        >
+                          Use Multibase
+                        </button>
+                        <button
+                          className="btn btn-xs"
+                          onClick={() => {
+                            setDidDocument(
+                              produce(didDocument, (draft) => {
+                                // prettier-ignore
+                                // @ts-ignore
+                                draft.verificationMethods[index].representation = "JsonWebKey2020";
+                              })
+                            );
+                          }}
+                        >
+                          Use JWK
+                        </button>
+                      </div>
+                    ) : (
+                      <></>
+                    )}
                     <button
-                      className="btn"
+                      className="btn btn-outline btn-error mt-4"
                       onClick={() => {
                         setDidDocument(
                           produce(didDocument, (draft) => {
                             // @ts-ignore
-                            draft.verificationMethods[index].representation =
-                              "Multibase";
+                            draft.verificationMethods.splice(index, 1);
                           })
                         );
                       }}
                     >
-                      Use Multibase
-                    </button>
-                    <button
-                      className="btn"
-                      onClick={() => {
-                        setDidDocument(
-                          produce(didDocument, (draft) => {
-                            // @ts-ignore
-                            draft.verificationMethods[index].representation =
-                              "JsonWebKey2020";
-                          })
-                        );
-                      }}
-                    >
-                      Use JWK
+                      Delete
                     </button>
                   </div>
-                ) : (
-                  <></>
-                )}
-                <button
-                  className="btn btn-outline btn-error"
-                  onClick={() => {
-                    setDidDocument(
-                      produce(didDocument, (draft) => {
-                        // @ts-ignore
-                        draft.verificationMethods.splice(index, 1);
-                      })
-                    );
-                  }}
-                >
-                  Delete
-                </button>
+                </div>
               </div>
             ))}
           </div>
           <button
-            className="btn btn-block btn-success"
+            className="btn btn-block btn-info"
             onClick={async () => await updateDidDocumentDAO(id, didDocument)}
           >
             Save

@@ -23,8 +23,8 @@ export const publicKeyJwkSchema = z.object({
 
 export const verificationMethodSchema = z.object({
     id: z.string(),
-    type: z.string().optional(),
-    controller: z.string().optional(),
+    type: z.string(),
+    controller: z.string(),
     publicKeyJwk: publicKeyJwkSchema.optional(),
     publicKeyMultibase: z.string().optional(),
     blockchainAccountId: z.string().optional(),
@@ -33,7 +33,7 @@ export const verificationMethodSchema = z.object({
     // publicKeyBase58: z.string().optional(), // DEPRECATED
     // publicKeyHex: z.string().optional(), // DEPRECATED
     // ethereumAddress: z.string().optional() // DEPRECATED
-})
+}).or(z.string())
 
 export const verificationMethodsSchema = z.array(verificationMethodSchema)
 
@@ -42,12 +42,12 @@ export const documentSchema = z.object({
     id: z.string(),
     alsoKnownAs: z.string().optional(),
     controller: z.string().optional(),
-    verificationMethod: verificationMethodsSchema.optional(), // TODO
+    verificationMethod: verificationMethodsSchema.optional(),
+    authentication: verificationMethodsSchema.optional(),
+    assertionMethod: verificationMethodsSchema.optional(),
+    keyAgreement: verificationMethodsSchema.optional(),
+    capabilityInvocation: verificationMethodsSchema.optional(),
+    capabilityDelegation: verificationMethodsSchema.optional(),
     service: z.string().optional(),
-    authentication: z.array(verificationMethodsSchema).or(z.array(z.string())).optional(),
-    assertionMethod: z.array(verificationMethodsSchema).or(z.array(z.string())).optional(),
-    keyAgreement: z.array(verificationMethodsSchema).or(z.array(z.string())).optional(),
-    capabilityInvocation: z.array(verificationMethodsSchema).or(z.array(z.string())).optional(),
-    capabilityDelegation: z.array(verificationMethodsSchema).or(z.array(z.string())).optional(),
 })
 

@@ -10,7 +10,7 @@ export type Representation = EmbeddedMaterial | ReferencedMaterial
 export type EmbeddedMaterial = 'JsonWebKey2020' | 'Multibase'
 export type ReferencedMaterial = 'Reference'
 
-const verificationRelationships = [
+export const verificationRelationships = [
     "verificationMethod",
     "authentication",
     "assertionMethod",
@@ -78,6 +78,7 @@ function encodeJsonWebKey(rawKeyMaterial: Uint8Array): JsonWebKey {
 }
 
 export const encodeVerificationMethod = (vm: LogicVM, representation: Representation): z.infer<typeof verificationMethodSchema> => {
+    if (!vm.id) throw Error('Unable to serialize verification method missing ID')
     // TODO: Preserve the correct fingerprint when translating
     if (vm.keyMaterial && representation !== 'Reference') {
         if (!vm.controller) throw Error('Malformed verification method: Embedded material must contain controller')

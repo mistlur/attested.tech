@@ -87,10 +87,14 @@ export default function DidBuilder({
             </ul>
           </div>
           {/* START Verification method modal */}
-          <label htmlFor="my-modal-3" className="btn">
+          <label htmlFor="newVerificationMaterial" className="btn">
             Add VerificationMethod
           </label>
-          <input type="checkbox" id="my-modal-3" className="modal-toggle" />
+          <input
+            type="checkbox"
+            id="newVerificationMaterial"
+            className="modal-toggle"
+          />
           <VerificationMaterial
             didDocument={didDocument}
             save={(vm: LogicVM) =>
@@ -176,23 +180,17 @@ export default function DidBuilder({
                     </div>
                   ))}
                 </div>
-                <label htmlFor="my-modal-3" className="btn">
-                  Add VerificationMethod
+                <label htmlFor={vm.id} className="btn">
+                  Edit
                 </label>
-                <input
-                  type="checkbox"
-                  id="my-modal-3"
-                  className="modal-toggle"
-                />
+                <input type="checkbox" id={vm.id} className="modal-toggle" />
                 <VerificationMaterial
+                  material={vm}
                   didDocument={didDocument}
                   save={(vm: LogicVM) =>
                     setDidDocument(
                       produce(didDocument, (draft) => {
-                        draft.verificationMethods = [
-                          ...didDocument.verificationMethods,
-                          vm,
-                        ];
+                        draft.verificationMethods[index] = vm;
                       })
                     )
                   }
@@ -202,7 +200,6 @@ export default function DidBuilder({
                   onClick={() => {
                     setDidDocument(
                       produce(didDocument, (draft) => {
-                        // @ts-ignore
                         draft.verificationMethods.splice(index, 1);
                       })
                     );

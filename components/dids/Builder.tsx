@@ -4,21 +4,21 @@ import { useState } from "react";
 import { documentSchema } from "../../lib/didParser";
 import { updateDidDocument as updateDidDocumentDAO } from "../../lib/dao";
 import {
+  DidDocument,
   didDocumentDeserializer,
-  didDocumentSerializer,
-  LogicDocument,
+  isEmbeddedVm,
   LogicVM,
-  VerificationRelationship,
+  verificationRelationships,
 } from "../../lib/verificationMaterialBuilder";
 import produce from "immer";
 import { getCompleteDid } from "../../lib/did";
 import VerificationMaterial from "./VerificationMaterial";
 
-const attemptSerialization = (didDocument: LogicDocument): JSX.Element => {
+const attemptSerialization = (didDocument: DidDocument): JSX.Element => {
   let result: string;
   let validDocument: boolean;
   try {
-    result = JSON.stringify(didDocumentSerializer(didDocument), null, 2);
+    result = JSON.stringify(didDocument.serialize(), null, 2);
     validDocument = true;
   } catch (e) {
     // @ts-ignore
@@ -51,7 +51,7 @@ export default function DidBuilder({
   name: string;
   document: Record<string, any>;
 }) {
-  const [didDocument, setDidDocument] = useState<LogicDocument>(
+  const [didDocument, setDidDocument] = useState<DidDocument>(
     didDocumentDeserializer(documentSchema.parse(document))
   );
 
@@ -96,14 +96,12 @@ export default function DidBuilder({
             className="modal-toggle"
           />
           <VerificationMaterial
+            htmlId="newVerificationMaterial"
             didDocument={didDocument}
             save={(vm: LogicVM) =>
               setDidDocument(
                 produce(didDocument, (draft) => {
-                  draft.verificationMethods = [
-                    ...didDocument.verificationMethods,
-                    vm,
-                  ];
+                  draft.addVerificationMaterial(vm);
                 })
               )
             }
@@ -116,75 +114,26 @@ export default function DidBuilder({
                 className="bg-base-200 text-xs p-8 gap-y-2 flex flex-col"
                 key={index}
               >
-                <div className="text-2xl opacity-50">{vm.curve}</div>
-                <div className="font-mono">{vm.id}</div>
-                <div>Controller: {vm.controller}</div>
-                <div className="flex flex-col gap-y-4 bg-base-300 p-4">
-                  {Object.keys(
-                    didDocument.verificationMethods[index]["usage"]
-                  ).map((method, indexMethod) => (
-                    <div
-                      key={indexMethod}
-                      className="flex align-baseline justify-between w-full"
-                    >
-                      <div>
-                        <span className="mr-4">{method}</span>
-                        <button
-                          className="btn btn-xs mr-4"
-                          onClick={() => {
-                            setDidDocument(
-                              produce(didDocument, (draft) => {
-                                //@ts-ignore
-                                draft.verificationMethods[index]["usage"][
-                                  method
-                                ] = "Multibase";
-                              })
-                            );
-                          }}
-                        >
-                          Use Multibase
-                        </button>
-                        <button
-                          className="btn btn-xs"
-                          onClick={() => {
-                            setDidDocument(
-                              produce(didDocument, (draft) => {
-                                // @ts-ignore
-                                draft.verificationMethods[index]["usage"][
-                                  method
-                                ] = "JsonWebKey2020";
-                              })
-                            );
-                          }}
-                        >
-                          Use JWK
-                        </button>
-                      </div>
-                      <div>
-                        <button
-                          className="btn btn-xs btn-error btn-square"
-                          onClick={() => {
-                            setDidDocument(
-                              produce(didDocument, (draft) => {
-                                // @ts-ignore
-                                draft.verificationMethods[index]["usage"][
-                                  method
-                                ] = undefined;
-                              })
-                            );
-                          }}
-                        >
-                          X
-                        </button>
-                      </div>
-                    </div>
-                  ))}
+                <div className="text-2xl opacity-50">
+                  {isEmbeddedVm(vm) ? vm.curve : "Reference"}
                 </div>
-                <label htmlFor={vm.id} className="btn">
+                <div className="font-mono">{vm.id}</div>
+                {isEmbeddedVm(vm) ? (
+                  <div>Controller: {vm.controller}</div>
+                ) : (
+                  <></>
+                )}
+                <div className="flex flex-col gap-y-4 bg-base-300 p-4"></div>
+                <label htmlFor={`vm${index}`} className="btn">
                   Edit
                 </label>
-                <input type="checkbox" id={vm.id} className="modal-toggle" />
+                <input
+                  type="checkbox"
+                  id={`vm${index}`}
+                  className="modal-toggle"
+                />
                 <VerificationMaterial
+                  htmlId={`vm${index}`}
                   material={vm}
                   didDocument={didDocument}
                   save={(vm: LogicVM) =>
@@ -213,7 +162,7 @@ export default function DidBuilder({
           <button
             className="btn btn-block btn-info"
             onClick={async () =>
-              await updateDidDocumentDAO(id, didDocumentSerializer(didDocument))
+              await updateDidDocumentDAO(id, didDocument.serialize())
             }
           >
             Publish

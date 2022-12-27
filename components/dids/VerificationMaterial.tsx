@@ -1,32 +1,33 @@
 import { useState } from "react";
 import {
-  LogicDocument,
+  DidDocument,
+  isEmbeddedVm,
   LogicVM,
-  newVerificationMaterial,
-  VerificationRelationship,
+  ReferenceVM,
+  Usage,
   verificationRelationships,
 } from "../../lib/verificationMaterialBuilder";
 
 export default function VerificationMaterial({
+  htmlId,
   material,
   didDocument,
   save,
 }: {
+  htmlId: string;
   material?: LogicVM;
-  didDocument: LogicDocument;
+  didDocument: DidDocument;
   save: (vm: LogicVM) => void;
 }): JSX.Element {
-  const initialMethods = material
-    ? (Object.keys(material.usage) as VerificationRelationship[])
-    : [];
-  console.log(initialMethods);
+  const initialMethods = material ? material.usage : {};
+  console.log("initialMethods", initialMethods);
 
   const [newVerificationMethodType, setNewVerificationMethodType] = useState<
     "key" | "reference"
   >("key");
 
-  const [controller, setController] = useState<string>(
-    material?.controller || didDocument.id
+  const [controller, setController] = useState<string | undefined>(
+    material && isEmbeddedVm(material) ? material.controller : didDocument.id
   );
 
   const [id, setId] = useState<string>(material?.id || "");
@@ -34,14 +35,13 @@ export default function VerificationMaterial({
   const [selectedVerificationMethodType, setSelectedVerificationMethodType] =
     useState<number | null>(null);
 
-  const [methods, setMethods] =
-    useState<VerificationRelationship[]>(initialMethods);
+  const [methods, setMethods] = useState<Usage>(initialMethods);
 
   return (
     <div className="modal">
       <div className="modal-box relative">
         <label
-          htmlFor={material ? material.id : "newVerificationMaterial"}
+          htmlFor={htmlId}
           className="btn btn-sm btn-circle absolute right-2 top-2"
         >
           ✕
@@ -57,7 +57,7 @@ export default function VerificationMaterial({
               }`}
               onClick={() => setNewVerificationMethodType("key")}
             >
-              Key
+              Embedded
             </button>
             <button
               className={`btn ${
@@ -65,7 +65,7 @@ export default function VerificationMaterial({
               }`}
               onClick={() => setNewVerificationMethodType("reference")}
             >
-              Reference Existing
+              Reference
             </button>
           </div>
           <div>
@@ -134,39 +134,85 @@ export default function VerificationMaterial({
               Select Verification Relationships
             </span>
             <div className="form-control">
-              {verificationRelationships.map(
-                (verificationRelationship, index) => {
-                  return (
-                    <label className="label cursor-pointer" key={index}>
-                      <span className="label-text capitalize">
-                        {verificationRelationship}
-                      </span>
-                      <input
-                        type="checkbox"
-                        className="checkbox"
-                        checked={methods.includes(verificationRelationship)}
-                        onChange={() => {
-                          methods.includes(verificationRelationship)
-                            ? setMethods(
-                                methods.filter(
-                                  (m) => m !== verificationRelationship
-                                )
-                              )
-                            : setMethods([
-                                verificationRelationship,
-                                ...methods,
-                              ]);
+              {verificationRelationships.map((method, indexMethod) => {
+                return (
+                  <div
+                    key={indexMethod}
+                    className="flex justify-between w-full"
+                  >
+                    <div>
+                      <span className="mr-4">{method}</span>
+                    </div>
+                    <div>
+                      <button
+                        className={`btn btn-xs ${
+                          methods[method] === "Multibase" ? "btn-primary" : ""
+                        }`}
+                        onClick={() => {
+                          setMethods({
+                            ...methods,
+                            [method]: "Multibase",
+                          });
                         }}
-                      />
-                    </label>
-                  );
-                }
-              )}
+                      >
+                        Multibase
+                      </button>
+                    </div>
+                    <div>
+                      <button
+                        className={`btn btn-xs ${
+                          methods[method] === "JsonWebKey2020"
+                            ? "btn-primary"
+                            : ""
+                        }`}
+                        onClick={() => {
+                          setMethods({
+                            ...methods,
+                            [method]: "JsonWebKey2020",
+                          });
+                        }}
+                      >
+                        JWK
+                      </button>
+                    </div>
+                    <div>
+                      <button
+                        className={`btn btn-xs ${
+                          methods[method] === "Reference" ? "btn-primary" : ""
+                        }`}
+                        onClick={() => {
+                          setMethods({
+                            ...methods,
+                            [method]: "Reference",
+                          });
+                        }}
+                      >
+                        Reference
+                      </button>
+                    </div>
+                    <div>
+                      <button
+                        className={`btn btn-xs ${
+                          !methods[method] ? "btn-primary" : "btn-outline"
+                        }`}
+                        onClick={() => {
+                          setMethods({
+                            ...methods,
+                            [method]: undefined,
+                          });
+                        }}
+                      >
+                        Not used
+                      </button>
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           </div>
         </div>
         <label
-          htmlFor={material ? material.id : "newVerificationMaterial"}
+          htmlFor={htmlId}
           className="btn btn-info btn-outline btn-block"
           onClick={async () => {
             let newVerificationMethod: LogicVM;
@@ -175,28 +221,19 @@ export default function VerificationMaterial({
                 id: didDocument.verificationMethods[
                   selectedVerificationMethodType
                 ].id,
-                controller,
-                fresh: true,
-                usage: {
-                  ...methods.reduce((a, v) => ({ ...a, [v]: "Reference" }), {}),
-                },
-              };
+                usage: {},
+              } as ReferenceVM; // ACTUALLY MAKE SO THIS CAN ONLY REFERENCE EMBEDDED
             } else {
               newVerificationMethod = {
-                ...(await newVerificationMaterial(id)),
+                ...(await didDocument.newVerificationMaterial()),
                 id, /////////////// FIXMEEEEE
                 controller,
-                usage: {
-                  ...methods.reduce(
-                    (a, v) => ({ ...a, [v]: "JsonWebKey2020" }),
-                    {}
-                  ),
-                },
+                usage: methods,
               };
             }
             save(newVerificationMethod);
             setSelectedVerificationMethodType(null);
-            setMethods(["verificationMethod"]);
+            setMethods({});
           }}
         >
           {material ? "Save" : "Add"}

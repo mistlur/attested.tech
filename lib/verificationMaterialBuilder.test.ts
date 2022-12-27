@@ -1,5 +1,5 @@
 import '@testing-library/jest-dom'
-import { decodeVerificationMethod, didDocumentDeserializer, didDocumentSerializer, EmbeddedMaterial, encodeVerificationMethod, LogicDocument, LogicVM, Representation } from './verificationMaterialBuilder'
+import { decodeVerificationMethod, DidDocument, didDocumentDeserializer, EmbeddedMaterial, EmbeddedVM, isEmbeddedVm, LogicDocument, LogicVM } from './verificationMaterialBuilder'
 
 describe('Deserialize Verification Method', () => {
     it('handles P-256 JWK method', () => {
@@ -16,10 +16,10 @@ describe('Deserialize Verification Method', () => {
         }
         const deserializedVerificationMethod = decodeVerificationMethod(verificationMethod, 'verificationMethod')
         expect(deserializedVerificationMethod.id).toBe('did:example:123#key-4')
-        const assertKeyTypeVm = deserializedVerificationMethod.curve !== undefined
+        const assertKeyTypeVm = isEmbeddedVm(deserializedVerificationMethod)
         expect(assertKeyTypeVm).toBeTruthy()
-        expect((deserializedVerificationMethod).curve).toBe('p256')
-        expect((deserializedVerificationMethod).keyMaterial!.length).toBe(65)
+        expect((deserializedVerificationMethod as EmbeddedVM).curve).toBe('P-256')
+        expect((deserializedVerificationMethod as EmbeddedVM).keyMaterial!.length).toBe(65)
         expect((deserializedVerificationMethod).usage).toStrictEqual({ 'verificationMethod': 'JsonWebKey2020' })
     })
 
@@ -33,17 +33,17 @@ describe('Deserialize Verification Method', () => {
 
         const deserializedVerificationMethod = decodeVerificationMethod(verificationMethod, 'verificationMethod')
         expect(deserializedVerificationMethod.id).toBe('did:example:123#key-4')
-        const assertKeyTypeVm = deserializedVerificationMethod.curve !== undefined
+        const assertKeyTypeVm = isEmbeddedVm(deserializedVerificationMethod)
         expect(assertKeyTypeVm).toBeTruthy()
-        expect((deserializedVerificationMethod).curve).toBe('p256')
-        expect((deserializedVerificationMethod).keyMaterial!.length).toBe(65)
+        expect((deserializedVerificationMethod as EmbeddedVM).curve).toBe('P-256')
+        expect((deserializedVerificationMethod as EmbeddedVM).keyMaterial!.length).toBe(65)
         expect((deserializedVerificationMethod).usage).toStrictEqual({ 'verificationMethod': 'Multibase' })
     })
 
     it('handles Reference method', () => {
         const verificationMethod = "did:example:123456789abcdefghi#keys-1"
         const deserializedVerificationMethod = decodeVerificationMethod(verificationMethod, 'verificationMethod')
-        const assertKeyTypeVm = deserializedVerificationMethod.curve !== undefined
+        const assertKeyTypeVm = isEmbeddedVm(deserializedVerificationMethod)
         expect(assertKeyTypeVm).toBeFalsy()
         expect(deserializedVerificationMethod.id).toBe(verificationMethod)
         expect((deserializedVerificationMethod).usage).toStrictEqual({ 'verificationMethod': 'Reference' })
@@ -197,12 +197,11 @@ describe('Deserialize DID Document', () => {
 
 describe('Serialize Verification Method', () => {
 
-    const validVerificationMethodP256: LogicVM = {
+    const validVerificationMethodP256: EmbeddedVM = {
         id: 'did:example:123#456',
-        curve: 'p256',
+        curve: 'P-256',
         controller: 'did:example:123',
         usage: {},
-        fresh: false,
         keyMaterial: new Uint8Array([
             4, 187, 178, 167, 157, 147, 183, 193, 156, 252, 156,
             128, 185, 164, 120, 150, 130, 195, 151, 149, 21, 35,
@@ -214,7 +213,7 @@ describe('Serialize Verification Method', () => {
     }
 
     const embeddedTestCases: {
-        deserializedVerificationMethod: LogicVM,
+        deserializedVerificationMethod: EmbeddedVM,
         representation: EmbeddedMaterial,
         expected: any
     }[] = [
@@ -246,7 +245,7 @@ describe('Serialize Verification Method', () => {
         ]
 
     const calculatedIds: Record<string, Record<EmbeddedMaterial, string>> = {
-        p256: {
+        ['P-256']: {
             Multibase: 'did:example:123#zDnaevHyfCfHYFyscLiRMYacaoXFqnA6gSDwgJXoZia5hNM9J',
             JsonWebKey2020: 'did:example:123#71DzuEySoYKSDysvn4QZM_w6uFcKs5gGexvV80H6aEQ'
         }
@@ -254,17 +253,19 @@ describe('Serialize Verification Method', () => {
 
     embeddedTestCases.forEach((testCase) => {
         it(`handles ${testCase.deserializedVerificationMethod.curve} representation as ${testCase.representation}`, () => {
-            const serialized = encodeVerificationMethod(validVerificationMethodP256, testCase.representation)
+            const didDocument = new DidDocument('did:example:123', 'did:example:123', [])
+            const serialized = didDocument.serializeVerificationMethod(testCase.deserializedVerificationMethod, testCase.representation)
             expect(serialized).toStrictEqual(testCase.expected)
         })
 
         it(`handles calculates the id for ${testCase.deserializedVerificationMethod.curve} represented as ${testCase.representation}`, () => {
+            const didDocument = new DidDocument('did:example:123', 'did:example:123', [])
             const freshMethod = {
-                ...validVerificationMethodP256,
-                fresh: true,
-                id: 'did:example:123'
+                ...testCase.deserializedVerificationMethod,
+                id: undefined
             }
-            const serialized = encodeVerificationMethod(freshMethod, testCase.representation)
+            const serialized = didDocument.serializeVerificationMethod(freshMethod, testCase.representation)
+            console.log(serialized)
             // @ts-ignore
             expect(serialized.id).toBe(calculatedIds[testCase.deserializedVerificationMethod.curve!][testCase.representation])
         })
@@ -273,12 +274,11 @@ describe('Serialize Verification Method', () => {
 
 describe('Serialize DID Document', () => {
 
-    const validVerificationMethodP256: LogicVM[] = [{
+    const validVerificationMethodP256: EmbeddedVM[] = [{
         id: 'did:example:123#456',
-        curve: 'p256',
+        curve: 'P-256',
         controller: 'did:example:123',
         usage: { verificationMethod: 'Multibase', assertionMethod: 'Reference' },
-        fresh: false,
         keyMaterial: new Uint8Array([
             4, 187, 178, 167, 157, 147, 183, 193, 156, 252, 156,
             128, 185, 164, 120, 150, 130, 195, 151, 149, 21, 35,
@@ -290,8 +290,7 @@ describe('Serialize DID Document', () => {
     },
     {
         id: 'did:example:123#678',
-        curve: 'p256',
-        fresh: false,
+        curve: 'P-256',
         controller: 'did:example:123',
         keyMaterial: new Uint8Array([
             4, 74, 75, 165, 56, 77, 105, 2, 249, 70, 40,
@@ -304,7 +303,7 @@ describe('Serialize DID Document', () => {
         usage: { authentication: 'JsonWebKey2020' }
     }]
 
-    const validDidDocument: LogicDocument = {
+    const validDidDocument = {
         id: 'did:example:123',
         controller: 'did:example:123',
         verificationMethods: validVerificationMethodP256
@@ -352,78 +351,79 @@ describe('Serialize DID Document', () => {
 
     validTestCases.forEach((testCase) => {
         it(`handles DID Document`, () => {
-            const serialized = didDocumentSerializer(testCase.deserializedDocument)
+            const document = new DidDocument(testCase.deserializedDocument.id, testCase.deserializedDocument.controller, testCase.deserializedDocument.verificationMethods)
+            const serialized = document.serialize()
             expect(serialized).toStrictEqual(testCase.expected)
         })
     })
 })
 
 describe('DID tests suite', () => {
-    it('apa', () => {
-        const validVerificationMethodP256: LogicVM[] = [{
-            id: 'did:example:123#456',
-            curve: 'p256',
-            controller: 'did:example:123',
-            usage: { verificationMethod: 'JsonWebKey2020', assertionMethod: 'Reference' },
-            fresh: false,
-            keyMaterial: new Uint8Array([
-                4, 187, 178, 167, 157, 147, 183, 193, 156, 252, 156,
-                128, 185, 164, 120, 150, 130, 195, 151, 149, 21, 35,
-                210, 41, 229, 18, 128, 44, 184, 157, 228, 71, 185,
-                108, 4, 123, 156, 39, 141, 49, 199, 151, 226, 123,
-                29, 225, 122, 177, 76, 38, 1, 247, 166, 27, 20,
-                174, 19, 21, 235, 96, 182, 159, 68, 149, 181
-            ])
-        },
-        {
-            id: 'did:example:123#456',
-            curve: 'p256',
-            fresh: false,
-            controller: 'did:example:123',
-            keyMaterial: new Uint8Array([
-                4, 74, 75, 165, 56, 77, 105, 2, 249, 70, 40,
-                4, 129, 140, 97, 20, 75, 144, 186, 233, 13, 21,
-                114, 102, 28, 149, 201, 161, 227, 240, 123, 159, 252,
-                130, 181, 204, 135, 17, 137, 83, 80, 18, 90, 97,
-                55, 97, 164, 128, 226, 105, 238, 18, 66, 71, 191,
-                155, 191, 253, 130, 177, 85, 239, 47, 209, 245
-            ]),
-            usage: { authentication: 'JsonWebKey2020', verificationMethod: 'Multibase' }
-        }]
+    // it('apa', () => {
+    //     const validVerificationMethodP256: LogicVM[] = [{
+    //         id: 'did:example:123#456',
+    //         curve: 'p256',
+    //         controller: 'did:example:123',
+    //         usage: { verificationMethod: 'JsonWebKey2020', assertionMethod: 'Reference' },
+    //         fresh: false,
+    //         keyMaterial: new Uint8Array([
+    //             4, 187, 178, 167, 157, 147, 183, 193, 156, 252, 156,
+    //             128, 185, 164, 120, 150, 130, 195, 151, 149, 21, 35,
+    //             210, 41, 229, 18, 128, 44, 184, 157, 228, 71, 185,
+    //             108, 4, 123, 156, 39, 141, 49, 199, 151, 226, 123,
+    //             29, 225, 122, 177, 76, 38, 1, 247, 166, 27, 20,
+    //             174, 19, 21, 235, 96, 182, 159, 68, 149, 181
+    //         ])
+    //     },
+    //     {
+    //         id: 'did:example:123#456',
+    //         curve: 'p256',
+    //         fresh: false,
+    //         controller: 'did:example:123',
+    //         keyMaterial: new Uint8Array([
+    //             4, 74, 75, 165, 56, 77, 105, 2, 249, 70, 40,
+    //             4, 129, 140, 97, 20, 75, 144, 186, 233, 13, 21,
+    //             114, 102, 28, 149, 201, 161, 227, 240, 123, 159, 252,
+    //             130, 181, 204, 135, 17, 137, 83, 80, 18, 90, 97,
+    //             55, 97, 164, 128, 226, 105, 238, 18, 66, 71, 191,
+    //             155, 191, 253, 130, 177, 85, 239, 47, 209, 245
+    //         ]),
+    //         usage: { authentication: 'JsonWebKey2020', verificationMethod: 'Multibase' }
+    //     }]
 
-        const validDidDocument: LogicDocument = {
-            id: 'did:example:123',
-            controller: 'did:example:123',
-            verificationMethods: validVerificationMethodP256
-        }
+    //     const validDidDocument: LogicDocument = {
+    //         id: 'did:example:123',
+    //         controller: 'did:example:123',
+    //         verificationMethods: validVerificationMethodP256
+    //     }
 
-        const apa = {
-            "didMethod": "did:web",
-            "implementation": "todo",
-            "implementer": "todo",
-            "supportedContentTypes": [
-                "application/did+json"
-            ],
-            "dids": [
-                validDidDocument.id
-            ],
-            "didParameters": {},
-            [validDidDocument.id]: {
-                "didDocumentDataModel": {
-                    "properties": didDocumentSerializer(validDidDocument)
-                },
-                "application/did+json": {
-                    "didDocumentDataModel": {
-                        "representationSpecificEntries": {}
-                    },
-                    "representation": JSON.stringify(didDocumentSerializer(validDidDocument)),
-                    "didDocumentMetadata": {},
-                    "didResolutionMetadata": {
-                        "contentType": "application/did+json"
-                    }
-                }
-            }
-        }
-        console.log(JSON.stringify(apa))
-    })
+    //     const apa = {
+    //         "didMethod": "did:web",
+    //         "implementation": "todo",
+    //         "implementer": "todo",
+    //         "supportedContentTypes": [
+    //             "application/did+json"
+    //         ],
+    //         "dids": [
+    //             validDidDocument.id
+    //         ],
+    //         "didParameters": {},
+    //         [validDidDocument.id]: {
+    //             "didDocumentDataModel": {
+    //                 "properties": didDocumentSerializer(validDidDocument)
+    //             },
+    //             "application/did+json": {
+    //                 "didDocumentDataModel": {
+    //                     "representationSpecificEntries": {}
+    //                 },
+    //                 "representation": JSON.stringify(didDocumentSerializer(validDidDocument)),
+    //                 "didDocumentMetadata": {},
+    //                 "didResolutionMetadata": {
+    //                     "contentType": "application/did+json"
+    //                 }
+    //             }
+    //         }
+    //     }
+    //     console.log(JSON.stringify(apa))
+    // })
 })

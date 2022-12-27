@@ -1,6 +1,7 @@
 import { useState } from "react";
 import {
   DidDocument,
+  EmbeddedMaterial,
   isEmbeddedVm,
   LogicVM,
   ReferenceVM,
@@ -20,20 +21,22 @@ export default function VerificationMaterial({
   save: (vm: LogicVM) => void;
 }): JSX.Element {
   const initialMethods = material ? material.usage : {};
-  console.log("initialMethods", initialMethods);
+  console.log("Material coming in", material);
+  console.log("diddocument", didDocument);
 
   const [newVerificationMethodType, setNewVerificationMethodType] = useState<
     "key" | "reference"
   >("key");
 
+  const [id, setId] = useState<string>(material?.id || "");
+
   const [controller, setController] = useState<string | undefined>(
     material && isEmbeddedVm(material) ? material.controller : didDocument.id
   );
 
-  const [id, setId] = useState<string>(material?.id || "");
-
-  const [selectedVerificationMethodType, setSelectedVerificationMethodType] =
-    useState<number | null>(null);
+  const [format, setFormat] = useState<EmbeddedMaterial>(
+    material && isEmbeddedVm(material) ? material.format : "JsonWebKey2020"
+  );
 
   const [methods, setMethods] = useState<Usage>(initialMethods);
 
@@ -69,28 +72,7 @@ export default function VerificationMaterial({
             </button>
           </div>
           <div>
-            <div
-              className={`${
-                newVerificationMethodType === "reference" ? "" : "hidden"
-              }`}
-            >
-              <select className="select select-bordered select-lg w-full max-w-xs">
-                {didDocument.verificationMethods.map((vm, index) => (
-                  <option
-                    key={index}
-                    disabled={index === 0}
-                    onClick={() => setSelectedVerificationMethodType(index)}
-                  >
-                    {vm.id}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div
-              className={`${
-                newVerificationMethodType === "reference" ? "hidden" : ""
-              }`}
-            >
+            <div>
               <div className="form-control w-full">
                 <label className="label">
                   <span className="label-text">Id</span>
@@ -114,25 +96,58 @@ export default function VerificationMaterial({
                   }`}
                 />
               </div>
-              <div className="form-control w-full">
-                <label className="label">
-                  <span className="label-text">Controller</span>
-                </label>
-                <input
-                  type="text"
-                  value={controller}
-                  onChange={(e) => setController(e.target.value)}
-                  placeholder="did:web:..."
-                  className="input input-bordered w-full"
-                />
+              <div
+                className={`form-control w-full ${
+                  newVerificationMethodType !== "reference" ? "" : "hidden"
+                }`}
+              >
+                <div className="form-control w-full">
+                  <label className="label">
+                    <span className="label-text">Controller</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={controller}
+                    onChange={(e) => setController(e.target.value)}
+                    placeholder="did:web:..."
+                    className="input input-bordered w-full"
+                  />
+                </div>
+                <div>
+                  <span className="opacity-50">Format</span>
+                  <div className="flex">
+                    <div>
+                      <button
+                        className={`btn btn-xs ${
+                          format === "JsonWebKey2020" ? "btn-primary" : ""
+                        }`}
+                        onClick={() => {
+                          setFormat("JsonWebKey2020");
+                        }}
+                      >
+                        JWK
+                      </button>
+                    </div>
+                    <div>
+                      <button
+                        className={`btn btn-xs ${
+                          format === "Multibase" ? "btn-primary" : ""
+                        }`}
+                        onClick={() => {
+                          setFormat("Multibase");
+                        }}
+                      >
+                        Multibase
+                      </button>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
 
           <div>
-            <span className="opacity-50">
-              Select Verification Relationships
-            </span>
+            <span className="opacity-50">Use in</span>
             <div className="form-control">
               {verificationRelationships.map((method, indexMethod) => {
                 return (
@@ -141,38 +156,28 @@ export default function VerificationMaterial({
                     className="flex justify-between w-full"
                   >
                     <div>
-                      <span className="mr-4">{method}</span>
+                      <span>{method}</span>
+                      <span className="opacity-50"> as</span>
                     </div>
-                    <div>
+                    <div
+                      className={`${
+                        newVerificationMethodType === "reference"
+                          ? "hidden"
+                          : ""
+                      }`}
+                    >
                       <button
                         className={`btn btn-xs ${
-                          methods[method] === "Multibase" ? "btn-primary" : ""
+                          methods[method] === "Embedded" ? "btn-primary" : ""
                         }`}
                         onClick={() => {
                           setMethods({
                             ...methods,
-                            [method]: "Multibase",
+                            [method]: "Embedded",
                           });
                         }}
                       >
-                        Multibase
-                      </button>
-                    </div>
-                    <div>
-                      <button
-                        className={`btn btn-xs ${
-                          methods[method] === "JsonWebKey2020"
-                            ? "btn-primary"
-                            : ""
-                        }`}
-                        onClick={() => {
-                          setMethods({
-                            ...methods,
-                            [method]: "JsonWebKey2020",
-                          });
-                        }}
-                      >
-                        JWK
+                        Embedded
                       </button>
                     </div>
                     <div>
@@ -196,10 +201,8 @@ export default function VerificationMaterial({
                           !methods[method] ? "btn-primary" : "btn-outline"
                         }`}
                         onClick={() => {
-                          setMethods({
-                            ...methods,
-                            [method]: undefined,
-                          });
+                          const { [method]: remove, ...keep } = methods;
+                          setMethods(keep);
                         }}
                       >
                         Not used
@@ -213,27 +216,28 @@ export default function VerificationMaterial({
         </div>
         <label
           htmlFor={htmlId}
-          className="btn btn-info btn-outline btn-block"
+          className="btn btn-info btn-outline btn-block mt-4"
           onClick={async () => {
             let newVerificationMethod: LogicVM;
-            if (selectedVerificationMethodType) {
+            if (newVerificationMethodType === "reference") {
               newVerificationMethod = {
-                id: didDocument.verificationMethods[
-                  selectedVerificationMethodType
-                ].id,
-                usage: {},
-              } as ReferenceVM; // ACTUALLY MAKE SO THIS CAN ONLY REFERENCE EMBEDDED
+                id,
+                usage: { verificationMethod: "Reference" },
+              }; // ACTUALLY MAKE SO THIS CAN ONLY REFERENCE EMBEDDED
             } else {
               newVerificationMethod = {
-                ...(await didDocument.newVerificationMaterial()),
-                id, /////////////// FIXMEEEEE
+                id,
+                format,
+                curve: "P-256",
                 controller,
                 usage: methods,
+                keyMaterial:
+                  material && isEmbeddedVm(material)
+                    ? material.keyMaterial
+                    : (await didDocument.newVerificationMaterial()).keyMaterial,
               };
             }
             save(newVerificationMethod);
-            setSelectedVerificationMethodType(null);
-            setMethods({});
           }}
         >
           {material ? "Save" : "Add"}

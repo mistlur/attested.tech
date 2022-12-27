@@ -88,7 +88,7 @@ export default function DidBuilder({
           </div>
           {/* START Verification method modal */}
           <label htmlFor="newVerificationMaterial" className="btn">
-            Add VerificationMethod
+            Add Verification Method
           </label>
           <input
             type="checkbox"
@@ -123,7 +123,16 @@ export default function DidBuilder({
                 ) : (
                   <></>
                 )}
-                <div className="flex flex-col gap-y-4 bg-base-300 p-4"></div>
+                <div className="flex flex-wrap gap-2">
+                  {Object.keys(vm.usage).map((method, index) => (
+                    <div
+                      className="badge badge-secondary badge-outline"
+                      key={index}
+                    >
+                      {method}
+                    </div>
+                  ))}
+                </div>
                 <label htmlFor={`vm${index}`} className="btn">
                   Edit
                 </label>
@@ -159,16 +168,18 @@ export default function DidBuilder({
               </div>
             ))}
           </div>
+        </div>
+        <div className="w-1/2 p-4">
           <button
-            className="btn btn-block btn-info"
+            className="btn btn-block btn-info mb-4"
             onClick={async () =>
               await updateDidDocumentDAO(id, didDocument.serialize())
             }
           >
             Publish
           </button>
+          {attemptSerialization(didDocument)}
         </div>
-        <div className="w-1/2 p-4">{attemptSerialization(didDocument)}</div>
       </div>
     </>
   );

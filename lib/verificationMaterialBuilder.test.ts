@@ -1,5 +1,5 @@
 import '@testing-library/jest-dom'
-import { decodeVerificationMethod, DidDocument, didDocumentDeserializer, EmbeddedMaterial, EmbeddedVM, isEmbeddedVm, LogicDocument, LogicVM } from './verificationMaterialBuilder'
+import { decodeVerificationMethod, DidDocument, didDocumentDeserializer, EmbeddedMaterial, EmbeddedVM, isEmbeddedVm, LogicDocument, LogicVM, SupportedCurves } from './verificationMaterialBuilder'
 
 describe('Deserialize Verification Method', () => {
     it('handles P-256 JWK method', () => {
@@ -20,7 +20,8 @@ describe('Deserialize Verification Method', () => {
         expect(assertKeyTypeVm).toBeTruthy()
         expect((deserializedVerificationMethod as EmbeddedVM).curve).toBe('P-256')
         expect((deserializedVerificationMethod as EmbeddedVM).keyMaterial!.length).toBe(65)
-        expect((deserializedVerificationMethod).usage).toStrictEqual({ 'verificationMethod': 'JsonWebKey2020' })
+        expect((deserializedVerificationMethod as EmbeddedVM).format).toBe('JsonWebKey2020')
+        expect((deserializedVerificationMethod).usage).toStrictEqual({ 'verificationMethod': 'Embedded' })
     })
 
     it('handles P-256 Multibase method', () => {
@@ -37,7 +38,8 @@ describe('Deserialize Verification Method', () => {
         expect(assertKeyTypeVm).toBeTruthy()
         expect((deserializedVerificationMethod as EmbeddedVM).curve).toBe('P-256')
         expect((deserializedVerificationMethod as EmbeddedVM).keyMaterial!.length).toBe(65)
-        expect((deserializedVerificationMethod).usage).toStrictEqual({ 'verificationMethod': 'Multibase' })
+        expect((deserializedVerificationMethod as EmbeddedVM).format).toBe('Multibase')
+        expect((deserializedVerificationMethod).usage).toStrictEqual({ 'verificationMethod': 'Embedded' })
     })
 
     it('handles Reference method', () => {
@@ -197,9 +199,9 @@ describe('Deserialize DID Document', () => {
 
 describe('Serialize Verification Method', () => {
 
-    const validVerificationMethodP256: EmbeddedVM = {
+    const validVerificationMethodP256 = {
         id: 'did:example:123#456',
-        curve: 'P-256',
+        curve: 'P-256' as SupportedCurves,
         controller: 'did:example:123',
         usage: {},
         keyMaterial: new Uint8Array([
@@ -214,12 +216,10 @@ describe('Serialize Verification Method', () => {
 
     const embeddedTestCases: {
         deserializedVerificationMethod: EmbeddedVM,
-        representation: EmbeddedMaterial,
         expected: any
     }[] = [
             {
-                deserializedVerificationMethod: validVerificationMethodP256,
-                representation: 'Multibase',
+                deserializedVerificationMethod: { ...validVerificationMethodP256, format: 'Multibase' },
                 expected: {
                     id: validVerificationMethodP256.id,
                     controller: 'did:example:123',
@@ -228,8 +228,7 @@ describe('Serialize Verification Method', () => {
                 }
             },
             {
-                deserializedVerificationMethod: validVerificationMethodP256,
-                representation: 'JsonWebKey2020',
+                deserializedVerificationMethod: { ...validVerificationMethodP256, format: 'JsonWebKey2020' },
                 expected: {
                     "id": "did:example:123#456",
                     "type": "JsonWebKey2020",
@@ -252,22 +251,21 @@ describe('Serialize Verification Method', () => {
     }
 
     embeddedTestCases.forEach((testCase) => {
-        it(`handles ${testCase.deserializedVerificationMethod.curve} representation as ${testCase.representation}`, () => {
+        it(`handles ${testCase.deserializedVerificationMethod.curve} representation as ${testCase.deserializedVerificationMethod.format}`, () => {
             const didDocument = new DidDocument('did:example:123', 'did:example:123', [])
-            const serialized = didDocument.serializeVerificationMethod(testCase.deserializedVerificationMethod, testCase.representation)
+            const serialized = didDocument.serializeVerificationMethod(testCase.deserializedVerificationMethod, 'Embedded')
             expect(serialized).toStrictEqual(testCase.expected)
         })
 
-        it(`handles calculates the id for ${testCase.deserializedVerificationMethod.curve} represented as ${testCase.representation}`, () => {
+        it(`handles calculates the id for ${testCase.deserializedVerificationMethod.curve} represented as ${testCase.deserializedVerificationMethod.format}`, () => {
             const didDocument = new DidDocument('did:example:123', 'did:example:123', [])
             const freshMethod = {
                 ...testCase.deserializedVerificationMethod,
                 id: undefined
             }
-            const serialized = didDocument.serializeVerificationMethod(freshMethod, testCase.representation)
-            console.log(serialized)
+            const serialized = didDocument.serializeVerificationMethod(freshMethod, 'Embedded')
             // @ts-ignore
-            expect(serialized.id).toBe(calculatedIds[testCase.deserializedVerificationMethod.curve!][testCase.representation])
+            expect(serialized.id).toBe(calculatedIds[testCase.deserializedVerificationMethod.curve!][testCase.deserializedVerificationMethod.format])
         })
     })
 })
@@ -278,7 +276,8 @@ describe('Serialize DID Document', () => {
         id: 'did:example:123#456',
         curve: 'P-256',
         controller: 'did:example:123',
-        usage: { verificationMethod: 'Multibase', assertionMethod: 'Reference' },
+        format: 'Multibase',
+        usage: { verificationMethod: 'Embedded', assertionMethod: 'Reference' },
         keyMaterial: new Uint8Array([
             4, 187, 178, 167, 157, 147, 183, 193, 156, 252, 156,
             128, 185, 164, 120, 150, 130, 195, 151, 149, 21, 35,
@@ -292,6 +291,7 @@ describe('Serialize DID Document', () => {
         id: 'did:example:123#678',
         curve: 'P-256',
         controller: 'did:example:123',
+        format: 'JsonWebKey2020',
         keyMaterial: new Uint8Array([
             4, 74, 75, 165, 56, 77, 105, 2, 249, 70, 40,
             4, 129, 140, 97, 20, 75, 144, 186, 233, 13, 21,
@@ -300,7 +300,7 @@ describe('Serialize DID Document', () => {
             55, 97, 164, 128, 226, 105, 238, 18, 66, 71, 191,
             155, 191, 253, 130, 177, 85, 239, 47, 209, 245
         ]),
-        usage: { authentication: 'JsonWebKey2020' }
+        usage: { authentication: 'Embedded' }
     }]
 
     const validDidDocument = {

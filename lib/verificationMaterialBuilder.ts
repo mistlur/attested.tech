@@ -23,22 +23,21 @@ export type VerificationRelationship = typeof verificationRelationships[number]
 
 export type SupportedCurves = 'P-256'
 
-export type Usage = { [x in VerificationRelationship]?: Representation }
+export type EmbeddedUsage = { [x in VerificationRelationship]?: Representation }
+export type ReferencedUsage = { [x in VerificationRelationship]?: ReferencedMaterial }
 
 export type EmbeddedVM = {
-    id?: string;
+    id: string;
     controller?: string;
     curve: SupportedCurves;
     keyMaterial: Uint8Array;
     format: EmbeddedMaterial
-    usage: Usage
+    usage: EmbeddedUsage
 }
 
 export type ReferenceVM = {
     id: string,
-    usage: {
-        [x in VerificationRelationship]?: ReferencedMaterial
-    }
+    usage: ReferencedUsage
 }
 
 
@@ -71,6 +70,7 @@ export class DidDocument {
         const keyMaterial = new Uint8Array(await window.crypto.subtle.exportKey('raw', keys.publicKey))
         const curve: SupportedCurves = "P-256"
         return {
+            curve,
             keyMaterial,
         }
     }

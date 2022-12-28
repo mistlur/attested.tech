@@ -6,13 +6,16 @@ import { updateDidDocument as updateDidDocumentDAO } from "../../lib/dao";
 import {
   DidDocument,
   didDocumentDeserializer,
+  EmbeddedVM,
   isEmbeddedVm,
-  LogicVM,
-  verificationRelationships,
+  ReferenceVM,
 } from "../../lib/verificationMaterialBuilder";
 import produce from "immer";
 import { getCompleteDid } from "../../lib/did";
-import VerificationMaterial from "./VerificationMaterial";
+import Embedded from "./EmbeddedMethod";
+import ReferenceMethod from "./ReferenceMethod";
+import DisplayEmbeddedMaterial from "./DisplayEmbeddedMethod";
+import DisplayReferenceMaterial from "./DisplayReferencedMethod";
 
 const attemptSerialization = (didDocument: DidDocument): JSX.Element => {
   let result: string;
@@ -28,13 +31,7 @@ const attemptSerialization = (didDocument: DidDocument): JSX.Element => {
 
   return (
     <div>
-      {validDocument ? (
-        <div className="bg-success text-success-content p-4">✓ Valid</div>
-      ) : (
-        <div className="bg-error text-error-content p-4">
-          <div>Invalid</div>
-        </div>
-      )}
+      <div className="bg-zinc-700 p-4">DID Document</div>
       <div className="bg-zinc-800 text-lime-500">
         <pre className="p-4 text-xs overflow-scroll">{result}</pre>
       </div>
@@ -86,19 +83,20 @@ export default function DidBuilder({
               </li>
             </ul>
           </div>
-          {/* START Verification method modal */}
+
+          {/* START Embedded */}
           <label htmlFor="newVerificationMaterial" className="btn">
-            Add Verification Method
+            Add Embedded Verification Method
           </label>
           <input
             type="checkbox"
             id="newVerificationMaterial"
             className="modal-toggle"
           />
-          <VerificationMaterial
+          <Embedded
             htmlId="newVerificationMaterial"
             didDocument={didDocument}
-            save={(vm: LogicVM) =>
+            save={(vm: EmbeddedVM) =>
               setDidDocument(
                 produce(didDocument, (draft) => {
                   draft.addVerificationMaterial(vm);
@@ -106,67 +104,76 @@ export default function DidBuilder({
               )
             }
           />
-          {/* END Verification method modal */}
+          {/* END Embedded */}
 
-          <div className="flex flex-col gap-y-4">
-            {didDocument.verificationMethods.map((vm, index) => (
-              <div
-                className="bg-base-200 text-xs p-8 gap-y-2 flex flex-col"
-                key={index}
-              >
-                <div className="text-2xl opacity-50">
-                  {isEmbeddedVm(vm) ? vm.curve : "Reference"}
-                </div>
-                <div className="font-mono">{vm.id}</div>
-                {isEmbeddedVm(vm) ? (
-                  <div>Controller: {vm.controller}</div>
-                ) : (
-                  <></>
-                )}
-                <div className="flex flex-wrap gap-2">
-                  {Object.keys(vm.usage).map((method, index) => (
-                    <div
-                      className="badge badge-secondary badge-outline"
-                      key={index}
-                    >
-                      {method}
-                    </div>
-                  ))}
-                </div>
-                <label htmlFor={`vm${index}`} className="btn">
-                  Edit
-                </label>
-                <input
-                  type="checkbox"
-                  id={`vm${index}`}
-                  className="modal-toggle"
-                />
-                <VerificationMaterial
-                  htmlId={`vm${index}`}
+          {/* START Refrence */}
+          <label htmlFor="newReferenceMaterial" className="btn">
+            Add Referenced Verification Method
+          </label>
+          <input
+            type="checkbox"
+            id="newReferenceMaterial"
+            className="modal-toggle"
+          />
+          <ReferenceMethod
+            htmlId="newReferenceMaterial"
+            didDocument={didDocument}
+            save={(vm: ReferenceVM) =>
+              setDidDocument(
+                produce(didDocument, (draft) => {
+                  draft.addVerificationMaterial(vm);
+                })
+              )
+            }
+          />
+          {/* END Reference */}
+
+          <div className="flex flex-col gap-y-4 mt-4">
+            {didDocument.verificationMethods.map((vm, index) =>
+              isEmbeddedVm(vm) ? (
+                <DisplayEmbeddedMaterial
+                  key={index}
                   material={vm}
                   didDocument={didDocument}
-                  save={(vm: LogicVM) =>
+                  index={index}
+                  save={(vm: EmbeddedVM) => {
                     setDidDocument(
                       produce(didDocument, (draft) => {
                         draft.verificationMethods[index] = vm;
                       })
-                    )
-                  }
-                />
-                <button
-                  className="btn btn-outline btn-error mt-4"
-                  onClick={() => {
+                    );
+                  }}
+                  remove={() => {
                     setDidDocument(
                       produce(didDocument, (draft) => {
                         draft.verificationMethods.splice(index, 1);
                       })
                     );
                   }}
-                >
-                  Delete
-                </button>
-              </div>
-            ))}
+                />
+              ) : (
+                <DisplayReferenceMaterial
+                  key={index}
+                  material={vm}
+                  didDocument={didDocument}
+                  index={index}
+                  save={(vm: ReferenceVM) => {
+                    setDidDocument(
+                      produce(didDocument, (draft) => {
+                        draft.verificationMethods[index] = vm;
+                      })
+                    );
+                  }}
+                  remove={() => {
+                    setDidDocument(
+                      produce(didDocument, (draft) => {
+                        draft.verificationMethods.splice(index, 1);
+                      })
+                    );
+                  }}
+                />
+              )
+            )}
           </div>
         </div>
         <div className="w-1/2 p-4">

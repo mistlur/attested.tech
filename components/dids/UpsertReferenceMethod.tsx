@@ -7,7 +7,7 @@ import {
   ReferencedUsage,
 } from "../../lib/verificationMaterialBuilder";
 
-export default function ReferenceMethod({
+export default function UpsertReferenceMethod({
   htmlId,
   material,
   save,

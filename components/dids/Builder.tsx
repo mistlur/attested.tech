@@ -12,10 +12,10 @@ import {
 } from "../../lib/verificationMaterialBuilder";
 import produce from "immer";
 import { getCompleteDid } from "../../lib/did";
-import Embedded from "./EmbeddedMethod";
-import ReferenceMethod from "./ReferenceMethod";
-import DisplayEmbeddedMaterial from "./DisplayEmbeddedMethod";
-import DisplayReferenceMaterial from "./DisplayReferencedMethod";
+import UpsertEmbeddedMethod from "./UpsertEmbeddedMethod";
+import UpsertReferenceMethod from "./UpsertReferenceMethod";
+import SummarizeEmbeddedMaterial from "./SummarizeEmbeddedMethod";
+import SummarizeReferenceMaterial from "./SummarizeReferencedMethod";
 
 const attemptSerialization = (didDocument: DidDocument): JSX.Element => {
   let result: string;
@@ -93,7 +93,7 @@ export default function DidBuilder({
             id="newVerificationMaterial"
             className="modal-toggle"
           />
-          <Embedded
+          <UpsertEmbeddedMethod
             htmlId="newVerificationMaterial"
             didDocument={didDocument}
             save={(vm: EmbeddedVM) =>
@@ -115,7 +115,7 @@ export default function DidBuilder({
             id="newReferenceMaterial"
             className="modal-toggle"
           />
-          <ReferenceMethod
+          <UpsertReferenceMethod
             htmlId="newReferenceMaterial"
             didDocument={didDocument}
             save={(vm: ReferenceVM) =>
@@ -131,7 +131,7 @@ export default function DidBuilder({
           <div className="flex flex-col gap-y-4 mt-4">
             {didDocument.verificationMethods.map((vm, index) =>
               isEmbeddedVm(vm) ? (
-                <DisplayEmbeddedMaterial
+                <SummarizeEmbeddedMaterial
                   key={index}
                   material={vm}
                   didDocument={didDocument}
@@ -152,7 +152,7 @@ export default function DidBuilder({
                   }}
                 />
               ) : (
-                <DisplayReferenceMaterial
+                <SummarizeReferenceMaterial
                   key={index}
                   material={vm}
                   didDocument={didDocument}

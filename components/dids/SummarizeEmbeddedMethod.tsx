@@ -3,9 +3,9 @@ import {
   EmbeddedVM,
   VerificationRelationship,
 } from "../../lib/verificationMaterialBuilder";
-import Embedded from "./EmbeddedMethod";
+import UpsertEmbeddedMethod from "./UpsertEmbeddedMethod";
 
-export default function DisplayEmbeddedMaterial({
+export default function SummarizeEmbeddedMaterial({
   material,
   didDocument,
   index,
@@ -67,7 +67,7 @@ export default function DisplayEmbeddedMaterial({
             id={`embeddedVm${index}`}
             className="modal-toggle"
           />
-          <Embedded
+          <UpsertEmbeddedMethod
             htmlId={`embeddedVm${index}`}
             material={material}
             didDocument={didDocument}

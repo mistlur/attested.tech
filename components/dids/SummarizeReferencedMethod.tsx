@@ -2,9 +2,9 @@ import {
   DidDocument,
   ReferenceVM,
 } from "../../lib/verificationMaterialBuilder";
-import ReferenceMethod from "./ReferenceMethod";
+import UpsertReferenceMethod from "./UpsertReferenceMethod";
 
-export default function DisplayReferenceMaterial({
+export default function SummarizeReferenceMaterial({
   material,
   didDocument,
   index,
@@ -36,7 +36,7 @@ export default function DisplayReferenceMaterial({
           Edit
         </label>
         <input type="checkbox" id={`vm${index}1`} className="modal-toggle" />
-        <ReferenceMethod
+        <UpsertReferenceMethod
           htmlId={`vm${index}1`}
           material={material}
           didDocument={didDocument}

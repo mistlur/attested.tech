@@ -1,4 +1,6 @@
+import { ec as EC } from "elliptic";
 import { useState } from "react";
+import { publicKeyJwkSchema } from "../../lib/didParser";
 import {
   DidDocument,
   EmbeddedMaterial,
@@ -6,6 +8,8 @@ import {
   EmbeddedUsage,
   verificationRelationships,
   deriveIdentificationFragment,
+  exportPrivateKey,
+  decodeP256Jwk,
 } from "../../lib/verificationMaterialBuilder";
 
 export default function Embedded({
@@ -20,11 +24,15 @@ export default function Embedded({
   save: (vm: EmbeddedVM) => void;
 }): JSX.Element {
   const initialMethods = material ? material.usage : {};
-
   const [id, setId] = useState<string>(material?.id || "");
-
   const [controller, setController] = useState<string | undefined>(
     material ? material.controller : didDocument.id
+  );
+
+  const [privateKey, setPrivateKey] = useState<string | undefined>();
+
+  const [keyMaterial, setKeyMaterial] = useState<Uint8Array | undefined>(
+    material ? material.keyMaterial : undefined
   );
 
   const [format, setFormat] = useState<EmbeddedMaterial>(
@@ -45,6 +53,44 @@ export default function Embedded({
         <h3 className="text-lg font-bold">
           {material ? "Edit Material" : "Add Verification Method"}
         </h3>
+
+        {privateKey ? (
+          <div>
+            <textarea
+              className="textarea textarea-ghost w-full h-36 bg-base-200 font-mono text-xs"
+              value={privateKey}
+              readOnly
+            />
+          </div>
+        ) : (
+          <div>
+            <textarea
+              className="textarea w-full h-36 font-mono text-xs"
+              placeholder={`{\n  "crv": "P-256",\n  "kty": "EC",\n  "x": "UdxQ_c44q5-W6ro8-qoPz1RNXKiZiafcF-4DUZ3lne4",\n  "y": "Dp0wHEr4YWPymU1e17UOL7WSZbYStsWP-VspiiG-Bqc"\n}`}
+              onChange={(e) => {
+                try {
+                  const parsedJson = JSON.parse(e.target.value);
+                  const parsedSchema = publicKeyJwkSchema.parse(parsedJson);
+                  const decoded = decodeP256Jwk(parsedSchema);
+                  setKeyMaterial(decoded);
+                } catch (e) {}
+              }}
+            />
+          </div>
+        )}
+        <button
+          className="btn btn-block"
+          onClick={() => {
+            const ec = new EC("p256");
+            const keypair = ec.genKeyPair();
+            setPrivateKey(JSON.stringify(exportPrivateKey(keypair), null, 2));
+            setKeyMaterial(
+              new Uint8Array(keypair.getPublic().encode("array", false))
+            );
+          }}
+        >
+          Generate key
+        </button>
         <div className="flex flex-col gap-y-8">
           <div>
             <div>
@@ -179,23 +225,25 @@ export default function Embedded({
           htmlFor={htmlId}
           className="btn btn-info btn-outline btn-block mt-4"
           onClick={async () => {
-            const keyMaterial = material
-              ? material.keyMaterial
+            const km = keyMaterial
+              ? keyMaterial
               : (await didDocument.newVerificationMaterial()).keyMaterial;
             const newVerificationMethod: EmbeddedVM = {
               id: id
                 ? id
                 : `${didDocument.id}#${deriveIdentificationFragment(
                     format,
-                    keyMaterial
+                    km
                   )}`,
               format,
               curve: "P-256",
               controller,
               usage: methods,
-              keyMaterial,
+              keyMaterial: km,
             };
             save(newVerificationMethod);
+            setPrivateKey(undefined);
+            setKeyMaterial(undefined);
           }}
         >
           {material ? "Save" : "Add"}

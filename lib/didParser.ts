@@ -14,13 +14,6 @@ export const publicKeyJwkSchema = z.object({
     y: z.string().optional(),
 })
 
-// export const jwk2020 = z.object({
-//     id: z.string(),
-//     type: z.literal('JsonWebKey2020'),
-//     controller: z.string().optional(),
-//     publicKeyJwk: publicKeyJwkSchema.optional(),
-// })
-
 export const verificationMethodSchema = z.object({
     id: z.string(),
     type: z.string(),

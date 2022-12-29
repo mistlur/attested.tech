@@ -1,5 +1,9 @@
 import '@testing-library/jest-dom'
 import { decodeVerificationMethod, DidDocument, didDocumentDeserializer, EmbeddedMaterial, EmbeddedVM, isEmbeddedVm, LogicDocument, LogicVM, SupportedCurves } from './verificationMaterialBuilder'
+import * as b58 from 'multiformats/bases/base58'
+import * as b64 from 'multiformats/bases/base64'
+import { ec as EC } from 'elliptic'
+import * as crypto from 'crypto'
 
 describe('Deserialize Verification Method', () => {
     it('handles P-256 JWK method', () => {

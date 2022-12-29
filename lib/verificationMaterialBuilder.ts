@@ -6,10 +6,6 @@ import { ec as EC } from 'elliptic'
 import { jwkThumbprintByEncoding } from 'jwk-thumbprint';
 import { immerable } from 'immer';
 
-export type Representation = "Embedded" | ReferencedMaterial
-export type EmbeddedMaterial = 'JsonWebKey2020' | 'Multibase'
-export type ReferencedMaterial = 'Reference'
-
 export const verificationRelationships = [
     "verificationMethod",
     "authentication",
@@ -19,10 +15,11 @@ export const verificationRelationships = [
     "capabilityDelegation"
 ] as const
 
+export type EmbeddedMaterial = 'JsonWebKey2020' | 'Multibase'
+export type ReferencedMaterial = 'Reference'
+export type Representation = "Embedded" | ReferencedMaterial
 export type VerificationRelationship = typeof verificationRelationships[number]
-
 export type SupportedCurves = 'P-256'
-
 export type EmbeddedUsage = { [x in VerificationRelationship]?: Representation }
 export type ReferencedUsage = { [x in VerificationRelationship]?: ReferencedMaterial }
 
@@ -143,6 +140,7 @@ export class DidDocument {
     }
 }
 
+// DEPRECATED
 const generateKey = async () => {
     return await window.crypto.subtle.generateKey(
         {
@@ -172,6 +170,23 @@ function encodeMultibaseKey(rawKeyMaterial: Uint8Array): string {
     return multibase.toString()
 }
 
+export function exportPrivateKey(keypair: EC.KeyPair): JsonWebKey {
+    const dBytes = new Uint8Array(keypair.getPrivate().toArray())
+    const xBytes = new Uint8Array(keypair.getPublic().getX().toArray())
+    const yBytes = new Uint8Array(keypair.getPublic().getY().toArray())
+    const d = b64.base64url.baseEncode(dBytes)
+    const x = b64.base64url.baseEncode(xBytes)
+    const y = b64.base64url.baseEncode(yBytes)
+
+    return {
+        crv: "P-256",
+        d,
+        kty: "EC",
+        x,
+        y,
+    }
+}
+
 function encodeJsonWebKey(rawKeyMaterial: Uint8Array): JsonWebKey {
     const ec = new EC('p256')
     const keypair = ec.keyFromPublic(rawKeyMaterial)
@@ -186,6 +201,16 @@ function encodeJsonWebKey(rawKeyMaterial: Uint8Array): JsonWebKey {
         x,
         y,
     }
+}
+
+export function decodeP256Jwk(key: JsonWebKey): Uint8Array {
+    const ec = new EC('p256')
+    const POINT_COMPRESSION = 0x04
+    if (!key.x || !key.y) throw new Error('Invalid key')
+    const x = b64.base64url.baseDecode(key.x)
+    const y = b64.base64url.baseDecode(key.y)
+    const keypair = ec.keyFromPublic([POINT_COMPRESSION, ...x, ...y])
+    return new Uint8Array(keypair.getPublic(false, 'array'))
 }
 
 export const decodeVerificationMethod = (verificationMethod: z.infer<typeof verificationMethodSchema>, method: VerificationRelationship): LogicVM => {
@@ -208,13 +233,8 @@ export const decodeVerificationMethod = (verificationMethod: z.infer<typeof veri
         if (verificationMethod.type === 'JsonWebKey2020') {
             format = 'JsonWebKey2020'
             // Set point compression to uncompressed as we are dealing with x and y in JWK
-            const POINT_COMPRESSION = 0x04
             if (!verificationMethod.publicKeyJwk) throw new Error('Invalid type: "JsonWebKey2020" must contain "publicKeyJwk"')
-            if (!verificationMethod.publicKeyJwk.x || !verificationMethod.publicKeyJwk.y) throw new Error('Invalid key') // TODO: better error handling
-            const x = b64.base64url.baseDecode(verificationMethod.publicKeyJwk.x)
-            const y = b64.base64url.baseDecode(verificationMethod.publicKeyJwk.y)
-            const keypair = ec.keyFromPublic([POINT_COMPRESSION, ...x, ...y])
-            keyMaterial = new Uint8Array(keypair.getPublic(false, 'array'))
+            keyMaterial = decodeP256Jwk(verificationMethod.publicKeyJwk)
         }
         else if (verificationMethod.type === 'P256Key2021') {
             format = 'Multibase'

@@ -3,18 +3,43 @@ import { useState } from "react";
 import { publicKeyJwkSchema } from "../../lib/didParser";
 import {
   decodeP256Jwk,
+  deriveIdentificationFragment,
+  DidDocument,
+  EmbeddedVM,
   exportPrivateKey,
 } from "../../lib/verificationMaterialBuilder";
 
 export default function NewKeyMaterial({
-  saveKeyMaterial,
+  didDocument,
+  setMethod,
 }: {
-  saveKeyMaterial: (km: Uint8Array) => void;
+  didDocument: DidDocument;
+  setMethod: (km: EmbeddedVM) => void;
 }): JSX.Element {
   const [isGeneratedKey, setIsGeneratedKey] = useState<boolean>(true);
   const [importedKeyValidationStatus, setImportedKeyValidationStatus] =
     useState<string | undefined>(undefined);
   const [privateKey, setPrivateKey] = useState<string>("");
+  const [keyMaterial, setKeyMaterial] = useState<Uint8Array | undefined>(
+    undefined
+  );
+
+  function completeSetup() {
+    if (!keyMaterial) throw Error("KeyMaterial is undefined");
+    const format = "JsonWebKey2020";
+    const material: EmbeddedVM = {
+      id: `${didDocument.id}#${deriveIdentificationFragment(
+        format,
+        keyMaterial
+      )}`,
+      controller: didDocument.id,
+      format,
+      curve: "P-256",
+      usage: {},
+      keyMaterial,
+    };
+    setMethod(material);
+  }
 
   return (
     <div className="mb-8">
@@ -38,6 +63,20 @@ export default function NewKeyMaterial({
       </div>
       {isGeneratedKey ? (
         <div>
+          <button
+            className="btn btn-block mb-4 mt-8"
+            onClick={() => {
+              const ec = new EC("p256");
+              const keypair = ec.genKeyPair();
+              const pk = JSON.stringify(exportPrivateKey(keypair), null, 2);
+              setPrivateKey(pk);
+              setKeyMaterial(
+                new Uint8Array(keypair.getPublic().encode("array", false))
+              );
+            }}
+          >
+            {privateKey === "" ? "Generate new key" : "Regenerate key"}
+          </button>
           <div className={`${privateKey === "" ? "hidden" : ""}`}>
             <div className="w-full bg-base-300 font-mono text-xs flex justify-between">
               <pre className="p-4">{privateKey}</pre>
@@ -61,20 +100,6 @@ export default function NewKeyMaterial({
               Save this key. You will not be able to retrieve it later
             </div>
           </div>
-          <button
-            className="btn btn-block mt-4"
-            onClick={() => {
-              const ec = new EC("p256");
-              const keypair = ec.genKeyPair();
-              const pk = JSON.stringify(exportPrivateKey(keypair), null, 2);
-              setPrivateKey(pk);
-              saveKeyMaterial(
-                new Uint8Array(keypair.getPublic().encode("array", false))
-              );
-            }}
-          >
-            {privateKey === "" ? "Generate new key" : "Regenerate key"}
-          </button>
         </div>
       ) : (
         <div className="form-control">
@@ -114,7 +139,7 @@ export default function NewKeyMaterial({
                 const parsedSchema = publicKeyJwkSchema.parse(parsedJson);
                 const decoded = decodeP256Jwk(parsedSchema);
                 setImportedKeyValidationStatus("Valid");
-                saveKeyMaterial(decoded);
+                setKeyMaterial(decoded);
               } catch (e) {
                 setImportedKeyValidationStatus("Invalid key or key format");
               }
@@ -122,6 +147,16 @@ export default function NewKeyMaterial({
           />
         </div>
       )}
+      <button
+        className={`btn btn-block mt-4 btn-success ${
+          !keyMaterial ? "btn-disabled" : ""
+        }`}
+        onClick={() => {
+          completeSetup();
+        }}
+      >
+        Done, configure method
+      </button>
     </div>
   );
 }

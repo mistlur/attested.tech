@@ -12,11 +12,12 @@ import {
 } from "../../lib/verificationMaterialBuilder";
 import produce from "immer";
 import { getCompleteDid } from "../../lib/did";
-import NewMethod from "./Embedded/NewMethod";
-import UpsertReferenceMethod from "./UpsertReferenceMethod";
-import SummarizeEmbeddedMaterial from "./SummarizeEmbeddedMethod";
-import SummarizeReferenceMaterial from "./SummarizeReferencedMethod";
-import EditMethod from "./Embedded/EditMethod";
+import NewEmbeddedMethod from "./Embedded/NewMethod";
+import SummarizeEmbeddedMethod from "./Embedded/Summarize";
+import EditEmbeddedMethod from "./Embedded/EditMethod";
+import NewReferenceMethod from "./Referenced/NewMethod";
+import SummarizeReferenceMethod from "./Referenced/Summarize";
+import EditReferenceMethod from "./Referenced/EditMethod";
 
 const attemptSerialization = (didDocument: DidDocument): JSX.Element => {
   let result: string;
@@ -53,8 +54,11 @@ export default function DidBuilder({
     didDocumentDeserializer(documentSchema.parse(document))
   );
 
-  const [showNewMethodModal, setShowNewMethodModal] = useState<boolean>(false);
-  const [showEditModal, setShowEditModal] = useState<boolean>(false);
+  const [showNewEmbeddedMethodModal, setShowNewEmbeddedMethodModal] =
+    useState<boolean>(false);
+  const [showNewReferenceMethodModal, setShowNewReferenceMethodModal] =
+    useState<boolean>(false);
+  const [showEditModal, setShowEditModal] = useState<string | null>(null);
 
   return (
     <>
@@ -96,13 +100,13 @@ export default function DidBuilder({
             type="checkbox"
             id="newVerificationMaterial"
             className="modal-toggle"
-            checked={showNewMethodModal}
+            checked={showNewEmbeddedMethodModal}
             onChange={() => {
-              setShowNewMethodModal(!showNewMethodModal);
+              setShowNewEmbeddedMethodModal(!showNewEmbeddedMethodModal);
             }}
           />
           <div className="modal">
-            {showNewMethodModal && (
+            {showNewEmbeddedMethodModal && (
               <div className="modal-box relative">
                 <label
                   htmlFor="newVerificationMaterial"
@@ -110,13 +114,13 @@ export default function DidBuilder({
                 >
                   ✕
                 </label>
-                <NewMethod
+                <NewEmbeddedMethod
                   htmlId="newVerificationMaterial"
                   didDocument={didDocument}
                   save={(vm: EmbeddedVM) =>
                     setDidDocument(
                       produce(didDocument, (draft) => {
-                        draft.addVerificationMaterial(vm);
+                        draft.addVerificationMethod(vm);
                       })
                     )
                   }
@@ -126,34 +130,50 @@ export default function DidBuilder({
           </div>
           {/* END Embedded */}
 
-          {/* START Refrence */}
-          <label htmlFor="newReferenceMaterial" className="btn">
-            Add Referenced Verification Method
+          {/* START Reference */}
+          <label htmlFor="newReferenceVerificationMaterial" className="btn">
+            Add Reference Verification Method
           </label>
           <input
             type="checkbox"
-            id="newReferenceMaterial"
+            id="newReferenceVerificationMaterial"
             className="modal-toggle"
+            checked={showNewReferenceMethodModal}
+            onChange={() => {
+              setShowNewReferenceMethodModal(!showNewReferenceMethodModal);
+            }}
           />
-          <UpsertReferenceMethod
-            htmlId="newReferenceMaterial"
-            didDocument={didDocument}
-            save={(vm: ReferenceVM) =>
-              setDidDocument(
-                produce(didDocument, (draft) => {
-                  draft.addVerificationMaterial(vm);
-                })
-              )
-            }
-          />
+          <div className="modal">
+            {showNewReferenceMethodModal && (
+              <div className="modal-box relative">
+                <label
+                  htmlFor="newReferenceVerificationMaterial"
+                  className="btn btn-sm btn-circle absolute right-2 top-2"
+                >
+                  ✕
+                </label>
+                <NewReferenceMethod
+                  htmlId="newReferenceVerificationMaterial"
+                  didDocument={didDocument}
+                  save={(vm: ReferenceVM) =>
+                    setDidDocument(
+                      produce(didDocument, (draft) => {
+                        draft.addVerificationMethod(vm);
+                      })
+                    )
+                  }
+                />
+              </div>
+            )}
+          </div>
           {/* END Reference */}
 
           <div className="flex flex-col gap-y-4 mt-4">
             {didDocument.verificationMethods.map((vm, index) =>
               isEmbeddedVm(vm) ? (
                 <div key={index}>
-                  <SummarizeEmbeddedMaterial
-                    material={vm}
+                  <SummarizeEmbeddedMethod
+                    method={vm}
                     didDocument={didDocument}
                     index={index}
                   />
@@ -168,9 +188,11 @@ export default function DidBuilder({
                       type="checkbox"
                       id={`embeddedVm${index}`}
                       className="modal-toggle"
-                      checked={showEditModal}
+                      checked={showEditModal === `embeddedVm${index}`}
                       onChange={() => {
-                        setShowEditModal(!showEditModal);
+                        setShowEditModal(
+                          showEditModal ? null : `embeddedVm${index}`
+                        );
                       }}
                     />
                     <div className="modal">
@@ -182,7 +204,7 @@ export default function DidBuilder({
                           >
                             ✕
                           </label>
-                          <EditMethod
+                          <EditEmbeddedMethod
                             htmlId={`embeddedVm${index}`}
                             method={vm}
                             didDocument={didDocument}
@@ -212,26 +234,69 @@ export default function DidBuilder({
                   </div>
                 </div>
               ) : (
-                <SummarizeReferenceMaterial
-                  key={index}
-                  material={vm}
-                  didDocument={didDocument}
-                  index={index}
-                  save={(vm: ReferenceVM) => {
-                    setDidDocument(
-                      produce(didDocument, (draft) => {
-                        draft.verificationMethods[index] = vm;
-                      })
-                    );
-                  }}
-                  remove={() => {
-                    setDidDocument(
-                      produce(didDocument, (draft) => {
-                        draft.verificationMethods.splice(index, 1);
-                      })
-                    );
-                  }}
-                />
+                <div key={index}>
+                  <SummarizeReferenceMethod
+                    key={index}
+                    method={vm}
+                    didDocument={didDocument}
+                    index={index}
+                  />
+                  <div className="bg-base-200 px-8 pb-8 flex w-full justify-between">
+                    <label
+                      htmlFor={`referenceVm${index}`}
+                      className="btn btn-wide"
+                    >
+                      Edit
+                    </label>
+                    <input
+                      type="checkbox"
+                      id={`referenceVm${index}`}
+                      className="modal-toggle"
+                      checked={showEditModal === `referenceVm${index}`}
+                      onChange={() => {
+                        setShowEditModal(
+                          showEditModal ? null : `referenceVm${index}`
+                        );
+                      }}
+                    />
+                    <div className="modal">
+                      {showEditModal && (
+                        <div className="modal-box relative">
+                          <label
+                            htmlFor={`referenceVm${index}`}
+                            className="btn btn-sm btn-circle absolute right-2 top-2"
+                          >
+                            ✕
+                          </label>
+                          <EditReferenceMethod
+                            htmlId={`referenceVm${index}`}
+                            method={vm}
+                            didDocument={didDocument}
+                            save={(vm: ReferenceVM) => {
+                              setDidDocument(
+                                produce(didDocument, (draft) => {
+                                  draft.verificationMethods[index] = vm;
+                                })
+                              );
+                            }}
+                          />
+                        </div>
+                      )}
+                    </div>
+                    <button
+                      className="btn btn-error btn-outline"
+                      onClick={() => {
+                        setDidDocument(
+                          produce(didDocument, (draft) => {
+                            draft.verificationMethods.splice(index, 1);
+                          })
+                        );
+                      }}
+                    >
+                      Delete
+                    </button>
+                  </div>
+                </div>
               )
             )}
           </div>

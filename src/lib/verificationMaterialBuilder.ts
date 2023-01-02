@@ -15,20 +15,20 @@ export const verificationRelationships = [
     "capabilityDelegation"
 ] as const
 
-export type EmbeddedMaterial = 'JsonWebKey2020' | 'Multibase'
-export type ReferencedMaterial = 'Reference'
-export type Representation = "Embedded" | ReferencedMaterial
+export type EmbeddedMaterialFormat = 'JsonWebKey2020' | 'Multibase'
+export type ReferencedMaterialFormat = 'Reference'
+export type Representation = "Embedded" | ReferencedMaterialFormat
 export type VerificationRelationship = typeof verificationRelationships[number]
 export type SupportedCurves = 'P-256'
 export type EmbeddedUsage = { [x in VerificationRelationship]?: Representation }
-export type ReferencedUsage = { [x in VerificationRelationship]?: ReferencedMaterial }
+export type ReferencedUsage = { [x in VerificationRelationship]?: ReferencedMaterialFormat }
 
 export type EmbeddedVM = {
     id: string;
     controller?: string;
     curve: SupportedCurves;
     keyMaterial: Uint8Array;
-    format: EmbeddedMaterial
+    format: EmbeddedMaterialFormat
     usage: EmbeddedUsage
 }
 
@@ -72,7 +72,7 @@ export class DidDocument {
         }
     }
 
-    addVerificationMaterial(vm: LogicVM) {
+    addVerificationMethod(vm: LogicVM) {
         this.verificationMethods.push(vm)
     }
 
@@ -152,7 +152,7 @@ const generateKey = async () => {
     );
 }
 
-export function deriveIdentificationFragment(format: EmbeddedMaterial, rawKeyMaterial: Uint8Array): string {
+export function deriveIdentificationFragment(format: EmbeddedMaterialFormat, rawKeyMaterial: Uint8Array): string {
     if (format === 'JsonWebKey2020') return jwkThumbprintByEncoding(encodeJsonWebKey(rawKeyMaterial), "SHA-256", 'base64url')!
     else if (format === 'Multibase') return encodeMultibaseKey(rawKeyMaterial)
     else {
@@ -205,6 +205,7 @@ function encodeJsonWebKey(rawKeyMaterial: Uint8Array): JsonWebKey {
 
 export function decodeP256Jwk(key: JsonWebKey): Uint8Array {
     const ec = new EC('p256')
+    // Set point compression to uncompressed as we are dealing with x and y in JWK
     const POINT_COMPRESSION = 0x04
     if (!key.x || !key.y) throw new Error('Invalid key')
     const x = b64.base64url.baseDecode(key.x)
@@ -224,7 +225,7 @@ export const decodeVerificationMethod = (verificationMethod: z.infer<typeof veri
     let keyMaterial
     let curve: SupportedCurves | undefined
     let representation: Representation | undefined
-    let format: EmbeddedMaterial | undefined
+    let format: EmbeddedMaterialFormat | undefined
 
     if (verificationMethod.type) {
         const ec = new EC('p256')
@@ -232,7 +233,6 @@ export const decodeVerificationMethod = (verificationMethod: z.infer<typeof veri
         representation = 'Embedded'
         if (verificationMethod.type === 'JsonWebKey2020') {
             format = 'JsonWebKey2020'
-            // Set point compression to uncompressed as we are dealing with x and y in JWK
             if (!verificationMethod.publicKeyJwk) throw new Error('Invalid type: "JsonWebKey2020" must contain "publicKeyJwk"')
             keyMaterial = decodeP256Jwk(verificationMethod.publicKeyJwk)
         }
@@ -242,7 +242,6 @@ export const decodeVerificationMethod = (verificationMethod: z.infer<typeof veri
             const multibase = b58.base58btc.decode(verificationMethod.publicKeyMultibase)
             // Omitting the first two codec bytes (0x12, 0x00) TODO: This can probably be done better by multicodec...
             const keyBytes = multibase.slice(2)
-            // TODO assert keysize
             const keypair = ec.keyFromPublic(keyBytes)
             keyMaterial = new Uint8Array(keypair.getPublic(false, 'array'))
         } else {

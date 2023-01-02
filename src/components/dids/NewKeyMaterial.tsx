@@ -27,7 +27,7 @@ export default function NewKeyMaterial({
   function completeSetup() {
     if (!keyMaterial) throw Error("KeyMaterial is undefined");
     const format = "JsonWebKey2020";
-    const material: EmbeddedVM = {
+    const method: EmbeddedVM = {
       id: `${didDocument.id}#${deriveIdentificationFragment(
         format,
         keyMaterial
@@ -38,7 +38,7 @@ export default function NewKeyMaterial({
       usage: {},
       keyMaterial,
     };
-    setMethod(material);
+    setMethod(method);
   }
 
   return (

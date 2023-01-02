@@ -1,5 +1,5 @@
 import '@testing-library/jest-dom'
-import { decodeVerificationMethod, DidDocument, didDocumentDeserializer, EmbeddedMaterial, EmbeddedVM, isEmbeddedVm, LogicDocument, LogicVM, SupportedCurves } from './verificationMaterialBuilder'
+import { decodeVerificationMethod, DidDocument, didDocumentDeserializer, EmbeddedMaterialFormat, EmbeddedVM, isEmbeddedVm, LogicDocument, LogicVM, SupportedCurves } from './verificationMaterialBuilder'
 import * as b58 from 'multiformats/bases/base58'
 import * as b64 from 'multiformats/bases/base64'
 import { ec as EC } from 'elliptic'
@@ -247,7 +247,7 @@ describe('Serialize Verification Method', () => {
             }
         ]
 
-    const calculatedIds: Record<string, Record<EmbeddedMaterial, string>> = {
+    const calculatedIds: Record<string, Record<EmbeddedMaterialFormat, string>> = {
         ['P-256']: {
             Multibase: 'did:example:123#zDnaevHyfCfHYFyscLiRMYacaoXFqnA6gSDwgJXoZia5hNM9J',
             JsonWebKey2020: 'did:example:123#71DzuEySoYKSDysvn4QZM_w6uFcKs5gGexvV80H6aEQ'

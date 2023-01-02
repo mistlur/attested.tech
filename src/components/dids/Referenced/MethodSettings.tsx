@@ -1,28 +1,23 @@
 import { useState } from "react";
 import {
   DidDocument,
-  EmbeddedMaterialFormat,
-  EmbeddedVM,
-  EmbeddedUsage,
   verificationRelationships,
-  deriveIdentificationFragment,
+  ReferencedUsage,
+  ReferenceVM,
 } from "../../../lib/verificationMaterialBuilder";
 
-export default function EmbeddedMethodSettings({
+export default function ReferenceMethodSettings({
   htmlId,
   method,
-  didDocument,
   save,
 }: {
   htmlId: string;
-  method: EmbeddedVM;
+  method: ReferenceVM;
   didDocument: DidDocument;
-  save: (vm: EmbeddedVM) => void;
+  save: (vm: ReferenceVM) => void;
 }): JSX.Element {
   const [id, setId] = useState<string>(method.id);
-  const [controller, setController] = useState<string>(method.controller);
-  const [format, setFormat] = useState<EmbeddedMaterialFormat>(method.format);
-  const [methods, setMethods] = useState<EmbeddedUsage>(method.usage);
+  const [methods, setMethods] = useState<ReferencedUsage>(method.usage);
 
   return (
     <div>
@@ -33,9 +28,6 @@ export default function EmbeddedMethodSettings({
               <label className="label">
                 <span className="label-text">Id</span>
                 {/* TODO: Validate DID */}
-                <span className="label-text-alt text-xs">
-                  Leave blank to generate the Id
-                </span>
               </label>
               <input
                 type="text"
@@ -46,48 +38,6 @@ export default function EmbeddedMethodSettings({
                   !id ? "input-error" : ""
                 }`}
               />
-            </div>
-
-            <div className="form-control w-full">
-              <label className="label">
-                <span className="label-text">Controller</span>
-              </label>
-              {/* TODO: Validate DID */}
-              <input
-                type="text"
-                value={controller}
-                onChange={(e) => setController(e.target.value)}
-                placeholder="did:web:..."
-                className="input input-bordered w-full"
-              />
-            </div>
-          </div>
-        </div>
-
-        <div>
-          <span className="opacity-50">Format</span>
-          <div className="flex w-full">
-            <div className="btn-group w-full">
-              <button
-                className={`btn w-1/2 ${
-                  format === "JsonWebKey2020" ? "btn-active " : ""
-                }`}
-                onClick={() => {
-                  setFormat("JsonWebKey2020");
-                }}
-              >
-                JWK
-              </button>
-              <button
-                className={`btn w-1/2 ${
-                  format === "Multibase" ? "btn-active" : ""
-                }`}
-                onClick={() => {
-                  setFormat("Multibase");
-                }}
-              >
-                Multibase
-              </button>
             </div>
           </div>
         </div>
@@ -103,20 +53,6 @@ export default function EmbeddedMethodSettings({
                     <span className="opacity-50"> as</span>
                   </div>
                   <div className="btn-group">
-                    <button
-                      className={`btn btn-xs ${
-                        methods[method] === "Embedded" ? "btn-accent" : ""
-                      }`}
-                      onClick={() => {
-                        setMethods({
-                          ...methods,
-                          [method]: "Embedded",
-                        });
-                      }}
-                    >
-                      Embedded
-                    </button>
-
                     <button
                       className={`btn btn-xs ${
                         methods[method] === "Reference" ? "btn-secondary" : ""
@@ -153,18 +89,9 @@ export default function EmbeddedMethodSettings({
         htmlFor={htmlId}
         className="btn btn-info btn-outline btn-block mt-4"
         onClick={() => {
-          const newVerificationMethod: EmbeddedVM = {
-            id: id
-              ? id
-              : `${didDocument.id}#${deriveIdentificationFragment(
-                  format,
-                  method.keyMaterial
-                )}`,
-            format,
-            curve: "P-256",
-            controller,
+          const newVerificationMethod: ReferenceVM = {
+            id,
             usage: methods,
-            keyMaterial: method.keyMaterial,
           };
           save(newVerificationMethod);
         }}

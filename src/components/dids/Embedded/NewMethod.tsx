@@ -4,9 +4,9 @@ import {
   EmbeddedVM,
 } from "../../../lib/verificationMaterialBuilder";
 import NewKeyMaterial from "../NewKeyMaterial";
-import MethodSettings from "./MethodSettings";
+import EmbeddedMethodSettings from "./MethodSettings";
 
-export default function NewMethod({
+export default function NewEmbeddedMethod({
   htmlId,
   didDocument,
   save,
@@ -25,11 +25,11 @@ export default function NewMethod({
           setMethod={(km: EmbeddedVM) => setMethod(km)}
         />
       ) : (
-        <MethodSettings
+        <EmbeddedMethodSettings
           htmlId={htmlId}
           didDocument={didDocument}
           save={save}
-          material={method}
+          method={method}
         />
       )}
     </>

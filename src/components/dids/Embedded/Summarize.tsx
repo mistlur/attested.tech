@@ -2,30 +2,30 @@ import {
   DidDocument,
   EmbeddedVM,
   VerificationRelationship,
-} from "../../lib/verificationMaterialBuilder";
+} from "../../../lib/verificationMaterialBuilder";
 
-export default function SummarizeEmbeddedMaterial({
-  material,
+export default function SummarizeEmbeddedMethod({
+  method,
   didDocument,
   index,
 }: {
   index: number;
-  material: EmbeddedVM;
+  method: EmbeddedVM;
   didDocument: DidDocument;
 }): JSX.Element {
   return (
     <>
       <div className="bg-base-200 p-8 gap-y-4 flex flex-col" key={index}>
-        <div className="text-2xl opacity-50">{material.curve}</div>
+        <div className="text-2xl opacity-50">{method.curve}</div>
         <div className="text-sm">
           <span className="opacity-75">Id:</span>{" "}
-          <span className="font-mono">{material.id}</span>
+          <span className="font-mono">{method.id}</span>
         </div>
         <div className="text-sm">
           <span className="opacity-75">Controller:</span>{" "}
-          <span className="font-mono">{material.controller}</span>
+          <span className="font-mono">{method.controller}</span>
           {" ("}
-          {material.controller === didDocument.id ? (
+          {method.controller === didDocument.id ? (
             <span className="text-success">DID Subject</span>
           ) : (
             <span className="text-error">External</span>
@@ -33,10 +33,10 @@ export default function SummarizeEmbeddedMaterial({
           {")"}
         </div>
         <div className="flex flex-wrap gap-2 bg-base-300 p-4">
-          {Object.keys(material.usage).map((method, index) => (
+          {Object.keys(method.usage).map((relationship, index) => (
             <div
               className={`badge badge-outline ${
-                material.usage[method as VerificationRelationship] ===
+                method.usage[relationship as VerificationRelationship] ===
                 "Reference"
                   ? "badge-secondary"
                   : "badge-accent"
@@ -45,9 +45,11 @@ export default function SummarizeEmbeddedMaterial({
             >
               <div
                 className="tooltip"
-                data-tip={material.usage[method as VerificationRelationship]}
+                data-tip={
+                  method.usage[relationship as VerificationRelationship]
+                }
               >
-                {method}
+                {relationship}
               </div>
             </div>
           ))}

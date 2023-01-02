@@ -1,28 +1,26 @@
 import {
   DidDocument,
-  EmbeddedVM,
+  ReferenceVM,
 } from "../../../lib/verificationMaterialBuilder";
-import EmbeddedMethodSettings from "./MethodSettings";
+import ReferenceMethodSettings from "./MethodSettings";
 
-export default function EditEmbeddedMethod({
+export default function NewReferenceMethod({
   htmlId,
   didDocument,
-  method,
   save,
 }: {
   htmlId: string;
   didDocument: DidDocument;
-  method: EmbeddedVM;
-  save: (vm: EmbeddedVM) => void;
+  save: (vm: ReferenceVM) => void;
 }): JSX.Element {
   return (
     <>
-      <h3 className="text-lg font-bold">{"Edit"}</h3>
-      <EmbeddedMethodSettings
+      <h3 className="text-lg font-bold">{"New Reference method"}</h3>
+      <ReferenceMethodSettings
         htmlId={htmlId}
         didDocument={didDocument}
         save={save}
-        method={method}
+        method={{ id: "", usage: {} }}
       />
     </>
   );

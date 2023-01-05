@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { documentSchema } from "../../lib/didParser";
 // import { updateDidDocument as updateDidDocumentDAO } from "../../lib/dao";
 import {
@@ -33,8 +33,8 @@ const attemptSerialization = (didDocument: DidDocument): JSX.Element => {
 
   return (
     <div>
-      <div className="bg-zinc-700 p-4">DID Document</div>
-      <div className="bg-zinc-800 text-lime-500">
+      <div className="bg-primary text-primary-content p-4">DID Document</div>
+      <div className="bg-base-200">
         <pre className="p-4 text-xs overflow-scroll">{result}</pre>
       </div>
     </div>
@@ -53,12 +53,26 @@ export default function DidBuilder({
   const [didDocument, setDidDocument] = useState<DidDocument>(
     didDocumentDeserializer(documentSchema.parse(document))
   );
-
   const [showNewEmbeddedMethodModal, setShowNewEmbeddedMethodModal] =
     useState<boolean>(false);
   const [showNewReferenceMethodModal, setShowNewReferenceMethodModal] =
     useState<boolean>(false);
   const [showEditModal, setShowEditModal] = useState<string | null>(null);
+
+  const onKeyup = useCallback((event) => {
+    if (event.key === "Escape") {
+      setShowNewEmbeddedMethodModal(false)
+      setShowNewReferenceMethodModal(false)
+      setShowEditModal(null)
+    }
+  }, [showNewEmbeddedMethodModal, showNewReferenceMethodModal, showEditModal])
+
+  useEffect(() => {
+    if (window) {
+        window.addEventListener('keyup', onKeyup);
+        return () => window.removeEventListener('keyup', onKeyup);
+    }
+  }, []);
 
   return (
     <>
@@ -66,12 +80,12 @@ export default function DidBuilder({
       <div className="flex">
         <div className="w-1/2 p-4">
           <div className="dropdown">
-            <label tabIndex={0} className="btn m-1">
+            <label tabIndex={0} className="btn btn-primary">
               Add DID Controller
             </label>
             <ul
               tabIndex={0}
-              className="dropdown-content menu p-2 shadow bg-base-300 rounded-box w-96"
+              className="dropdown-content menu p-2 shadow bg-primary text-primary-content rounded-box w-96"
             >
               <li
                 onClick={() => {
@@ -93,7 +107,7 @@ export default function DidBuilder({
           </div>
 
           {/* START Embedded */}
-          <label htmlFor="newVerificationMaterial" className="btn">
+          <label htmlFor="newVerificationMaterial" className="btn btn-primary" >
             Add Embedded Verification Method
           </label>
           <input
@@ -131,7 +145,7 @@ export default function DidBuilder({
           {/* END Embedded */}
 
           {/* START Reference */}
-          <label htmlFor="newReferenceVerificationMaterial" className="btn">
+          <label htmlFor="newReferenceVerificationMaterial" className="btn btn-primary" >
             Add Reference Verification Method
           </label>
           <input
@@ -303,10 +317,11 @@ export default function DidBuilder({
         </div>
         <div className="w-1/2 p-4">
           <button
-            className="btn btn-block btn-info mb-4"
+            className="btn btn-block btn-secondary mb-4"
             onClick={async () => Promise.resolve()}
+            // disabled
           >
-            Publish
+            Publish (coming soon)
           </button>
           {attemptSerialization(didDocument)}
         </div>

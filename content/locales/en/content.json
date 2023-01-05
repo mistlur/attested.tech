@@ -6,5 +6,7 @@
   "closeDocsMenu": "Close Documentation Menu",
   "dashboard": "Dashboard",
   "login": "Login",
-  "signUp": "Sign up"
+  "signUp": "Sign up",
+  "didDocument": "DID Document",
+  "didDocumentDescription": "DID Document Playground"
 }

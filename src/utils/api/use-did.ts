@@ -3,6 +3,7 @@ import { useQuery, UseQueryOptions } from "@tanstack/react-query";
 import handleSupabaseErrors from "../handle-supabase-errors";
 import { Database } from "@/types/supabase-types";
 import { useSupabaseClient } from "@supabase/auth-helpers-react";
+import {getInitialDidDocument} from "@/lib/did";
 
 export default function useDid(
   accountId: string,
@@ -26,17 +27,10 @@ export default function useDid(
       const { data: insert, error: insertError } = await supabaseClient
         .from("did_documents")
         .insert({
-          id,
           account_id: accountId,
+          id,
           name: "Initial did",
-          document: {
-            "@context": [
-              "https://www.w3.org/ns/did/v1",
-              "https://w3id.org/security/suites/jws-2020/v1",
-              "https://w3id.org/security/suites/multikey-2021/v1",
-            ],
-            id: `did:web:attested.tech:api:${id}`,
-          },
+          document: getInitialDidDocument(id),
         })
         .select();
 

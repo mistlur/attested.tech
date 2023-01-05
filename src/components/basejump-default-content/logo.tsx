@@ -30,7 +30,7 @@ const Logo = ({ size = "lg", className }: Props) => {
       >
         <ShieldCheckIcon
                          className={cx({
-                           "w-20 h-20 text-red-600": size === "lg",
+                           "w-24 h-24 text-red-600": size === "lg",
                            "w-6 h-6 text-red-600": size === "sm",
                          })}/>
       </div>

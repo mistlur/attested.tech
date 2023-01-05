@@ -5,16 +5,16 @@ import ContentMeta from "@/components/content-pages/content-meta";
 const BasejumpHomepage = () => (
   <div className="max-w-screen-lg mx-auto bg-base-100">
     <ContentMeta
-      title="Basejump - SaaS starter kit for Supabase and NextJS"
-      description="An opinionated short cut for launching Supabase apps using NextJS"
+      title="Attested.tech"
+      description="Playground for decentralized identifiers"
       socialImage={`/api/og?title=Basejump`}
     />
     <div className="pt-8 pb-24 md:pt-36 md:pb-48">
       <Logo size="lg" className="mx-auto" />
       <h2 className="h2 text-center my-2">
-        An opinionated shortcut for launching{" "}
-        <span className="text-accent">Supabase</span> apps with{" "}
-        <span className="text-accent">NextJS</span>
+        Playground for{" "}
+        <span className="text-accent">decentralized identifiers</span> and{" "}
+        <span className="text-accent">verifiable credentials</span>
       </h2>
     </div>
     <div className="grid grid-cols-1 gap-y-8 lg:gap-y-16">

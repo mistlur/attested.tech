@@ -1,6 +1,7 @@
 /* istanbul ignore file */
 import Image from "next/image";
 import cx from "classnames";
+import {ShieldCheckIcon} from "@heroicons/react/outline";
 
 type Props = {
   size: "sm" | "lg";
@@ -27,11 +28,11 @@ const Logo = ({ size = "lg", className }: Props) => {
           "w-14 md:w-auto": size === "sm",
         })}
       >
-        <Image
-          src={"/images/basejump-logo.png"}
-          height={height}
-          width={width}
-        />
+        <ShieldCheckIcon
+                         className={cx({
+                           "w-20 h-20 text-red-600": size === "lg",
+                           "w-6 h-6 text-red-600": size === "sm",
+                         })}/>
       </div>
       <h1
         className={cx("font-black", {
@@ -39,7 +40,7 @@ const Logo = ({ size = "lg", className }: Props) => {
           "text-2xl": size === "sm",
         })}
       >
-        Basejump
+        Attested.tech
       </h1>
     </div>
   );

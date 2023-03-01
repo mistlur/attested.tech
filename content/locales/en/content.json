@@ -8,5 +8,8 @@
   "login": "Login",
   "signUp": "Sign up",
   "didDocument": "DID Document",
-  "didDocumentDescription": "DID Document Playground"
+  "didDocumentDescription": "DID Document Playground",
+  "vc": "VC",
+  "vcDescription": "Verifiable Credential Playground",
+  "vcBody": "Body"
 }

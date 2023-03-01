@@ -14,6 +14,10 @@ export default function useHeaderNavigation() {
     {
       title: t("didDocument"),
       href: "/did-document",
+    },
+    {
+      title: t("vc"),
+      href: "/vc",
     }
   ];
 }

@@ -1,7 +1,5 @@
-import {
-  DidDocument,
-  EmbeddedVM,
-} from "../../../lib/verificationMaterialBuilder";
+import { DidDocument } from "@/lib/DidDocument";
+import { EmbeddedMaterial } from "@/lib/DidMaterial";
 import EmbeddedMethodSettings from "./MethodSettings";
 
 export default function EditEmbeddedMethod({
@@ -12,8 +10,8 @@ export default function EditEmbeddedMethod({
 }: {
   htmlId: string;
   didDocument: DidDocument;
-  method: EmbeddedVM;
-  save: (vm: EmbeddedVM) => void;
+  method: EmbeddedMaterial;
+  save: (vm: EmbeddedMaterial) => void;
 }): JSX.Element {
   return (
     <>

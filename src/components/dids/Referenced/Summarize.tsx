@@ -1,15 +1,13 @@
-import {
-  DidDocument,
-  ReferenceVM,
-  VerificationRelationship,
-} from "../../../lib/verificationMaterialBuilder";
+import { DidDocument } from "@/lib/DidDocument";
+import { ReferencedMaterial } from "@/lib/DidMaterial";
+import { VerificationRelationship } from "@/types/dids";
 
 export default function SummarizeReferenceMethod({
   method,
   index,
 }: {
   index: number;
-  method: ReferenceVM;
+  method: ReferencedMaterial;
   didDocument: DidDocument;
 }): JSX.Element {
   return (
@@ -21,20 +19,19 @@ export default function SummarizeReferenceMethod({
           <span className="font-mono">{method.id}</span>
         </div>
         <div className="flex flex-wrap gap-2 bg-base-300 p-4">
-          {Object.keys(method.usage).map((relationship, index) => (
+          {Object.keys(method.getUsage()).map((relationship, index) => (
             <div
-              className={`badge badge-outline ${
-                method.usage[relationship as VerificationRelationship] ===
+              className={`badge badge-outline ${method.getUsage()[relationship as VerificationRelationship] ===
                 "Reference"
-                  ? "badge-secondary"
-                  : "badge-accent"
-              }`}
+                ? "badge-secondary"
+                : "badge-accent"
+                }`}
               key={index}
             >
               <div
                 className="tooltip"
                 data-tip={
-                  method.usage[relationship as VerificationRelationship]
+                  method.getUsage()[relationship as VerificationRelationship]
                 }
               >
                 {relationship}

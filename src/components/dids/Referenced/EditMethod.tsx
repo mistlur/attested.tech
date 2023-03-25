@@ -1,7 +1,5 @@
-import {
-  DidDocument,
-  ReferenceVM,
-} from "../../../lib/verificationMaterialBuilder";
+import { DidDocument } from "@/lib/DidDocument";
+import { ReferencedMaterial } from "@/lib/DidMaterial";
 import ReferenceMethodSettings from "./MethodSettings";
 
 export default function EditReferenceMethod({
@@ -12,8 +10,8 @@ export default function EditReferenceMethod({
 }: {
   htmlId: string;
   didDocument: DidDocument;
-  method: ReferenceVM;
-  save: (vm: ReferenceVM) => void;
+  method: ReferencedMaterial;
+  save: (vm: ReferencedMaterial) => void;
 }): JSX.Element {
   return (
     <>

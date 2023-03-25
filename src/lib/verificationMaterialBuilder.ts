@@ -1,231 +1,21 @@
 import { z } from 'zod'
-import { documentSchema, verificationMethodSchema, verificationMethodsSchema } from './didParser'
+import { documentSchema, verificationRelationshipSchema, verificationRelationshipsSchema } from './didParser'
 import * as b58 from 'multiformats/bases/base58'
-import * as b64 from 'multiformats/bases/base64'
 import { ec as EC } from 'elliptic'
-import { jwkThumbprintByEncoding } from 'jwk-thumbprint';
-import { immerable } from 'immer';
+import { Representation, SupportedCurves, VerificationRelationship, KeyFormat, verificationRelationships } from '@/types/dids'
+import { DidMaterial, EmbeddedMaterial, isEmbeddedType, ReferencedMaterial } from './DidMaterial'
+import { decodeP256Jwk } from './keys'
+import { DidDocument } from './DidDocument'
 
-export const verificationRelationships = [
-    "verificationMethod",
-    "authentication",
-    "assertionMethod",
-    "keyAgreement",
-    "capabilityInvocation",
-    "capabilityDelegation"
-] as const
-
-export type EmbeddedMaterialFormat = 'JsonWebKey2020' | 'Multibase'
-export type ReferencedMaterialFormat = 'Reference'
-export type Representation = "Embedded" | ReferencedMaterialFormat
-export type VerificationRelationship = typeof verificationRelationships[number]
-export type SupportedCurves = 'P-256'
-export type EmbeddedUsage = { [x in VerificationRelationship]?: Representation }
-export type ReferencedUsage = { [x in VerificationRelationship]?: ReferencedMaterialFormat }
-
-export type EmbeddedVM = {
-    id: string;
-    controller?: string;
-    curve: SupportedCurves;
-    keyMaterial: Uint8Array;
-    format: EmbeddedMaterialFormat
-    usage: EmbeddedUsage
-}
-
-export type ReferenceVM = {
-    id: string,
-    usage: ReferencedUsage
-}
-
-
-export type LogicVM = EmbeddedVM | ReferenceVM
-
-export function isEmbeddedVm(vm: EmbeddedVM | ReferenceVM): vm is EmbeddedVM {
-    return (vm as EmbeddedVM).curve !== undefined;
-}
-
-export type LogicDocument = {
-    id: string,
-    controller: string | undefined,
-    verificationMethods: LogicVM[]
-}
-
-export class DidDocument {
-    [immerable] = true
-    public id: string
-    public controller: string | undefined
-    public verificationMethods: LogicVM[]
-
-    constructor(id: string, controller: string | undefined, verificationMethods: LogicVM[]) {
-        this.id = id
-        this.controller = controller
-        this.verificationMethods = verificationMethods
-    }
-
-    async newVerificationMaterial() {
-        const keys = await generateKey()
-        const keyMaterial = new Uint8Array(await window.crypto.subtle.exportKey('raw', keys.publicKey))
-        const curve: SupportedCurves = "P-256"
-        return {
-            curve,
-            keyMaterial,
-        }
-    }
-
-    addVerificationMethod(vm: LogicVM) {
-        this.verificationMethods.push(vm)
-    }
-
-    getContexts(): string[] {
-        const uniqueRepresentations = [...new Set(this.verificationMethods.filter(vm => isEmbeddedVm(vm) && Object.values(vm.usage).includes('Embedded')).map((vm) => (vm as EmbeddedVM).format))]
-        const representationsUsed = uniqueRepresentations.map(representation => {
-            switch (representation) {
-                case 'JsonWebKey2020': return "https://w3id.org/security/suites/jws-2020/v1"
-                case 'Multibase': return "https://w3id.org/security/suites/multikey-2021/v1"
-                default: return 'Unkown'
-            }
-        })
-        return ["https://www.w3.org/ns/did/v1", ...representationsUsed]
-    }
-
-    getRelationships(relationship: VerificationRelationship): LogicVM[] {
-        return this.verificationMethods.filter(method => method.usage[relationship])
-    }
-
-    serializeVerificationMethod(vm: LogicVM, representation: Representation): z.infer<typeof verificationMethodSchema> {
-        if (isEmbeddedVm(vm)) {
-            if (!vm.controller) throw Error('Malformed verification method: Embedded material must contain controller')
-            const id = !vm.id ? `${this.id}#${deriveIdentificationFragment(vm.format, vm.keyMaterial)}` : vm.id
-            if (representation === 'Reference') {
-                return id
-            }
-            if (vm.format === 'JsonWebKey2020') {
-                return {
-                    id,
-                    type: vm.format,
-                    controller: vm.controller,
-                    publicKeyJwk: encodeJsonWebKey(vm.keyMaterial),
-                }
-            } else if (vm.format === 'Multibase') {
-                return {
-                    id,
-                    type: 'P256Key2021',
-                    controller: vm.controller,
-                    publicKeyMultibase: encodeMultibaseKey(vm.keyMaterial)
-                }
-            } else {
-                throw new Error(`Unable to serialize verification method\n${JSON.stringify(vm)}`)
-            }
-        } else {
-            return vm.id
-        }
-    }
-
-    serializeRelationship(relationships: LogicVM[], relationship: VerificationRelationship): z.infer<typeof verificationMethodsSchema> {
-        return relationships.map(method => this.serializeVerificationMethod(method, method.usage[relationship]!))
-    }
-
-    public serialize(): z.infer<typeof documentSchema> {
-        const relationships: Record<string, any> = {}
-        verificationRelationships.map(relationship => {
-            const existingRelationships = this.getRelationships(relationship)
-            if (existingRelationships.length) relationships[relationship as string] = this.serializeRelationship(existingRelationships, relationship)
-        })
-        return {
-            ['@context']: this.getContexts(),
-            id: this.id,
-            controller: this.controller,
-            ...relationships
-        }
-    }
-}
-
-// DEPRECATED
-const generateKey = async () => {
-    return await window.crypto.subtle.generateKey(
-        {
-            name: "ECDSA",
-            namedCurve: "P-256"
-        },
-        true,
-        ["sign", "verify"]
-    );
-}
-
-export function deriveIdentificationFragment(format: EmbeddedMaterialFormat, rawKeyMaterial: Uint8Array): string {
-    if (format === 'JsonWebKey2020') return jwkThumbprintByEncoding(encodeJsonWebKey(rawKeyMaterial), "SHA-256", 'base64url')!
-    else if (format === 'Multibase') return encodeMultibaseKey(rawKeyMaterial)
-    else {
-        throw new Error('Unsupported keytype')
-    }
-
-}
-
-function encodeMultibaseKey(rawKeyMaterial: Uint8Array): string {
-    const p256codec = [0x80, 0x24]
-    const ec = new EC('p256')
-    const keypair = ec.keyFromPublic(rawKeyMaterial)
-    const keyMaterialCompactForm = keypair.getPublic(true, 'array')
-    const multibase = b58.base58btc.encode(new Uint8Array([...p256codec, ...keyMaterialCompactForm]))
-    return multibase.toString()
-}
-
-export function exportPrivateKey(keypair: EC.KeyPair): JsonWebKey {
-    const dBytes = new Uint8Array(keypair.getPrivate().toArray())
-    const xBytes = new Uint8Array(keypair.getPublic().getX().toArray())
-    const yBytes = new Uint8Array(keypair.getPublic().getY().toArray())
-    const d = b64.base64url.baseEncode(dBytes)
-    const x = b64.base64url.baseEncode(xBytes)
-    const y = b64.base64url.baseEncode(yBytes)
-
-    return {
-        crv: "P-256",
-        d,
-        kty: "EC",
-        x,
-        y,
-    }
-}
-
-function encodeJsonWebKey(rawKeyMaterial: Uint8Array): JsonWebKey {
-    const ec = new EC('p256')
-    const keypair = ec.keyFromPublic(rawKeyMaterial)
-    const xBytes = new Uint8Array(keypair.getPublic().getX().toArray())
-    const yBytes = new Uint8Array(keypair.getPublic().getY().toArray())
-    const x = b64.base64url.baseEncode(xBytes)
-    const y = b64.base64url.baseEncode(yBytes)
-
-    return {
-        crv: "P-256",
-        kty: "EC",
-        x,
-        y,
-    }
-}
-
-export function decodeP256Jwk(key: JsonWebKey): Uint8Array {
-    const ec = new EC('p256')
-    // Set point compression to uncompressed as we are dealing with x and y in JWK
-    const POINT_COMPRESSION = 0x04
-    if (!key.x || !key.y) throw new Error('Invalid key')
-    const x = b64.base64url.baseDecode(key.x)
-    const y = b64.base64url.baseDecode(key.y)
-    const keypair = ec.keyFromPublic([POINT_COMPRESSION, ...x, ...y])
-    return new Uint8Array(keypair.getPublic(false, 'array'))
-}
-
-export const decodeVerificationMethod = (verificationMethod: z.infer<typeof verificationMethodSchema>, method: VerificationRelationship): LogicVM => {
+export const decodeVerificationRelationship = (verificationMethod: z.infer<typeof verificationRelationshipSchema>, method: VerificationRelationship): DidMaterial => {
     if (typeof verificationMethod === "string") {
-        return {
-            id: verificationMethod,
-            usage: { [method]: 'Reference' }
-        }
+        return new ReferencedMaterial(verificationMethod, { usage: { [method]: 'Reference' } })
     }
 
     let keyMaterial
     let curve: SupportedCurves | undefined
     let representation: Representation | undefined
-    let format: EmbeddedMaterialFormat | undefined
+    let format: KeyFormat | undefined
 
     if (verificationMethod.type) {
         const ec = new EC('p256')
@@ -251,44 +41,45 @@ export const decodeVerificationMethod = (verificationMethod: z.infer<typeof veri
 
     if (!keyMaterial || !curve || !representation || !format) throw Error('Invalid key')
 
-    return {
-        id: verificationMethod.id,
-        curve: curve,
-        controller: verificationMethod.controller,
-        keyMaterial,
-        format,
-        usage: { [method]: representation }
-    }
+    return new EmbeddedMaterial(
+        verificationMethod.id,
+        {
+            curve: curve,
+            controller: verificationMethod.controller,
+            keyMaterial,
+            format,
+            usage: { [method]: representation }
+        })
 }
 
 export const didDocumentDeserializer = (document: z.infer<typeof documentSchema>): DidDocument => {
-    const verificationMethods: LogicVM[] = []
+    const incomingDidMaterial: DidMaterial[] = []
+
     verificationRelationships.map(relationship => {
         if (document[relationship]) {
-            document[relationship]!.forEach(vm => verificationMethods.push(decodeVerificationMethod(vm, relationship)))
+            document[relationship]!.forEach(vm => incomingDidMaterial.push(decodeVerificationRelationship(vm, relationship)))
         }
     })
 
-    const denormalized: LogicVM[] = []
-    for (let vm of verificationMethods) {
-        const existingIndex = denormalized.findIndex((t) => t.id === vm.id)
-        const apa = denormalized[existingIndex]
-        if (existingIndex < 0) denormalized.push(vm)
+    const denormalized: DidMaterial[] = []
+    for (let material of incomingDidMaterial) {
+        const existingIndex = denormalized.findIndex((t) => t.id === material.id)
+        const other = denormalized[existingIndex]
+        if (existingIndex < 0) denormalized.push(material)
         else {
-            if (isEmbeddedVm(apa) && isEmbeddedVm(vm)) {
-                if (vm.keyMaterial.toString() !== apa.keyMaterial.toString()) {
-                    denormalized.push(vm)
+            if (isEmbeddedType(other.material) && isEmbeddedType(material.material)) {
+                if (!material.equals(other)) {
+                    denormalized.push(material)
                 } else {
-                    apa.usage = { ...apa.usage, ...vm.usage }
-                    denormalized[existingIndex] = apa
+                    other.setUsage({ ...other.getUsage(), ...material.getUsage() })
+                    denormalized[existingIndex] = other
                 }
             } else {
-                vm.usage = { ...apa.usage, ...vm.usage }
-                denormalized[existingIndex] = vm
+                material.setUsage({ ...other.getUsage(), ...material.getUsage() })
+                denormalized[existingIndex] = material
             }
         }
     }
-
     return new DidDocument(document.id, document.controller, denormalized)
 }
 

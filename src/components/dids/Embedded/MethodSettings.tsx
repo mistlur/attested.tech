@@ -1,28 +1,24 @@
+import { DidDocument } from "@/lib/DidDocument";
+import { EmbeddedMaterial } from "@/lib/DidMaterial";
+import { KeyFormat, Representation, UsageFormat, verificationRelationships } from "@/types/dids";
 import { useState } from "react";
-import {
-  DidDocument,
-  EmbeddedMaterialFormat,
-  EmbeddedVM,
-  EmbeddedUsage,
-  verificationRelationships,
-  deriveIdentificationFragment,
-} from "../../../lib/verificationMaterialBuilder";
+
 
 export default function EmbeddedMethodSettings({
   htmlId,
   method,
-  didDocument,
   save,
 }: {
   htmlId: string;
-  method: EmbeddedVM;
+  method: EmbeddedMaterial;
   didDocument: DidDocument;
-  save: (vm: EmbeddedVM) => void;
+  save: (vm: EmbeddedMaterial) => void;
 }): JSX.Element {
+  const material = method.material.keyMaterial
   const [id, setId] = useState<string>(method.id);
-  const [controller, setController] = useState<string>(method.controller);
-  const [format, setFormat] = useState<EmbeddedMaterialFormat>(method.format);
-  const [methods, setMethods] = useState<EmbeddedUsage>(method.usage);
+  const [controller, setController] = useState<string>(method.material.controller);
+  const [format, setFormat] = useState<KeyFormat>(method.material.format);
+  const [methods, setMethods] = useState<UsageFormat<Representation>>(method.material.usage);
 
   return (
     <div>
@@ -33,18 +29,13 @@ export default function EmbeddedMethodSettings({
               <label className="label">
                 <span className="label-text">Id</span>
                 {/* TODO: Validate DID */}
-                <span className="label-text-alt text-xs">
-                  Leave blank to generate the Id
-                </span>
               </label>
               <input
                 type="text"
                 value={id}
                 onChange={(e) => setId(e.target.value)}
-                placeholder="did:web:..."
-                className={`input input-bordered w-full ${
-                  !id ? "input-error" : ""
-                }`}
+                placeholder="did:web:... (leave blank to use a generated id)"
+                className={`input input-bordered w-full`}
               />
             </div>
 
@@ -69,9 +60,8 @@ export default function EmbeddedMethodSettings({
           <div className="flex w-full">
             <div className="btn-group w-full">
               <button
-                className={`btn w-1/2 ${
-                  format === "JsonWebKey2020" ? "btn-active " : ""
-                }`}
+                className={`btn w-1/2 ${format === "JsonWebKey2020" ? "btn-active " : ""
+                  }`}
                 onClick={() => {
                   setFormat("JsonWebKey2020");
                 }}
@@ -79,9 +69,8 @@ export default function EmbeddedMethodSettings({
                 JWK
               </button>
               <button
-                className={`btn w-1/2 ${
-                  format === "Multibase" ? "btn-active" : ""
-                }`}
+                className={`btn w-1/2 ${format === "Multibase" ? "btn-active" : ""
+                  }`}
                 onClick={() => {
                   setFormat("Multibase");
                 }}
@@ -91,7 +80,6 @@ export default function EmbeddedMethodSettings({
             </div>
           </div>
         </div>
-
         <div>
           <span className="opacity-50">Use in</span>
           <div className="form-control">
@@ -104,9 +92,8 @@ export default function EmbeddedMethodSettings({
                   </div>
                   <div className="btn-group">
                     <button
-                      className={`btn btn-xs ${
-                        methods[method] === "Embedded" ? "btn-accent" : ""
-                      }`}
+                      className={`btn btn-xs ${methods[method] === "Embedded" ? "btn-accent" : ""
+                        }`}
                       onClick={() => {
                         setMethods({
                           ...methods,
@@ -118,9 +105,8 @@ export default function EmbeddedMethodSettings({
                     </button>
 
                     <button
-                      className={`btn btn-xs ${
-                        methods[method] === "Reference" ? "btn-secondary" : ""
-                      }`}
+                      className={`btn btn-xs ${methods[method] === "Reference" ? "btn-secondary" : ""
+                        }`}
                       onClick={() => {
                         setMethods({
                           ...methods,
@@ -132,9 +118,8 @@ export default function EmbeddedMethodSettings({
                     </button>
 
                     <button
-                      className={`btn btn-xs ${
-                        !methods[method] ? "btn-active" : ""
-                      }`}
+                      className={`btn btn-xs ${!methods[method] ? "btn-active" : ""
+                        }`}
                       onClick={() => {
                         const { [method]: remove, ...keep } = methods;
                         setMethods(keep);
@@ -153,19 +138,15 @@ export default function EmbeddedMethodSettings({
         htmlFor={htmlId}
         className="btn btn-info btn-outline btn-block mt-4"
         onClick={() => {
-          const newVerificationMethod: EmbeddedVM = {
-            id: id
-              ? id
-              : `${didDocument.id}#${deriveIdentificationFragment(
-                  format,
-                  method.keyMaterial
-                )}`,
-            format,
-            curve: "P-256",
-            controller,
-            usage: methods,
-            keyMaterial: method.keyMaterial,
-          };
+          const newVerificationMethod: EmbeddedMaterial =
+            new EmbeddedMaterial(id,
+              {
+                format,
+                curve: "P-256",
+                controller,
+                usage: methods,
+                keyMaterial: material,
+              });
           save(newVerificationMethod);
         }}
       >

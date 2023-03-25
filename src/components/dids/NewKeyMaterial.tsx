@@ -1,20 +1,16 @@
+import { DidDocument } from "@/lib/DidDocument";
+import { EmbeddedMaterial } from "@/lib/DidMaterial";
+import { decodeP256Jwk, exportPrivateKey } from "@/lib/keys";
 import { ec as EC } from "elliptic";
 import { useState } from "react";
 import { publicKeyJwkSchema } from "../../lib/didParser";
-import {
-  decodeP256Jwk,
-  deriveIdentificationFragment,
-  DidDocument,
-  EmbeddedVM,
-  exportPrivateKey,
-} from "../../lib/verificationMaterialBuilder";
 
 export default function NewKeyMaterial({
   didDocument,
   setMethod,
 }: {
   didDocument: DidDocument;
-  setMethod: (km: EmbeddedVM) => void;
+  setMethod: (km: EmbeddedMaterial) => void;
 }): JSX.Element {
   const [isGeneratedKey, setIsGeneratedKey] = useState<boolean>(true);
   const [importedKeyValidationStatus, setImportedKeyValidationStatus] =
@@ -27,17 +23,15 @@ export default function NewKeyMaterial({
   function completeSetup() {
     if (!keyMaterial) throw Error("KeyMaterial is undefined");
     const format = "JsonWebKey2020";
-    const method: EmbeddedVM = {
-      id: `${didDocument.id}#${deriveIdentificationFragment(
+    const method: EmbeddedMaterial = new EmbeddedMaterial(
+      undefined,
+      {
+        controller: didDocument.id,
         format,
-        keyMaterial
-      )}`,
-      controller: didDocument.id,
-      format,
-      curve: "P-256",
-      usage: {},
-      keyMaterial,
-    };
+        curve: "P-256",
+        usage: {},
+        keyMaterial,
+      });
     setMethod(method);
   }
 
@@ -108,27 +102,23 @@ export default function NewKeyMaterial({
               Import a JWK formatted P-256 Public Key
             </span>
             <span
-              className={`label-text-alt ${
-                importedKeyValidationStatus === "Valid" ? "text-success" : ""
-              } ${
-                importedKeyValidationStatus &&
-                importedKeyValidationStatus !== "Valid"
+              className={`label-text-alt ${importedKeyValidationStatus === "Valid" ? "text-success" : ""
+                } ${importedKeyValidationStatus &&
+                  importedKeyValidationStatus !== "Valid"
                   ? "text-error"
                   : ""
-              }`}
+                }`}
             >
               {importedKeyValidationStatus}
             </span>
           </label>
           <textarea
-            className={`textarea bg-base-300 textarea-bordered w-full h-36 font-mono text-xs ${
-              importedKeyValidationStatus === "Valid" ? "textarea-success" : ""
-            } ${
-              importedKeyValidationStatus &&
-              importedKeyValidationStatus !== "Valid"
+            className={`textarea bg-base-300 textarea-bordered w-full h-36 font-mono text-xs ${importedKeyValidationStatus === "Valid" ? "textarea-success" : ""
+              } ${importedKeyValidationStatus &&
+                importedKeyValidationStatus !== "Valid"
                 ? "textarea-error"
                 : ""
-            }`}
+              }`}
             onChange={(e) => {
               if (e.target.value === "") {
                 setImportedKeyValidationStatus(undefined);
@@ -148,9 +138,8 @@ export default function NewKeyMaterial({
         </div>
       )}
       <button
-        className={`btn btn-block mt-4 btn-success ${
-          !keyMaterial ? "btn-disabled" : ""
-        }`}
+        className={`btn btn-block mt-4 btn-success ${!keyMaterial ? "btn-disabled" : ""
+          }`}
         onClick={() => {
           completeSetup();
         }}

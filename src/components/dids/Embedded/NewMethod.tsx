@@ -1,8 +1,7 @@
+import { DidDocument } from "@/lib/DidDocument";
+import { EmbeddedMaterial } from "@/lib/DidMaterial";
 import { useState } from "react";
-import {
-  DidDocument,
-  EmbeddedVM,
-} from "../../../lib/verificationMaterialBuilder";
+
 import NewKeyMaterial from "../NewKeyMaterial";
 import EmbeddedMethodSettings from "./MethodSettings";
 
@@ -13,16 +12,16 @@ export default function NewEmbeddedMethod({
 }: {
   htmlId: string;
   didDocument: DidDocument;
-  save: (vm: EmbeddedVM) => void;
+  save: (vm: EmbeddedMaterial) => void;
 }): JSX.Element {
-  const [method, setMethod] = useState<EmbeddedVM | undefined>(undefined);
+  const [method, setMethod] = useState<EmbeddedMaterial | undefined>(undefined);
   return (
     <>
       <h3 className="text-lg font-bold">{"Add Verification Method"}</h3>
       {!method ? (
         <NewKeyMaterial
           didDocument={didDocument}
-          setMethod={(km: EmbeddedVM) => setMethod(km)}
+          setMethod={(km: EmbeddedMaterial) => setMethod(km)}
         />
       ) : (
         <EmbeddedMethodSettings

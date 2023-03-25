@@ -1,5 +1,5 @@
 import '@testing-library/jest-dom'
-import { decodeVerificationMethod, DidDocument, didDocumentDeserializer, EmbeddedMaterialFormat, EmbeddedVM, isEmbeddedVm, LogicDocument, LogicVM, SupportedCurves } from './verificationMaterialBuilder'
+import { decodeVerificationRelationship, DidDocument, didDocumentDeserializer, KeyFormat, EmbeddedType, isEmbeddedType, LogicDocument, MaterialType, SupportedCurves, isEmbeddedMaterial, isEmbeddedMaterial } from './verificationMaterialBuilder'
 import * as b58 from 'multiformats/bases/base58'
 import * as b64 from 'multiformats/bases/base64'
 import { ec as EC } from 'elliptic'
@@ -18,13 +18,13 @@ describe('Deserialize Verification Method', () => {
                 "y": "bAR7nCeNMceX4nsd4XqxTCYB96YbFK4TFetgtp9ElbU"
             }
         }
-        const deserializedVerificationMethod = decodeVerificationMethod(verificationMethod, 'verificationMethod')
+        const deserializedVerificationMethod = decodeVerificationRelationship(verificationMethod, 'verificationMethod')
         expect(deserializedVerificationMethod.id).toBe('did:example:123#key-4')
-        const assertKeyTypeVm = isEmbeddedVm(deserializedVerificationMethod)
+        const assertKeyTypeVm = isEmbeddedMaterial(deserializedVerificationMethod)
         expect(assertKeyTypeVm).toBeTruthy()
-        expect((deserializedVerificationMethod as EmbeddedVM).curve).toBe('P-256')
-        expect((deserializedVerificationMethod as EmbeddedVM).keyMaterial!.length).toBe(65)
-        expect((deserializedVerificationMethod as EmbeddedVM).format).toBe('JsonWebKey2020')
+        expect((deserializedVerificationMethod as EmbeddedType).curve).toBe('P-256')
+        expect((deserializedVerificationMethod as EmbeddedType).keyMaterial!.length).toBe(65)
+        expect((deserializedVerificationMethod as EmbeddedType).format).toBe('JsonWebKey2020')
         expect((deserializedVerificationMethod).usage).toStrictEqual({ 'verificationMethod': 'Embedded' })
     })
 
@@ -36,20 +36,20 @@ describe('Deserialize Verification Method', () => {
             "publicKeyMultibase": "zDnaeb7hxqexhrMUYTFzCmesbFF1d12sk4uV7yzhJox5PThAP"
         }
 
-        const deserializedVerificationMethod = decodeVerificationMethod(verificationMethod, 'verificationMethod')
+        const deserializedVerificationMethod = decodeVerificationRelationship(verificationMethod, 'verificationMethod')
         expect(deserializedVerificationMethod.id).toBe('did:example:123#key-4')
-        const assertKeyTypeVm = isEmbeddedVm(deserializedVerificationMethod)
+        const assertKeyTypeVm = isEmbeddedType(deserializedVerificationMethod)
         expect(assertKeyTypeVm).toBeTruthy()
-        expect((deserializedVerificationMethod as EmbeddedVM).curve).toBe('P-256')
-        expect((deserializedVerificationMethod as EmbeddedVM).keyMaterial!.length).toBe(65)
-        expect((deserializedVerificationMethod as EmbeddedVM).format).toBe('Multibase')
+        expect((deserializedVerificationMethod as EmbeddedType).curve).toBe('P-256')
+        expect((deserializedVerificationMethod as EmbeddedType).keyMaterial!.length).toBe(65)
+        expect((deserializedVerificationMethod as EmbeddedType).format).toBe('Multibase')
         expect((deserializedVerificationMethod).usage).toStrictEqual({ 'verificationMethod': 'Embedded' })
     })
 
     it('handles Reference method', () => {
         const verificationMethod = "did:example:123456789abcdefghi#keys-1"
-        const deserializedVerificationMethod = decodeVerificationMethod(verificationMethod, 'verificationMethod')
-        const assertKeyTypeVm = isEmbeddedVm(deserializedVerificationMethod)
+        const deserializedVerificationMethod = decodeVerificationRelationship(verificationMethod, 'verificationMethod')
+        const assertKeyTypeVm = isEmbeddedType(deserializedVerificationMethod)
         expect(assertKeyTypeVm).toBeFalsy()
         expect(deserializedVerificationMethod.id).toBe(verificationMethod)
         expect((deserializedVerificationMethod).usage).toStrictEqual({ 'verificationMethod': 'Reference' })
@@ -63,8 +63,8 @@ describe('Deserialize Verification Method', () => {
             controller: 'did:example:1234',
             publicKeyMultibase: 'zXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX',
         }
-        expect(() => decodeVerificationMethod(verificationMethod, 'verificationMethod')).toThrow(Error)
-        expect(() => decodeVerificationMethod(verificationMethod, 'verificationMethod')).toThrow(`Unsupported type: ${unsupportedType}`)
+        expect(() => decodeVerificationRelationship(verificationMethod, 'verificationMethod')).toThrow(Error)
+        expect(() => decodeVerificationRelationship(verificationMethod, 'verificationMethod')).toThrow(`Unsupported type: ${unsupportedType}`)
     })
 
     it('throws on malformed key', () => {
@@ -75,8 +75,8 @@ describe('Deserialize Verification Method', () => {
             "controller": "did:web:be0f-83-248-113-71.ngrok.io:api:4dbac1c5-2430-459d-8ef6-e3f2327221ff",
             "publicKeyMultibase": "zDnaeb7hxqexhrMUYTFzCmesbFF1d12sk4uV7yzhJox5PThAP"
         }
-        expect(() => decodeVerificationMethod(verificationMethod, 'verificationMethod')).toThrow(Error)
-        expect(() => decodeVerificationMethod(verificationMethod, 'verificationMethod')).toThrow('Invalid type: "JsonWebKey2020" must contain "publicKeyJwk"')
+        expect(() => decodeVerificationRelationship(verificationMethod, 'verificationMethod')).toThrow(Error)
+        expect(() => decodeVerificationRelationship(verificationMethod, 'verificationMethod')).toThrow('Invalid type: "JsonWebKey2020" must contain "publicKeyJwk"')
     })
 
     it.skip('throws on invalid key', () => { // TODO: Is this within the responsibility of this app?
@@ -91,8 +91,8 @@ describe('Deserialize Verification Method', () => {
                 "y": "b"
             }
         }
-        expect(() => decodeVerificationMethod(verificationMethod, 'verificationMethod')).toThrow(Error)
-        expect(() => decodeVerificationMethod(verificationMethod, 'verificationMethod')).toThrow(`invalid key`)
+        expect(() => decodeVerificationRelationship(verificationMethod, 'verificationMethod')).toThrow(Error)
+        expect(() => decodeVerificationRelationship(verificationMethod, 'verificationMethod')).toThrow(`invalid key`)
     })
 
     it('throws on missing key material', () => {
@@ -102,8 +102,8 @@ describe('Deserialize Verification Method', () => {
             controller: 'did:example:1234',
             publicKeyMultibase: '',
         }
-        expect(() => decodeVerificationMethod(verificationMethod, 'verificationMethod')).toThrow(Error)
-        expect(() => decodeVerificationMethod(verificationMethod, 'verificationMethod')).toThrow(`Invalid key`)
+        expect(() => decodeVerificationRelationship(verificationMethod, 'verificationMethod')).toThrow(Error)
+        expect(() => decodeVerificationRelationship(verificationMethod, 'verificationMethod')).toThrow(`Invalid key`)
     })
 })
 
@@ -154,8 +154,8 @@ describe('Deserialize DID Document', () => {
         const deserializedDocument = didDocumentDeserializer(document)
         expect(deserializedDocument.id).toBe('did:example:1234')
         expect(deserializedDocument.controller).toBe('did:example:456')
-        expect(deserializedDocument.verificationMethods.length).toBe(2)
-        deserializedDocument.verificationMethods.forEach(vm => {
+        expect(deserializedDocument.verificationMaterials.length).toBe(2)
+        deserializedDocument.verificationMaterials.forEach(vm => {
             expect(vm.usage).toEqual({
                 verificationMethod: expect.any(String),
                 authentication: expect.any(String),
@@ -197,7 +197,7 @@ describe('Deserialize DID Document', () => {
         const deserializedDocument = didDocumentDeserializer(document)
         expect(deserializedDocument.id).toBe('did:example:1234')
         expect(deserializedDocument.controller).toBe('did:example:456')
-        expect(deserializedDocument.verificationMethods.length).toBe(1)
+        expect(deserializedDocument.verificationMaterials.length).toBe(1)
     })
 })
 
@@ -219,7 +219,7 @@ describe('Serialize Verification Method', () => {
     }
 
     const embeddedTestCases: {
-        deserializedVerificationMethod: EmbeddedVM,
+        deserializedVerificationMethod: EmbeddedType,
         expected: any
     }[] = [
             {
@@ -247,7 +247,7 @@ describe('Serialize Verification Method', () => {
             }
         ]
 
-    const calculatedIds: Record<string, Record<EmbeddedMaterialFormat, string>> = {
+    const calculatedIds: Record<string, Record<KeyFormat, string>> = {
         ['P-256']: {
             Multibase: 'did:example:123#zDnaevHyfCfHYFyscLiRMYacaoXFqnA6gSDwgJXoZia5hNM9J',
             JsonWebKey2020: 'did:example:123#71DzuEySoYKSDysvn4QZM_w6uFcKs5gGexvV80H6aEQ'
@@ -257,7 +257,7 @@ describe('Serialize Verification Method', () => {
     embeddedTestCases.forEach((testCase) => {
         it(`handles ${testCase.deserializedVerificationMethod.curve} representation as ${testCase.deserializedVerificationMethod.format}`, () => {
             const didDocument = new DidDocument('did:example:123', 'did:example:123', [])
-            const serialized = didDocument.serializeVerificationMethod(testCase.deserializedVerificationMethod, 'Embedded')
+            const serialized = didDocument.serializeMaterial(testCase.deserializedVerificationMethod, 'Embedded')
             expect(serialized).toStrictEqual(testCase.expected)
         })
 
@@ -267,7 +267,7 @@ describe('Serialize Verification Method', () => {
                 ...testCase.deserializedVerificationMethod,
                 id: undefined
             }
-            const serialized = didDocument.serializeVerificationMethod(freshMethod, 'Embedded')
+            const serialized = didDocument.serializeMaterial(freshMethod, 'Embedded')
             // @ts-ignore
             expect(serialized.id).toBe(calculatedIds[testCase.deserializedVerificationMethod.curve!][testCase.deserializedVerificationMethod.format])
         })
@@ -276,7 +276,7 @@ describe('Serialize Verification Method', () => {
 
 describe('Serialize DID Document', () => {
 
-    const validVerificationMethodP256: EmbeddedVM[] = [{
+    const validVerificationMethodP256: EmbeddedType[] = [{
         id: 'did:example:123#456',
         curve: 'P-256',
         controller: 'did:example:123',

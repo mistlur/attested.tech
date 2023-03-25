@@ -21,14 +21,19 @@ export const verificationMethodSchema = z.object({
     publicKeyJwk: publicKeyJwkSchema.optional(),
     publicKeyMultibase: z.string().optional(),
     blockchainAccountId: z.string().optional(),
-    // NOT SUPPORTED
-    // publicKeyBase64: z.string().optional(), // NOT MENTIONED IN https://www.w3.org/TR/did-spec-registries/#verification-method-properties
-    // publicKeyBase58: z.string().optional(), // DEPRECATED
-    // publicKeyHex: z.string().optional(), // DEPRECATED
-    // ethereumAddress: z.string().optional() // DEPRECATED
+})
+
+export const verificationRelationshipSchema = z.object({
+    id: z.string(),
+    type: z.string(),
+    controller: z.string(),
+    publicKeyJwk: publicKeyJwkSchema.optional(),
+    publicKeyMultibase: z.string().optional(),
+    blockchainAccountId: z.string().optional(),
 }).or(z.string())
 
 export const verificationMethodsSchema = z.array(verificationMethodSchema)
+export const verificationRelationshipsSchema = z.array(verificationRelationshipSchema)
 
 export const documentSchema = z.object({
     ['@context']: z.literal('https://w3.org/ns/did/v1').or(z.string()).or(z.array(z.string())).optional(),
@@ -36,11 +41,11 @@ export const documentSchema = z.object({
     alsoKnownAs: z.string().optional(),
     controller: z.string().optional(),
     verificationMethod: verificationMethodsSchema.optional(),
-    authentication: verificationMethodsSchema.optional(),
-    assertionMethod: verificationMethodsSchema.optional(),
-    keyAgreement: verificationMethodsSchema.optional(),
-    capabilityInvocation: verificationMethodsSchema.optional(),
-    capabilityDelegation: verificationMethodsSchema.optional(),
+    authentication: verificationRelationshipsSchema.optional(),
+    assertionMethod: verificationRelationshipsSchema.optional(),
+    keyAgreement: verificationRelationshipsSchema.optional(),
+    capabilityInvocation: verificationRelationshipsSchema.optional(),
+    capabilityDelegation: verificationRelationshipsSchema.optional(),
     service: z.string().optional(),
 })
 

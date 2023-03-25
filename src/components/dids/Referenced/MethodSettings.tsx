@@ -1,10 +1,7 @@
+import { DidDocument } from "@/lib/DidDocument";
+import { ReferencedMaterial } from "@/lib/DidMaterial";
+import { verificationRelationships, UsageFormat } from "@/types/dids";
 import { useState } from "react";
-import {
-  DidDocument,
-  verificationRelationships,
-  ReferencedUsage,
-  ReferenceVM,
-} from "../../../lib/verificationMaterialBuilder";
 
 export default function ReferenceMethodSettings({
   htmlId,
@@ -12,12 +9,12 @@ export default function ReferenceMethodSettings({
   save,
 }: {
   htmlId: string;
-  method: ReferenceVM;
+  method: ReferencedMaterial;
   didDocument: DidDocument;
-  save: (vm: ReferenceVM) => void;
+  save: (vm: ReferencedMaterial) => void;
 }): JSX.Element {
   const [id, setId] = useState<string>(method.id);
-  const [methods, setMethods] = useState<ReferencedUsage>(method.usage);
+  const [methods, setMethods] = useState<UsageFormat<"Reference">>(method.getUsage());
 
   return (
     <div>
@@ -34,9 +31,8 @@ export default function ReferenceMethodSettings({
                 value={id}
                 onChange={(e) => setId(e.target.value)}
                 placeholder="did:web:..."
-                className={`input input-bordered w-full ${
-                  !id ? "input-error" : ""
-                }`}
+                className={`input input-bordered w-full ${!id ? "input-error" : ""
+                  }`}
               />
             </div>
           </div>
@@ -54,9 +50,8 @@ export default function ReferenceMethodSettings({
                   </div>
                   <div className="btn-group">
                     <button
-                      className={`btn btn-xs ${
-                        methods[method] === "Reference" ? "btn-secondary" : ""
-                      }`}
+                      className={`btn btn-xs ${methods[method] === "Reference" ? "btn-secondary" : ""
+                        }`}
                       onClick={() => {
                         setMethods({
                           ...methods,
@@ -68,9 +63,8 @@ export default function ReferenceMethodSettings({
                     </button>
 
                     <button
-                      className={`btn btn-xs ${
-                        !methods[method] ? "btn-active" : ""
-                      }`}
+                      className={`btn btn-xs ${!methods[method] ? "btn-active" : ""
+                        }`}
                       onClick={() => {
                         const { [method]: remove, ...keep } = methods;
                         setMethods(keep);
@@ -89,10 +83,12 @@ export default function ReferenceMethodSettings({
         htmlFor={htmlId}
         className="btn btn-info btn-outline btn-block mt-4"
         onClick={() => {
-          const newVerificationMethod: ReferenceVM = {
-            id,
-            usage: methods,
-          };
+          const newVerificationMethod: ReferencedMaterial =
+            new ReferencedMaterial(
+              id,
+              {
+                usage: methods,
+              });
           save(newVerificationMethod);
         }}
       >

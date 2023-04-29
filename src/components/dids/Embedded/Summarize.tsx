@@ -1,6 +1,18 @@
 import { DidDocument } from "@/lib/DidDocument";
 import { EmbeddedMaterial } from "@/lib/DidMaterial";
 import { VerificationRelationship } from "@/types/dids";
+import FeatherIcon from 'feather-icons-react';
+
+function getRelationShipIcon(relationship: VerificationRelationship): JSX.Element {
+  switch (relationship) {
+    case "authentication": return <span className="font-mono">Auth</span>;
+    case "assertionMethod": return <span className="font-mono">AM</span>;
+    case "keyAgreement": return <span className="font-mono">KA</span>;
+    case "capabilityDelegation": return <span className="font-mono">CD</span>;
+    case "capabilityInvocation": return <span className="font-mono">CI</span>;
+    default: return <span>unknown</span>;
+  }
+}
 
 export default function SummarizeEmbeddedMethod({
   method,
@@ -13,43 +25,31 @@ export default function SummarizeEmbeddedMethod({
 }): JSX.Element {
   return (
     <>
-      <div className="bg-base-200 p-8 gap-y-4 flex flex-col" key={index}>
-        <div className="text-2xl opacity-50">{method.material.curve}</div>
+      <div className="flex flex-col min-w-0 pr-1" key={index}>
         <div className="text-sm">
-          <span className="opacity-75">Id:</span>{" "}
-          <span className="font-mono">{method.id}</span>
-        </div>
-        <div className="text-sm">
-          <span className="opacity-75">Controller:</span>{" "}
-          <span className="font-mono">{method.material.controller}</span>
-          {" ("}
-          {method.material.controller === didDocument.id ? (
-            <span className="text-success">DID Subject</span>
-          ) : (
-            <span className="text-error">External</span>
-          )}
-          {")"}
-        </div>
-        <div className="flex flex-wrap gap-2 bg-base-300 p-4">
-          {Object.keys(method.material.usage).map((relationship, index) => (
-            <div
-              className={`badge badge-outline ${method.material.usage[relationship as VerificationRelationship] ===
-                "Reference"
-                ? "badge-secondary"
-                : "badge-accent"
-                }`}
-              key={index}
-            >
-              <div
-                className="tooltip"
-                data-tip={
-                  method.material.usage[relationship as VerificationRelationship]
-                }
-              >
-                {relationship}
+          <div className="truncate">
+            <span className="opacity-50">Id:</span>{" "}
+            {method.id}
+          </div>
+
+          <div><span className="opacity-50">Curve:</span> {method.material.curve}</div>
+          <div className="flex flex-wrap gap-2">
+            <span className="opacity-50">Usage:</span>{" "}
+            {Object.keys(method.material.usage).map((relationship, index, arr) => (
+              <div key={index}>
+                <div
+                  className="tooltip"
+                  data-tip={
+                    `${relationship} as ${method.material.usage[relationship as VerificationRelationship]}`
+                  }
+                >
+                  {getRelationShipIcon(relationship as VerificationRelationship)} {
+                    index === arr.length - 1 ? "" : "·"
+                  }
+                </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       </div>
     </>

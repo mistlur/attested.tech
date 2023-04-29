@@ -18,7 +18,7 @@ export default function ReferenceMethodSettings({
 
   return (
     <div>
-      <div className="flex flex-col gap-y-8">
+      <div className="flex flex-col gap-y-8 text-base-content">
         <div>
           <div>
             <div className="form-control w-full">
@@ -81,7 +81,7 @@ export default function ReferenceMethodSettings({
       </div>
       <label
         htmlFor={htmlId}
-        className="btn btn-info btn-outline btn-block mt-4"
+        className={`btn btn-info btn-outline btn-block mt-4 ${id === "" ? "btn-disabled" : ""}`}
         onClick={() => {
           const newVerificationMethod: ReferencedMaterial =
             new ReferencedMaterial(

@@ -1,5 +1,6 @@
 import { DidDocument } from "@/lib/DidDocument";
 import { EmbeddedMaterial } from "@/lib/DidMaterial";
+import { deriveIdentificationFragment } from "@/lib/keys";
 import { KeyFormat, Representation, UsageFormat, verificationRelationships } from "@/types/dids";
 import { useState } from "react";
 
@@ -22,7 +23,7 @@ export default function EmbeddedMethodSettings({
 
   return (
     <div>
-      <div className="flex flex-col gap-y-8">
+      <div className="flex flex-col gap-y-8 text-base-content">
         <div>
           <div>
             <div className="form-control w-full">
@@ -92,7 +93,7 @@ export default function EmbeddedMethodSettings({
                   </div>
                   <div className="btn-group">
                     <button
-                      className={`btn btn-xs ${methods[method] === "Embedded" ? "btn-accent" : ""
+                      className={`btn btn-xs ${methods[method] === "Embedded" ? "btn-primary" : ""
                         }`}
                       onClick={() => {
                         setMethods({
@@ -114,7 +115,7 @@ export default function EmbeddedMethodSettings({
                         });
                       }}
                     >
-                      Reference
+                      Referenced
                     </button>
 
                     <button
@@ -139,7 +140,7 @@ export default function EmbeddedMethodSettings({
         className="btn btn-info btn-outline btn-block mt-4"
         onClick={() => {
           const newVerificationMethod: EmbeddedMaterial =
-            new EmbeddedMaterial(id,
+            new EmbeddedMaterial(id || `#${deriveIdentificationFragment(format, material)}`,
               {
                 format,
                 curve: "P-256",

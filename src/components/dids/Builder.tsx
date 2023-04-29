@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useCallback, useEffect } from "react";
+import FeatherIcon from 'feather-icons-react';
 import { documentSchema } from "../../lib/didParser";
 // import { updateDidDocument as updateDidDocumentDAO } from "../../lib/dao";
 import { didDocumentDeserializer } from "../../lib/verificationMaterialBuilder";
@@ -12,7 +13,6 @@ import EditEmbeddedMethod from "./Embedded/EditMethod";
 import NewReferenceMethod from "./Referenced/NewMethod";
 import SummarizeReferenceMethod from "./Referenced/Summarize";
 import EditReferenceMethod from "./Referenced/EditMethod";
-import { produceTestVector } from "@/lib/testvector";
 import { DidDocument } from "@/lib/DidDocument";
 import { EmbeddedMaterial, isEmbeddedMaterial, ReferencedMaterial } from "@/lib/DidMaterial";
 
@@ -30,16 +30,20 @@ const attemptSerialization = (didDocument: DidDocument): JSX.Element => {
 
   return (
     <div>
-      <div className="bg-primary text-primary-content p-4 flex">
-        <h3 className="flex-1">
-          DID Document
-        </h3>
-        <div
-          onClick={() => {
-            navigator.clipboard.writeText(result);
-          }}
-        >
-          <button className="btn btn-square btn-sm">
+      <div className="bg-base-300 text-base-content p-4 flex justify-between">
+        <div>
+          <h2 className="font-bold text-lg">
+            DID Document
+          </h2>
+          <h3 className="text-sm">
+            JSON Format
+          </h3>
+        </div>
+        <div>
+          <button className="btn btn-square btn-sm"
+            onClick={() => {
+              navigator.clipboard.writeText(result);
+            }}>
             <svg
               className="w-5 h-5 fill-current"
               xmlns="http://www.w3.org/2000/svg"
@@ -92,253 +96,253 @@ export default function DidBuilder({
 
   return (
     <>
-      <h1 className="text-2xl font-extrabold ml-4 mb-4">{name}</h1>
-      <div className="flex">
-        <div className="w-1/2 p-4">
-          <div className="dropdown">
-            <label tabIndex={0} className="btn btn-primary">
-              Add DID Controller
-            </label>
-            <ul
-              tabIndex={0}
-              className="dropdown-content menu p-2 shadow bg-primary text-primary-content rounded-box w-96"
+      <h1 className="text-2xl font-extrabold mb-4">{name}</h1>
+      <div className="flex gap-x-4 gap-4 p-4 bg-base-200">
+        <div className="dropdown">
+          <label tabIndex={0} className="btn btn-ghost btn-sm">
+            Edit Controller
+          </label>
+          <ul
+            tabIndex={0}
+            className="dropdown-content menu p-2 shadow bg-primary text-primary-content rounded-box w-96"
+          >
+            <li
+              onClick={() => {
+                setDidDocument(
+                  produce(didDocument, (draft) => {
+                    draft.controller = getCompleteDid(id);
+                  })
+                );
+              }}
             >
-              <li
-                onClick={() => {
+              <div>DID Subject</div>
+            </li>
+            <li>
+              <div>
+                Another entity <span className="italic">(opens modal)</span>
+              </div>
+            </li>
+          </ul>
+        </div>
+        {/* START Embedded */}
+        <div>
+          <label htmlFor="newVerificationMaterial" className="btn btn-ghost btn-sm" >
+            Add Embedded Material
+          </label>
+        </div>
+        <input
+          type="checkbox"
+          id="newVerificationMaterial"
+          className="modal-toggle"
+          checked={showNewEmbeddedMethodModal}
+          onChange={() => {
+            setShowNewEmbeddedMethodModal(!showNewEmbeddedMethodModal);
+          }}
+        />
+        <div className="modal">
+          {showNewEmbeddedMethodModal && (
+            <div className="modal-box relative">
+              <label
+                htmlFor="newVerificationMaterial"
+                className="btn btn-sm btn-circle absolute right-2 top-2"
+              >
+                ✕
+              </label>
+              <NewEmbeddedMethod
+                htmlId="newVerificationMaterial"
+                didDocument={didDocument}
+                save={(vm: EmbeddedMaterial) =>
                   setDidDocument(
                     produce(didDocument, (draft) => {
-                      draft.controller = getCompleteDid(id);
+                      draft.addVerificationMethod(vm);
                     })
-                  );
-                }}
+                  )
+                }
+              />
+            </div>
+          )}
+        </div>
+        {/* END Embedded */}
+
+        {/* START Reference */}
+        <div>
+          <label htmlFor="newReferenceVerificationMaterial" className="btn btn-ghost btn-sm" >
+            Add Referenced Material
+          </label>
+        </div>
+        <input
+          type="checkbox"
+          id="newReferenceVerificationMaterial"
+          className="modal-toggle"
+          checked={showNewReferenceMethodModal}
+          onChange={() => {
+            setShowNewReferenceMethodModal(!showNewReferenceMethodModal);
+          }}
+        />
+        <div className="modal">
+          {showNewReferenceMethodModal && (
+            <div className="modal-box relative">
+              <label
+                htmlFor="newReferenceVerificationMaterial"
+                className="btn btn-sm btn-circle absolute right-2 top-2"
               >
-                <div>DID Subject</div>
-              </li>
-              <li>
-                <div>
-                  Another entity <span className="italic">(opens modal)</span>
-                </div>
-              </li>
-            </ul>
-          </div>
-
-          {/* START Embedded */}
-          <label htmlFor="newVerificationMaterial" className="btn btn-primary" >
-            Add Embedded Verification Method
-          </label>
-          <input
-            type="checkbox"
-            id="newVerificationMaterial"
-            className="modal-toggle"
-            checked={showNewEmbeddedMethodModal}
-            onChange={() => {
-              setShowNewEmbeddedMethodModal(!showNewEmbeddedMethodModal);
-            }}
-          />
-          <div className="modal">
-            {showNewEmbeddedMethodModal && (
-              <div className="modal-box relative">
-                <label
-                  htmlFor="newVerificationMaterial"
-                  className="btn btn-sm btn-circle absolute right-2 top-2"
-                >
-                  ✕
-                </label>
-                <NewEmbeddedMethod
-                  htmlId="newVerificationMaterial"
-                  didDocument={didDocument}
-                  save={(vm: EmbeddedMaterial) =>
-                    setDidDocument(
-                      produce(didDocument, (draft) => {
-                        draft.addVerificationMethod(vm);
-                      })
-                    )
-                  }
-                />
-              </div>
-            )}
-          </div>
-          {/* END Embedded */}
-
-          {/* START Reference */}
-          <label htmlFor="newReferenceVerificationMaterial" className="btn btn-primary" >
-            Add Reference Verification Method
-          </label>
-          <input
-            type="checkbox"
-            id="newReferenceVerificationMaterial"
-            className="modal-toggle"
-            checked={showNewReferenceMethodModal}
-            onChange={() => {
-              setShowNewReferenceMethodModal(!showNewReferenceMethodModal);
-            }}
-          />
-          <div className="modal">
-            {showNewReferenceMethodModal && (
-              <div className="modal-box relative">
-                <label
-                  htmlFor="newReferenceVerificationMaterial"
-                  className="btn btn-sm btn-circle absolute right-2 top-2"
-                >
-                  ✕
-                </label>
-                <NewReferenceMethod
-                  htmlId="newReferenceVerificationMaterial"
-                  didDocument={didDocument}
-                  save={(vm: ReferencedMaterial) =>
-                    setDidDocument(
-                      produce(didDocument, (draft) => {
-                        draft.addVerificationMethod(vm);
-                      })
-                    )
-                  }
-                />
-              </div>
-            )}
-          </div>
-          {/* END Reference */}
-
-          <div className="flex flex-col gap-y-4 mt-4">
+                ✕
+              </label>
+              <NewReferenceMethod
+                htmlId="newReferenceVerificationMaterial"
+                didDocument={didDocument}
+                save={(vm: ReferencedMaterial) =>
+                  setDidDocument(
+                    produce(didDocument, (draft) => {
+                      draft.addVerificationMethod(vm);
+                    })
+                  )
+                }
+              />
+            </div>
+          )}
+        </div>
+      </div>
+      {/* END Reference */}
+      <div className="flex justify-between mb-8">
+        <div className="w-1/3 bg-neutral text-neutral-content shadow-[inset_-147px_0px_180px_-180px_rgba(0,0,0,1)]">
+          <div className="flex flex-col">
             {didDocument.verificationMaterials.map((vm, index) =>
               isEmbeddedMaterial(vm) ? (
                 <div key={index}>
-                  <SummarizeEmbeddedMethod
-                    method={vm}
-                    didDocument={didDocument}
-                    index={index}
-                  />
-                  <div className="bg-base-200 px-8 pb-8 flex w-full justify-between">
-                    <label
-                      htmlFor={`embeddedVm${index}`}
-                      className="btn btn-wide"
-                    >
-                      Edit
-                    </label>
-                    <input
-                      type="checkbox"
-                      id={`embeddedVm${index}`}
-                      className="modal-toggle"
-                      checked={showEditModal === `embeddedVm${index}`}
-                      onChange={() => {
-                        setShowEditModal(
-                          showEditModal ? null : `embeddedVm${index}`
-                        );
-                      }}
-                    />
-                    <div className="modal">
-                      {showEditModal && (
-                        <div className="modal-box relative">
-                          <label
-                            htmlFor={`embeddedVm${index}`}
-                            className="btn btn-sm btn-circle absolute right-2 top-2"
-                          >
-                            ✕
-                          </label>
-                          <EditEmbeddedMethod
-                            htmlId={`embeddedVm${index}`}
-                            method={vm}
-                            didDocument={didDocument}
-                            save={(vm: EmbeddedMaterial) => {
-                              setDidDocument(
-                                produce(didDocument, (draft) => {
-                                  draft.verificationMaterials[index] = vm;
-                                })
-                              );
-                            }}
-                          />
-                        </div>
-                      )}
+                  <div className="py-4 flex w-full">
+                    <div className="flex flex-col justify-between mx-2">
+                      <label
+                        htmlFor={`embeddedVm${index}`}
+                        className="btn btn-ghost btn-xs opacity-50 text-success"
+                      >
+                        <FeatherIcon icon="edit" size="18" />
+                      </label>
+                      <input
+                        type="checkbox"
+                        id={`embeddedVm${index}`}
+                        className="modal-toggle"
+                        checked={showEditModal === `embeddedVm${index}`}
+                        onChange={() => {
+                          setShowEditModal(
+                            showEditModal ? null : `embeddedVm${index}`
+                          );
+                        }}
+                      />
+                      <div className="modal">
+                        {showEditModal && (
+                          <div className="modal-box relative">
+                            <label
+                              htmlFor={`embeddedVm${index}`}
+                              className="btn btn-sm btn-circle absolute right-2 top-2"
+                            >
+                              ✕
+                            </label>
+                            <EditEmbeddedMethod
+                              htmlId={`embeddedVm${index}`}
+                              method={vm}
+                              didDocument={didDocument}
+                              save={(vm: EmbeddedMaterial) => {
+                                setDidDocument(
+                                  produce(didDocument, (draft) => {
+                                    draft.verificationMaterials[index] = vm;
+                                  })
+                                );
+                              }}
+                            />
+                          </div>
+                        )}
+                      </div>
+                      <button
+                        className="btn btn-ghost btn-xs opacity-50 text-error"
+                        onClick={() => {
+                          setDidDocument(
+                            produce(didDocument, (draft) => {
+                              draft.verificationMaterials.splice(index, 1);
+                            })
+                          );
+                        }}
+                      >
+                        <FeatherIcon icon="trash" size="18" />
+                      </button>
                     </div>
-                    <button
-                      className="btn btn-error btn-outline"
-                      onClick={() => {
-                        setDidDocument(
-                          produce(didDocument, (draft) => {
-                            draft.verificationMaterials.splice(index, 1);
-                          })
-                        );
-                      }}
-                    >
-                      Delete
-                    </button>
+                    <SummarizeEmbeddedMethod
+                      method={vm}
+                      didDocument={didDocument}
+                      index={index}
+                    />
                   </div>
                 </div>
               ) : (
                 <div key={index}>
-                  <SummarizeReferenceMethod
-                    key={index}
-                    method={vm}
-                    didDocument={didDocument}
-                    index={index}
-                  />
-                  <div className="bg-base-200 px-8 pb-8 flex w-full justify-between">
-                    <label
-                      htmlFor={`referenceVm${index}`}
-                      className="btn btn-wide"
-                    >
-                      Edit
-                    </label>
-                    <input
-                      type="checkbox"
-                      id={`referenceVm${index}`}
-                      className="modal-toggle"
-                      checked={showEditModal === `referenceVm${index}`}
-                      onChange={() => {
-                        setShowEditModal(
-                          showEditModal ? null : `referenceVm${index}`
-                        );
-                      }}
-                    />
-                    <div className="modal">
-                      {showEditModal && (
-                        <div className="modal-box relative">
-                          <label
-                            htmlFor={`referenceVm${index}`}
-                            className="btn btn-sm btn-circle absolute right-2 top-2"
-                          >
-                            ✕
-                          </label>
-                          <EditReferenceMethod
-                            htmlId={`referenceVm${index}`}
-                            method={vm}
-                            didDocument={didDocument}
-                            save={(vm: ReferencedMaterial) => {
-                              setDidDocument(
-                                produce(didDocument, (draft) => {
-                                  draft.verificationMaterials[index] = vm;
-                                })
-                              );
-                            }}
-                          />
-                        </div>
-                      )}
+                  <div className="py-4 flex w-full">
+                    <div className="flex flex-col justify-between mx-2">
+                      <label
+                        htmlFor={`referenceVm${index}`}
+                        className="btn btn-ghost btn-xs opacity-50 text-success"
+                      >
+                        <FeatherIcon icon="edit" size="18" />
+                      </label>
+                      <input
+                        type="checkbox"
+                        id={`referenceVm${index}`}
+                        className="modal-toggle"
+                        checked={showEditModal === `referenceVm${index}`}
+                        onChange={() => {
+                          setShowEditModal(
+                            showEditModal ? null : `referenceVm${index}`
+                          );
+                        }}
+                      />
+                      <div className="modal">
+                        {showEditModal && (
+                          <div className="modal-box relative">
+                            <label
+                              htmlFor={`referenceVm${index}`}
+                              className="btn btn-sm btn-circle absolute right-2 top-2"
+                            >
+                              ✕
+                            </label>
+                            <EditReferenceMethod
+                              htmlId={`referenceVm${index}`}
+                              method={vm}
+                              didDocument={didDocument}
+                              save={(vm: ReferencedMaterial) => {
+                                setDidDocument(
+                                  produce(didDocument, (draft) => {
+                                    draft.verificationMaterials[index] = vm;
+                                  })
+                                );
+                              }}
+                            />
+                          </div>
+                        )}
+                      </div>
+                      <button
+                        className="btn btn-ghost btn-xs opacity-50 text-error"
+                        onClick={() => {
+                          setDidDocument(
+                            produce(didDocument, (draft) => {
+                              draft.verificationMaterials.splice(index, 1);
+                            })
+                          );
+                        }}
+                      >
+                        <FeatherIcon icon="trash" size="18" />
+                      </button>
                     </div>
-                    <button
-                      className="btn btn-error btn-outline"
-                      onClick={() => {
-                        setDidDocument(
-                          produce(didDocument, (draft) => {
-                            draft.verificationMaterials.splice(index, 1);
-                          })
-                        );
-                      }}
-                    >
-                      Delete
-                    </button>
+                    <SummarizeReferenceMethod
+                      method={vm}
+                      didDocument={didDocument}
+                      index={index}
+                    />
                   </div>
                 </div>
               )
             )}
           </div>
         </div>
-        <div className="w-1/2 p-4">
-          <button
-            className="btn btn-block btn-secondary mb-4"
-            onClick={async () => produceTestVector(didDocument)}
-          // disabled
-          >
-            Publish (coming soon)
-          </button>
+        <div className="w-2/3">
           {attemptSerialization(didDocument)}
         </div>
       </div>

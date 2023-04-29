@@ -63,20 +63,20 @@ export class EmbeddedMaterial implements DidMaterial {
 
   public serialize(representation: Representation): z.infer<typeof verificationRelationshipSchema> {
     if (!this.material.controller) throw Error('Malformed verification method: Embedded material must contain controller')
-    const id = !this.id ? `#${deriveIdentificationFragment(this.material.format, this.material.keyMaterial)}` : this.id
+    if (!this.id || this.id === "") throw Error('Malformed verification method: Embedded material must contain id')
     if (representation === 'Reference') {
-      return id
+      return this.id
     }
     if (this.material.format === 'JsonWebKey2020') {
       return {
-        id,
+        id: this.id,
         type: this.material.format,
         controller: this.material.controller,
         publicKeyJwk: encodeJsonWebKey(this.material.keyMaterial),
       }
     } else if (this.material.format === 'Multibase') {
       return {
-        id,
+        id: this.id,
         type: 'P256Key2021',
         controller: this.material.controller,
         publicKeyMultibase: encodeMultibaseKey(this.material.keyMaterial)
@@ -117,6 +117,7 @@ export class ReferencedMaterial implements DidMaterial {
   }
 
   public serialize(): z.infer<typeof verificationRelationshipSchema> {
+    if (!this.id || this.id === "") throw Error('Malformed verification method: Referenced material must contain id')
     return this.id
   }
 }

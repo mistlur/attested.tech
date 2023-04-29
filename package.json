@@ -22,6 +22,7 @@
     "classnames": "^2.3.2",
     "date-fns": "^2.29.3",
     "elliptic": "^6.5.4",
+    "feather-icons-react": "^0.6.2",
     "gray-matter": "^4.0.3",
     "immer": "^9.0.16",
     "jwk-thumbprint": "^0.1.4",

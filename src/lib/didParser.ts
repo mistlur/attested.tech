@@ -39,7 +39,7 @@ export const documentSchema = z.object({
     ['@context']: z.literal('https://w3.org/ns/did/v1').or(z.string()).or(z.array(z.string())).optional(),
     id: z.string(),
     alsoKnownAs: z.string().optional(),
-    controller: z.string().optional(),
+    controller: z.string().or(z.set(z.string())).optional(),
     verificationMethod: verificationMethodsSchema.optional(),
     authentication: verificationRelationshipsSchema.optional(),
     assertionMethod: verificationRelationshipsSchema.optional(),

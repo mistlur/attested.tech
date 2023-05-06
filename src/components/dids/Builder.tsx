@@ -13,8 +13,9 @@ import EditEmbeddedMethod from "./Embedded/EditMethod";
 import NewReferenceMethod from "./Referenced/NewMethod";
 import SummarizeReferenceMethod from "./Referenced/Summarize";
 import EditReferenceMethod from "./Referenced/EditMethod";
-import { DidDocument } from "@/lib/DidDocument";
+import { DidController, DidDocument } from "@/lib/DidDocument";
 import { EmbeddedMaterial, isEmbeddedMaterial, ReferencedMaterial } from "@/lib/DidMaterial";
+import EditDidController from "./EditDidController";
 
 const attemptSerialization = (didDocument: DidDocument): JSX.Element => {
   let result: string;
@@ -77,7 +78,11 @@ export default function DidBuilder({
     useState<boolean>(false);
   const [showNewReferenceMethodModal, setShowNewReferenceMethodModal] =
     useState<boolean>(false);
+  const [showEditDidControllerModal, setShowEditDidControllerModal] =
+    useState<boolean>(false);
   const [showEditModal, setShowEditModal] = useState<string | null>(null);
+
+
 
   const onKeyup = useCallback((event) => {
     if (event.key === "Escape") {
@@ -98,32 +103,47 @@ export default function DidBuilder({
     <>
       <h1 className="text-2xl font-extrabold mb-4">{name}</h1>
       <div className="flex gap-x-4 gap-4 p-4 bg-base-200">
-        <div className="dropdown">
-          <label tabIndex={0} className="btn btn-ghost btn-sm">
-            Edit Controller
+        {/* START DID Controller */}
+        <div>
+          <label htmlFor="editDidController" className="btn btn-ghost btn-sm" >
+            Edit DID Controller
           </label>
-          <ul
-            tabIndex={0}
-            className="dropdown-content menu p-2 shadow bg-primary text-primary-content rounded-box w-96"
-          >
-            <li
-              onClick={() => {
-                setDidDocument(
-                  produce(didDocument, (draft) => {
-                    draft.controller = getCompleteDid(id);
-                  })
-                );
-              }}
-            >
-              <div>DID Subject</div>
-            </li>
-            <li>
-              <div>
-                Another entity <span className="italic">(opens modal)</span>
-              </div>
-            </li>
-          </ul>
         </div>
+        <input
+          type="checkbox"
+          id="editDidController"
+          className="modal-toggle"
+          checked={showEditDidControllerModal}
+          onChange={() => {
+            setShowEditDidControllerModal(!showEditDidControllerModal);
+          }}
+        />
+        <div className="modal">
+          {showEditDidControllerModal && (
+            <div className="modal-box relative">
+              <label
+                htmlFor="editDidController"
+                className="btn btn-sm btn-circle absolute right-2 top-2"
+              >
+                ✕
+              </label>
+              <EditDidController
+                htmlId="editDidController"
+                existingControllers={didDocument.controller}
+                subject={didDocument.id}
+                save={(controller: DidController | null) =>
+                  setDidDocument(
+                    produce(didDocument, (draft) => {
+                      draft.setController(controller);
+                    })
+                  )
+                }
+              />
+            </div>
+          )}
+        </div>
+        {/* END DID Controller */}
+
         {/* START Embedded */}
         <div>
           <label htmlFor="newVerificationMaterial" className="btn btn-ghost btn-sm" >

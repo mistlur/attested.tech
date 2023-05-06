@@ -4,26 +4,40 @@ import { z } from "zod"
 import { DidMaterial, EmbeddedMaterial, isEmbeddedMaterial } from "./DidMaterial"
 import { documentSchema } from "./didParser"
 
+export type DidController = Set<string>
+
 export type LogicDocument = {
   id: string, // TODO: Proper Id type
-  controller: string | undefined,
+  controller: DidController | undefined,
   verificationMethods: DidMaterial[]
 }
 
 export class DidDocument {
   [immerable] = true
   public id: string | undefined
-  public controller: string | undefined
+  public controller: DidController | undefined
   public verificationMaterials: DidMaterial[]
 
-  constructor(id: string | undefined, controller: string | undefined, verificationMaterials: DidMaterial[]) {
+  constructor(id: string | undefined, controller: DidController | null, verificationMaterials: DidMaterial[]) {
     this.id = id
-    this.controller = controller
+    this.controller = controller || new Set([])
     this.verificationMaterials = verificationMaterials
   }
 
   addVerificationMethod(material: DidMaterial) {
     this.verificationMaterials.push(material)
+  }
+
+  setController(controller: DidController | null) {
+    this.controller = controller
+  }
+
+  serializeController() {
+    if (!this.controller) return null
+    const asArray = [...this.controller]
+    if (asArray.length === 0) return null
+    else if (asArray.length === 1) return asArray[0]
+    else return asArray
   }
 
   getContexts(): string[] {
@@ -45,6 +59,7 @@ export class DidDocument {
   public serialize(): z.infer<typeof documentSchema> {
     const relationships: Record<string, (string | object)[]> = {}
     const allMaterials = this.verificationMaterials
+    const controller = this.serializeController()
 
     allMaterials.forEach(material => {
       const usedIn = material.getUsage()
@@ -67,7 +82,7 @@ export class DidDocument {
     return {
       ['@context']: this.getContexts(),
       id: this.id,
-      controller: this.controller,
+      ...(controller && { controller }),
       ...relationships
     }
   }

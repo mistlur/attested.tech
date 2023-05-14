@@ -16,6 +16,7 @@ import EditReferenceMethod from "./Referenced/EditMethod";
 import { DidController, DidDocument } from "@/lib/DidDocument";
 import { EmbeddedMaterial, isEmbeddedMaterial, ReferencedMaterial } from "@/lib/DidMaterial";
 import EditDidController from "./EditDidController";
+import EditDidSubject from "./EditDidSubject";
 
 const attemptSerialization = (didDocument: DidDocument): JSX.Element => {
   let result: string;
@@ -80,6 +81,8 @@ export default function DidBuilder({
     useState<boolean>(false);
   const [showEditDidControllerModal, setShowEditDidControllerModal] =
     useState<boolean>(false);
+  const [showEditDidSubjectModal, setShowEditDidSubjectModal] =
+    useState<boolean>(false);
   const [showEditModal, setShowEditModal] = useState<string | null>(null);
 
 
@@ -103,6 +106,45 @@ export default function DidBuilder({
     <>
       <h1 className="text-2xl font-extrabold mb-4">{name}</h1>
       <div className="flex gap-x-4 gap-4 p-4 bg-base-200">
+        {/* START DID Subject */}
+        <div>
+          <label htmlFor="editDidSubject" className="btn btn-ghost btn-sm" >
+            Edit DID Subject
+          </label>
+        </div>
+        <input
+          type="checkbox"
+          id="editDidSubject"
+          className="modal-toggle"
+          checked={showEditDidSubjectModal}
+          onChange={() => {
+            setShowEditDidSubjectModal(!showEditDidSubjectModal);
+          }}
+        />
+        <div className="modal">
+          {showEditDidSubjectModal && (
+            <div className="modal-box relative max-w-none w-1/2">
+              <label
+                htmlFor="editDidSubject"
+                className="btn btn-sm btn-circle absolute right-2 top-2"
+              >
+                ✕
+              </label>
+              <EditDidSubject
+                htmlId="editDidSubject"
+                existingSubject={didDocument.id}
+                save={(did: string) =>
+                  setDidDocument(
+                    produce(didDocument, (draft) => {
+                      draft.setIdentifier(did);
+                    })
+                  )
+                }
+              />
+            </div>
+          )}
+        </div>
+        {/* END DID Subject*/}
         {/* START DID Controller */}
         <div>
           <label htmlFor="editDidController" className="btn btn-ghost btn-sm" >

@@ -28,6 +28,10 @@ export class DidDocument {
     this.verificationMaterials.push(material)
   }
 
+  setIdentifier(did: string) {
+    this.id = did
+  }
+
   setController(controller: DidController | null) {
     this.controller = controller
   }

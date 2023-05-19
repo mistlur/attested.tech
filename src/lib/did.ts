@@ -18,8 +18,6 @@ export class Did {
 
   private static didRegex = /^did:(?<method>[a-z0-9]+):(?<identifier>[a-zA-Z0-9_.:-]+)(?<path>\/[a-zA-Z0-9_.:-]*)?(\?(?<query>[a-zA-Z0-9_.-]+=[a-zA-Z0-9:_.-]+(&[a-zA-Z0-9:_.-\/]+=[a-zA-Z0-9:_.-\/]+)*)|)(#(?<fragment>[a-zA-Z0-9_.-]+)|)$/u;
 
-
-
   constructor(id: string) {
     const match = this.parse(id)
 

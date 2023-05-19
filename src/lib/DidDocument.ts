@@ -5,6 +5,7 @@ import { DidMaterial, EmbeddedMaterial, isEmbeddedMaterial } from "./DidMaterial
 import { documentSchema } from "./didParser"
 
 export type DidController = Set<string>
+export type SerializedRepresentation = "JSON" | "JSONLD"
 
 export type LogicDocument = {
   id: string, // TODO: Proper Id type
@@ -38,6 +39,7 @@ export class DidDocument {
 
   serializeController() {
     if (!this.controller) return null
+    //@ts-ignore
     const asArray = [...this.controller]
     if (asArray.length === 0) return null
     else if (asArray.length === 1) return asArray[0]
@@ -60,7 +62,7 @@ export class DidDocument {
     return this.verificationMaterials.filter(method => method.isUsedInRelationship(relationship))
   }
 
-  public serialize(): z.infer<typeof documentSchema> {
+  public serialize(representation: SerializedRepresentation = "JSONLD"): z.infer<typeof documentSchema> {
     const relationships: Record<string, (string | object)[]> = {}
     const allMaterials = this.verificationMaterials
     const controller = this.serializeController()
@@ -84,7 +86,7 @@ export class DidDocument {
     })
 
     return {
-      ['@context']: this.getContexts(),
+      ...(representation === "JSONLD" && { ['@context']: this.getContexts() }),
       id: this.id,
       ...(controller && { controller }),
       ...relationships

@@ -3,10 +3,8 @@
 import { useState, useCallback, useEffect } from "react";
 import FeatherIcon from 'feather-icons-react';
 import { documentSchema } from "../../lib/didParser";
-// import { updateDidDocument as updateDidDocumentDAO } from "../../lib/dao";
 import { didDocumentDeserializer } from "../../lib/verificationMaterialBuilder";
 import produce from "immer";
-import { getCompleteDid } from "../../lib/did";
 import NewEmbeddedMethod from "./Embedded/NewMethod";
 import SummarizeEmbeddedMethod from "./Embedded/Summarize";
 import EditEmbeddedMethod from "./Embedded/EditMethod";
@@ -14,15 +12,18 @@ import NewReferenceMethod from "./Referenced/NewMethod";
 import SummarizeReferenceMethod from "./Referenced/Summarize";
 import EditReferenceMethod from "./Referenced/EditMethod";
 import { DidController, DidDocument } from "@/lib/DidDocument";
-import { EmbeddedMaterial, isEmbeddedMaterial, ReferencedMaterial } from "@/lib/DidMaterial";
+import { EmbeddedMaterial, isEmbeddedMaterial, isReferencedMaterial, ReferencedMaterial } from "@/lib/DidMaterial";
 import EditDidController from "./EditDidController";
 import EditDidSubject from "./EditDidSubject";
+import ImportDocument from "./ImportDocument";
 
 const attemptSerialization = (didDocument: DidDocument): JSX.Element => {
+  const [isJsonLd, setIsJsonLd] = useState<boolean>(true)
   let result: string;
   let validDocument: boolean;
   try {
-    result = JSON.stringify(didDocument.serialize(), null, 2);
+    result = JSON.stringify(didDocument.serialize(isJsonLd ? "JSONLD" : "JSON"), null, 2);
+    documentSchema.parse(didDocument.serialize(isJsonLd ? "JSONLD" : "JSON"))
     validDocument = true;
   } catch (e) {
     // @ts-ignore
@@ -37,9 +38,17 @@ const attemptSerialization = (didDocument: DidDocument): JSX.Element => {
           <h2 className="font-bold text-lg">
             DID Document
           </h2>
-          <h3 className="text-sm">
-            JSON Format
-          </h3>
+          <div className="flex gap-x-2">
+            <h3 className="text-sm">
+              Format
+            </h3>
+            <div className="btn-group">
+              <button className={`btn btn-xs ${isJsonLd ? "btn-active" : ""}`} onClick={() => setIsJsonLd
+                (!isJsonLd)}>JSON-LD</button>
+              <button className={`btn btn-xs ${isJsonLd ? "" : "btn-active"}`} onClick={() => setIsJsonLd
+                (!isJsonLd)}>JSON</button>
+            </div>
+          </div>
         </div>
         <div>
           <button className="btn btn-square btn-sm"
@@ -56,9 +65,17 @@ const attemptSerialization = (didDocument: DidDocument): JSX.Element => {
           </button>
         </div>
       </div>
-      <div className="bg-base-200">
+      {!validDocument && (
+        <div className="bg-error text-error-content p-4 text-xs overflow-scroll">
+          <h3 className="font-bold">Error parsing or generating the DID Document.</h3>
+
+          Details:
+          <pre className="bg-neutral text-neutral-content p-4">{result}</pre>
+        </div>
+      )}
+      {validDocument && (<div className="bg-base-200">
         <pre className="p-4 text-xs overflow-scroll">{result}</pre>
-      </div>
+      </div>)}
     </div>
   );
 };
@@ -72,8 +89,16 @@ export default function DidBuilder({
   name: string;
   document: Record<string, any>;
 }) {
+
+  let maybeDocument: DidDocument
+  try {
+    maybeDocument = didDocumentDeserializer(documentSchema.parse(document))
+  } catch (e) {
+    maybeDocument = new DidDocument(id, new Set([id]), [])
+  }
+
   const [didDocument, setDidDocument] = useState<DidDocument>(
-    didDocumentDeserializer(documentSchema.parse(document))
+    maybeDocument
   );
   const [showNewEmbeddedMethodModal, setShowNewEmbeddedMethodModal] =
     useState<boolean>(false);
@@ -84,7 +109,8 @@ export default function DidBuilder({
   const [showEditDidSubjectModal, setShowEditDidSubjectModal] =
     useState<boolean>(false);
   const [showEditModal, setShowEditModal] = useState<string | null>(null);
-
+  const [showImportDocumentModal, setShowImportDocumentModal] =
+    useState<boolean>(false);
 
 
   const onKeyup = useCallback((event) => {
@@ -264,13 +290,49 @@ export default function DidBuilder({
             </div>
           )}
         </div>
+        {/* END Reference */}
+        {/* START Import Document */}
+        <div className="ml-auto">
+          <label htmlFor="importDocument" className="btn btn-sm" >
+            Import Document
+          </label>
+        </div>
+        <input
+          type="checkbox"
+          id="importDocument"
+          className="modal-toggle"
+          checked={showImportDocumentModal}
+          onChange={() => {
+            setShowImportDocumentModal(!showImportDocumentModal);
+          }}
+        />
+        <div className="modal">
+          {showImportDocumentModal && (
+            <div className="modal-box relative max-w-none w-1/2">
+              <label
+                htmlFor="importDocument"
+                className="btn btn-sm btn-circle absolute right-2 top-2"
+              >
+                ✕
+              </label>
+              <ImportDocument
+                htmlId="importDocument"
+                save={(document: DidDocument) =>
+                  setDidDocument(document)
+                }
+              />
+            </div>
+          )}
+        </div>
+        {/* END Import Document*/}
       </div>
-      {/* END Reference */}
+
       <div className="flex justify-between mb-8">
         <div className="w-1/3 bg-neutral text-neutral-content shadow-[inset_-147px_0px_180px_-180px_rgba(0,0,0,1)]">
           <div className="flex flex-col">
+            {!didDocument.verificationMaterials.length && <div className="text-center py-4 text-sm opacity-50">No material associated with DID</div>}
             {didDocument.verificationMaterials.map((vm, index) =>
-              isEmbeddedMaterial(vm) ? (
+              isEmbeddedMaterial(vm) && (
                 <div key={index}>
                   <div className="py-4 flex w-full">
                     <div className="flex flex-col justify-between mx-2">
@@ -330,12 +392,12 @@ export default function DidBuilder({
                     </div>
                     <SummarizeEmbeddedMethod
                       method={vm}
-                      didDocument={didDocument}
                       index={index}
                     />
                   </div>
                 </div>
-              ) : (
+              ) ||
+              isReferencedMaterial(vm) && (
                 <div key={index}>
                   <div className="py-4 flex w-full">
                     <div className="flex flex-col justify-between mx-2">

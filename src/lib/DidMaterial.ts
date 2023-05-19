@@ -1,7 +1,7 @@
 import { EmbeddedType, ReferencedMaterialFormat, ReferencedType, Representation, UsageFormat, VerificationRelationship } from "@/types/dids";
 import { z } from "zod";
 import { verificationRelationshipSchema } from "./didParser";
-import { deriveIdentificationFragment, encodeJsonWebKey, encodeMultibaseKey } from "./keys";
+import { encodeJsonWebKey, encodeMultibaseKey } from "./keys";
 
 export function isEmbeddedType(vm: EmbeddedType | ReferencedType): vm is EmbeddedType {
   return (vm as EmbeddedType).curve !== undefined;
@@ -9,6 +9,10 @@ export function isEmbeddedType(vm: EmbeddedType | ReferencedType): vm is Embedde
 
 export function isEmbeddedMaterial(i: DidMaterial): i is EmbeddedMaterial {
   return isEmbeddedType(i.material)
+}
+
+export function isReferencedMaterial(i: DidMaterial): i is ReferencedMaterial {
+  return !isEmbeddedType(i.material)
 }
 
 export interface DidMaterial {

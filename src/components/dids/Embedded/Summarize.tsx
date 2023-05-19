@@ -16,13 +16,26 @@ function getRelationShipIcon(relationship: VerificationRelationship): JSX.Elemen
 
 export default function SummarizeEmbeddedMethod({
   method,
-  didDocument,
   index,
 }: {
   index: number;
   method: EmbeddedMaterial;
-  didDocument: DidDocument;
 }): JSX.Element {
+  const usages = Object.keys(method.material.usage).map((relationship, index, arr) => (
+    <div key={index}>
+      <div
+        className="tooltip"
+        data-tip={
+          `${relationship} as ${method.material.usage[relationship as VerificationRelationship]}`
+        }
+      >
+        {getRelationShipIcon(relationship as VerificationRelationship)} {
+          index === arr.length - 1 ? "" : "·"
+        }
+      </div>
+    </div>
+  ))
+
   return (
     <>
       <div className="flex flex-col min-w-0 pr-1" key={index}>
@@ -35,20 +48,7 @@ export default function SummarizeEmbeddedMethod({
           <div><span className="opacity-50">Curve:</span> {method.material.curve}</div>
           <div className="flex flex-wrap gap-2">
             <span className="opacity-50">Usage:</span>{" "}
-            {Object.keys(method.material.usage).map((relationship, index, arr) => (
-              <div key={index}>
-                <div
-                  className="tooltip"
-                  data-tip={
-                    `${relationship} as ${method.material.usage[relationship as VerificationRelationship]}`
-                  }
-                >
-                  {getRelationShipIcon(relationship as VerificationRelationship)} {
-                    index === arr.length - 1 ? "" : "·"
-                  }
-                </div>
-              </div>
-            ))}
+            {usages.length > 0 ? usages : "Unused"}
           </div>
         </div>
       </div>

@@ -1,5 +1,6 @@
 import { DidController } from "@/lib/DidDocument";
 import { useState } from "react";
+import DidInput from "./DidInput";
 
 export default function EditDidController(
   {
@@ -14,9 +15,10 @@ export default function EditDidController(
     save: (controller: DidController) => void;
   }
 ): JSX.Element {
-  const [newId, setNewId] = useState<string>("");
+  const [newDid, setNewDid] = useState<string>("");
   const [controllers, setControllers] = useState<DidController>(existingControllers);
   const [isSubject, setIsSubject] = useState<boolean>(false);
+  const [isNewDidValid, setIsNewDidValid] = useState<boolean>(false)
   return (
     <div>
       <h3 className="text-lg font-bold">Edit DID Controller</h3>
@@ -36,36 +38,36 @@ export default function EditDidController(
           <div className="divider">OR</div>
           <div className={`${isSubject ? "opacity-25" : ""}`}>
             <div className="flex items-end gap-x-4">
-
-              <div className="form-control w-full">
-                <label className="label">
-                  <span className="label-text">Add other Controller</span>
-                </label>
-                <input
-                  type="text"
-                  value={newId}
-                  onChange={(e) => setNewId(e.target.value)}
-                  disabled={isSubject}
-                  placeholder="did:web:..."
-                  className={`input input-bordered w-full`}
-                />
-              </div>
-
+              <DidInput
+                value={""}
+                callback={(e) => {
+                  setIsNewDidValid(e.valid)
+                  if (e.did) setNewDid(e.did.serialize())
+                }} />
               <button
-                disabled={isSubject || !newId || newId.length < 1}
+                disabled={!isNewDidValid}
                 className="btn"
                 onClick={() => {
-                  setControllers(new Set([...controllers, newId]))
-                  setNewId("")
+                  //@ts-ignore
+                  setControllers(new Set([...controllers, newDid]))
+                  setNewDid("")
                 }}
               >
                 Add Controller
               </button>
             </div>
             <ul className="my-4 divide-y divide-solid divide-neutral divide-opacity-25">
-              {[...controllers].map((controller, i) => <li key={i} className="font-mono text-xs py-2 truncate">
-                <button className="btn btn-square btn-xs mr-4" onClick={() => setControllers(new Set([...controllers].filter(c => c !== controller)))}>X</button>{controller
-                }</li>)}
+
+              {
+                //@ts-ignore
+                [...controllers].map((controller, i) => <li key={i} className="font-mono text-xs py-2 truncate">
+                  <button className="btn btn-square btn-xs mr-4" onClick={
+                    //@ts-ignore
+                    () => setControllers(new Set([...controllers].filter(c => c !== controller)))
+                  }>
+                    X
+                  </button>{controller
+                  }</li>)}
             </ul>
           </div>
         </div>

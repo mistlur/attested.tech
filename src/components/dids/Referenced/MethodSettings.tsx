@@ -2,6 +2,7 @@ import { DidDocument } from "@/lib/DidDocument";
 import { ReferencedMaterial } from "@/lib/DidMaterial";
 import { verificationRelationships, UsageFormat } from "@/types/dids";
 import { useState } from "react";
+import DidInput from "../DidInput";
 
 export default function ReferenceMethodSettings({
   htmlId,
@@ -19,24 +20,11 @@ export default function ReferenceMethodSettings({
   return (
     <div>
       <div className="flex flex-col gap-y-8 text-base-content">
-        <div>
-          <div>
-            <div className="form-control w-full">
-              <label className="label">
-                <span className="label-text">Id</span>
-                {/* TODO: Validate DID */}
-              </label>
-              <input
-                type="text"
-                value={id}
-                onChange={(e) => setId(e.target.value)}
-                placeholder="did:web:..."
-                className={`input input-bordered w-full ${!id ? "input-error" : ""
-                  }`}
-              />
-            </div>
-          </div>
-        </div>
+        <DidInput
+          value={method.id}
+          callback={(e) => {
+            setId(e.did?.serialize() || "")
+          }} />
 
         <div>
           <span className="opacity-50">Use in</span>

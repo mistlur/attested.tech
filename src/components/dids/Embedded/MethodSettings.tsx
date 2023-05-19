@@ -3,6 +3,7 @@ import { EmbeddedMaterial } from "@/lib/DidMaterial";
 import { deriveIdentificationFragment } from "@/lib/keys";
 import { KeyFormat, Representation, UsageFormat, verificationRelationships } from "@/types/dids";
 import { useState } from "react";
+import DidInput from "../DidInput";
 
 
 export default function EmbeddedMethodSettings({
@@ -29,35 +30,27 @@ export default function EmbeddedMethodSettings({
             <div className="form-control w-full">
               <label className="label">
                 <span className="label-text">Id</span>
-                {/* TODO: Validate DID */}
+                <span className="label-text-alt">Leave blank to derive Id</span>
               </label>
               <input
                 type="text"
                 value={id}
                 onChange={(e) => setId(e.target.value)}
-                placeholder="did:web:... (leave blank to use a generated id)"
+                placeholder="#lwg2wFClmq7gEjv..."
                 className={`input input-bordered w-full`}
               />
             </div>
-
-            <div className="form-control w-full">
-              <label className="label">
-                <span className="label-text">Controller</span>
-              </label>
-              {/* TODO: Validate DID */}
-              <input
-                type="text"
-                value={controller}
-                onChange={(e) => setController(e.target.value)}
-                placeholder="did:web:..."
-                className="input input-bordered w-full"
-              />
-            </div>
+            <DidInput
+              value={controller}
+              label="Controller"
+              callback={(e) => {
+                setController(e.did?.serialize() || "")
+              }} />
           </div>
         </div>
 
         <div>
-          <span className="opacity-50">Format</span>
+          <span className="opacity-50 font-bold">Format</span>
           <div className="flex w-full">
             <div className="btn-group w-full">
               <button
@@ -82,7 +75,7 @@ export default function EmbeddedMethodSettings({
           </div>
         </div>
         <div>
-          <span className="opacity-50">Use in</span>
+          <span className="opacity-50 font-bold">Used for</span>
           <div className="form-control">
             {verificationRelationships.map((method, indexMethod) => {
               return (
@@ -137,7 +130,7 @@ export default function EmbeddedMethodSettings({
       </div>
       <label
         htmlFor={htmlId}
-        className="btn btn-info btn-outline btn-block mt-4"
+        className={`btn btn-info btn-outline btn-block mt-4 ${controller !== "" ? "" : "btn-disabled"}`}
         onClick={() => {
           const newVerificationMethod: EmbeddedMaterial =
             new EmbeddedMaterial(id || `#${deriveIdentificationFragment(format, material)}`,

@@ -6,14 +6,15 @@ type Props = InputProps & {
   label?: string;
   helpText?: string;
   errorMessage?: string;
+  successMessage?: string;
 };
 const Input = forwardRef(
   (
-    { label, helpText, errorMessage, color, ...props }: Props,
+    { label, helpText, errorMessage, successMessage, color, ...props }: Props,
     ref: ForwardedRef<HTMLInputElement>
   ) => {
     return (
-      <div className="form-control">
+      <div className="form-control w-full">
         <label className="label">
           <span
             className={cx("label-text", {
@@ -22,23 +23,22 @@ const Input = forwardRef(
           >
             {label}
           </span>
+          {(!!helpText || !!errorMessage || !!successMessage) && (
+            <span
+              className={cx("label-text-alt", {
+                "text-success": !!successMessage,
+                "text-error": !!errorMessage,
+              })}
+            >
+              {errorMessage || successMessage || helpText}
+            </span>
+          )}
         </label>
         <InnerInput
           {...props}
           ref={ref}
-          color={!!errorMessage ? "error" : color}
+          color={!!errorMessage ? "error" : !!successMessage ? "success" : color}
         />
-        {(!!helpText || !!errorMessage) && (
-          <label className="label">
-            <span
-              className={cx("label-text-alt", {
-                "text-error": !!errorMessage,
-              })}
-            >
-              {errorMessage || helpText}
-            </span>
-          </label>
-        )}
       </div>
     );
   }

@@ -15,7 +15,7 @@ export default function EditEmbeddedMethod({
 }): JSX.Element {
   return (
     <>
-      <h3 className="text-lg font-bold">{"Edit"}</h3>
+      <h3 className="text-lg font-bold text-base-content truncate max-w-sm">Edit <span className="font-mono opacity-75">{method.id}</span></h3>
       <EmbeddedMethodSettings
         htmlId={htmlId}
         didDocument={didDocument}

@@ -12,8 +12,8 @@ export default function useHeaderNavigation() {
     //   href: "/blog",
     // },
     {
-      title: t("didDocument"),
-      href: "/did-document",
-    }
+      title: t("DIDs"),
+      href: "#dids",
+    },
   ];
 }

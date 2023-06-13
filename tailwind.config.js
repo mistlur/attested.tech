@@ -9,7 +9,9 @@ module.exports = {
     "node_modules/react-daisyui/dist/**/*.js",
   ],
   theme: {
-    extend: {},
+    fontFamily: {
+      sans: ['"Geologica"', "sans-serif"],
+    },
   },
   plugins: [
     require("@tailwindcss/typography"),

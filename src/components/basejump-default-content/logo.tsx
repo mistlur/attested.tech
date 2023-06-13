@@ -1,7 +1,6 @@
 /* istanbul ignore file */
-import Image from "next/image";
 import cx from "classnames";
-import {ShieldCheckIcon} from "@heroicons/react/outline";
+import { ShieldCheckIcon } from "@heroicons/react/outline";
 
 type Props = {
   size: "sm" | "lg";
@@ -29,10 +28,11 @@ const Logo = ({ size = "lg", className }: Props) => {
         })}
       >
         <ShieldCheckIcon
-                         className={cx({
-                           "w-24 h-24 text-red-600": size === "lg",
-                           "w-6 h-6 text-red-600": size === "sm",
-                         })}/>
+          className={cx({
+            "w-24 h-24 text-teal-600": size === "lg",
+            "w-10 h-10 text-teal-600": size === "sm",
+          })}
+        />
       </div>
       <h1
         className={cx("font-black", {

@@ -27,14 +27,14 @@ export const AVAILABLE_THEMES = {
 };
 
 const ThemeSelector = () => {
-  const { theme, setTheme, clearTheme } = useThemeStorage();
+  const { theme, setTheme, clearTheme } = useThemeStorage("dracula");
 
   const selectedTheme = useMemo(() => {
     return AVAILABLE_THEMES[theme];
   }, [theme]);
 
   return (
-    <Dropdown vertical="top" horizontal="left">
+    <Dropdown vertical="middle" horizontal="left">
       <Button color="ghost" shape="square">
         {!selectedTheme ? (
           <SunIcon className="h-5 w-5" />
@@ -42,7 +42,7 @@ const ThemeSelector = () => {
           <selectedTheme.Icon className="h-5 w-5" />
         )}
       </Button>
-      <Dropdown.Menu className="w-56">
+      <Dropdown.Menu className="w-56 bg-base-100 text-base-content">
         {Object.values(AVAILABLE_THEMES).map((themeOption) => (
           <Button
             key={`theme-${themeOption.id}`}

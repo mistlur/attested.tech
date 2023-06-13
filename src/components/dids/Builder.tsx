@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useCallback, useEffect } from "react";
-import FeatherIcon from 'feather-icons-react';
+import FeatherIcon from "feather-icons-react";
 import { documentSchema } from "../../lib/didParser";
 import { didDocumentDeserializer } from "../../lib/verificationMaterialBuilder";
 import produce from "immer";
@@ -12,18 +12,27 @@ import NewReferenceMethod from "./Referenced/NewMethod";
 import SummarizeReferenceMethod from "./Referenced/Summarize";
 import EditReferenceMethod from "./Referenced/EditMethod";
 import { DidController, DidDocument } from "@/lib/DidDocument";
-import { EmbeddedMaterial, isEmbeddedMaterial, isReferencedMaterial, ReferencedMaterial } from "@/lib/DidMaterial";
+import {
+  EmbeddedMaterial,
+  isEmbeddedMaterial,
+  isReferencedMaterial,
+  ReferencedMaterial,
+} from "@/lib/DidMaterial";
 import EditDidController from "./EditDidController";
 import EditDidSubject from "./EditDidSubject";
 import ImportDocument from "./ImportDocument";
 
 const attemptSerialization = (didDocument: DidDocument): JSX.Element => {
-  const [isJsonLd, setIsJsonLd] = useState<boolean>(true)
+  const [isJsonLd, setIsJsonLd] = useState<boolean>(true);
   let result: string;
   let validDocument: boolean;
   try {
-    result = JSON.stringify(didDocument.serialize(isJsonLd ? "JSONLD" : "JSON"), null, 2);
-    documentSchema.parse(didDocument.serialize(isJsonLd ? "JSONLD" : "JSON"))
+    result = JSON.stringify(
+      didDocument.serialize(isJsonLd ? "JSONLD" : "JSON"),
+      null,
+      2
+    );
+    documentSchema.parse(didDocument.serialize(isJsonLd ? "JSONLD" : "JSON"));
     validDocument = true;
   } catch (e) {
     // @ts-ignore
@@ -35,26 +44,32 @@ const attemptSerialization = (didDocument: DidDocument): JSX.Element => {
     <div>
       <div className="bg-base-300 text-base-content p-4 flex justify-between">
         <div>
-          <h2 className="font-bold text-lg">
-            DID Document
-          </h2>
+          <h2 className="font-bold text-lg">DID Document</h2>
           <div className="flex gap-x-2">
-            <h3 className="text-sm">
-              Format
-            </h3>
+            <h3 className="text-sm">Format</h3>
             <div className="btn-group">
-              <button className={`btn btn-xs ${isJsonLd ? "btn-active" : ""}`} onClick={() => setIsJsonLd
-                (!isJsonLd)}>JSON-LD</button>
-              <button className={`btn btn-xs ${isJsonLd ? "" : "btn-active"}`} onClick={() => setIsJsonLd
-                (!isJsonLd)}>JSON</button>
+              <button
+                className={`btn btn-xs ${isJsonLd ? "btn-active" : ""}`}
+                onClick={() => setIsJsonLd(!isJsonLd)}
+              >
+                JSON-LD
+              </button>
+              <button
+                className={`btn btn-xs ${isJsonLd ? "" : "btn-active"}`}
+                onClick={() => setIsJsonLd(!isJsonLd)}
+              >
+                JSON
+              </button>
             </div>
           </div>
         </div>
         <div>
-          <button className="btn btn-square btn-sm"
+          <button
+            className="btn btn-square btn-sm"
             onClick={() => {
               navigator.clipboard.writeText(result);
-            }}>
+            }}
+          >
             <svg
               className="w-5 h-5 fill-current"
               xmlns="http://www.w3.org/2000/svg"
@@ -67,15 +82,18 @@ const attemptSerialization = (didDocument: DidDocument): JSX.Element => {
       </div>
       {!validDocument && (
         <div className="bg-error text-error-content p-4 text-xs overflow-scroll">
-          <h3 className="font-bold">Error parsing or generating the DID Document.</h3>
-
+          <h3 className="font-bold">
+            Error parsing or generating the DID Document.
+          </h3>
           Details:
           <pre className="bg-neutral text-neutral-content p-4">{result}</pre>
         </div>
       )}
-      {validDocument && (<div className="bg-base-200">
-        <pre className="p-4 text-xs overflow-scroll">{result}</pre>
-      </div>)}
+      {validDocument && (
+        <div className="bg-base-200">
+          <pre className="p-4 text-xs overflow-scroll">{result}</pre>
+        </div>
+      )}
     </div>
   );
 };
@@ -89,17 +107,14 @@ export default function DidBuilder({
   name: string;
   document: Record<string, any>;
 }) {
-
-  let maybeDocument: DidDocument
+  let maybeDocument: DidDocument;
   try {
-    maybeDocument = didDocumentDeserializer(documentSchema.parse(document))
+    maybeDocument = didDocumentDeserializer(documentSchema.parse(document));
   } catch (e) {
-    maybeDocument = new DidDocument(id, new Set([id]), [])
+    maybeDocument = new DidDocument(id, new Set([id]), []);
   }
 
-  const [didDocument, setDidDocument] = useState<DidDocument>(
-    maybeDocument
-  );
+  const [didDocument, setDidDocument] = useState<DidDocument>(maybeDocument);
   const [showNewEmbeddedMethodModal, setShowNewEmbeddedMethodModal] =
     useState<boolean>(false);
   const [showNewReferenceMethodModal, setShowNewReferenceMethodModal] =
@@ -112,29 +127,30 @@ export default function DidBuilder({
   const [showImportDocumentModal, setShowImportDocumentModal] =
     useState<boolean>(false);
 
-
-  const onKeyup = useCallback((event) => {
-    if (event.key === "Escape") {
-      setShowNewEmbeddedMethodModal(false)
-      setShowNewReferenceMethodModal(false)
-      setShowEditModal(null)
-    }
-  }, [showNewEmbeddedMethodModal, showNewReferenceMethodModal, showEditModal])
+  const onKeyup = useCallback(
+    (event) => {
+      if (event.key === "Escape") {
+        setShowNewEmbeddedMethodModal(false);
+        setShowNewReferenceMethodModal(false);
+        setShowEditModal(null);
+      }
+    },
+    [showNewEmbeddedMethodModal, showNewReferenceMethodModal, showEditModal]
+  );
 
   useEffect(() => {
     if (window) {
-      window.addEventListener('keyup', onKeyup);
-      return () => window.removeEventListener('keyup', onKeyup);
+      window.addEventListener("keyup", onKeyup);
+      return () => window.removeEventListener("keyup", onKeyup);
     }
   }, []);
 
   return (
     <>
-      <h1 className="text-2xl font-extrabold mb-4">{name}</h1>
       <div className="flex gap-x-4 gap-4 p-4 bg-base-200">
         {/* START DID Subject */}
         <div>
-          <label htmlFor="editDidSubject" className="btn btn-ghost btn-sm" >
+          <label htmlFor="editDidSubject" className="btn btn-ghost btn-sm">
             Edit DID Subject
           </label>
         </div>
@@ -173,7 +189,7 @@ export default function DidBuilder({
         {/* END DID Subject*/}
         {/* START DID Controller */}
         <div>
-          <label htmlFor="editDidController" className="btn btn-ghost btn-sm" >
+          <label htmlFor="editDidController" className="btn btn-ghost btn-sm">
             Edit DID Controller
           </label>
         </div>
@@ -214,7 +230,10 @@ export default function DidBuilder({
 
         {/* START Embedded */}
         <div>
-          <label htmlFor="newVerificationMaterial" className="btn btn-ghost btn-sm" >
+          <label
+            htmlFor="newVerificationMaterial"
+            className="btn btn-ghost btn-sm"
+          >
             Add Embedded Material
           </label>
         </div>
@@ -254,7 +273,10 @@ export default function DidBuilder({
 
         {/* START Reference */}
         <div>
-          <label htmlFor="newReferenceVerificationMaterial" className="btn btn-ghost btn-sm" >
+          <label
+            htmlFor="newReferenceVerificationMaterial"
+            className="btn btn-ghost btn-sm"
+          >
             Add Referenced Material
           </label>
         </div>
@@ -293,7 +315,7 @@ export default function DidBuilder({
         {/* END Reference */}
         {/* START Import Document */}
         <div className="ml-auto">
-          <label htmlFor="importDocument" className="btn btn-sm" >
+          <label htmlFor="importDocument" className="btn btn-sm">
             Import Document
           </label>
         </div>
@@ -317,9 +339,7 @@ export default function DidBuilder({
               </label>
               <ImportDocument
                 htmlId="importDocument"
-                save={(document: DidDocument) =>
-                  setDidDocument(document)
-                }
+                save={(document: DidDocument) => setDidDocument(document)}
               />
             </div>
           )}
@@ -330,145 +350,145 @@ export default function DidBuilder({
       <div className="flex justify-between mb-8">
         <div className="w-1/3 bg-neutral text-neutral-content shadow-[inset_-147px_0px_180px_-180px_rgba(0,0,0,1)]">
           <div className="flex flex-col">
-            {!didDocument.verificationMaterials.length && <div className="text-center py-4 text-sm opacity-50">No material associated with DID</div>}
-            {didDocument.verificationMaterials.map((vm, index) =>
-              isEmbeddedMaterial(vm) && (
-                <div key={index}>
-                  <div className="py-4 flex w-full">
-                    <div className="flex flex-col justify-between mx-2">
-                      <label
-                        htmlFor={`embeddedVm${index}`}
-                        className="btn btn-ghost btn-xs opacity-50 text-success"
-                      >
-                        <FeatherIcon icon="edit" size="18" />
-                      </label>
-                      <input
-                        type="checkbox"
-                        id={`embeddedVm${index}`}
-                        className="modal-toggle"
-                        checked={showEditModal === `embeddedVm${index}`}
-                        onChange={() => {
-                          setShowEditModal(
-                            showEditModal ? null : `embeddedVm${index}`
-                          );
-                        }}
-                      />
-                      <div className="modal">
-                        {showEditModal && (
-                          <div className="modal-box relative">
-                            <label
-                              htmlFor={`embeddedVm${index}`}
-                              className="btn btn-sm btn-circle absolute right-2 top-2"
-                            >
-                              ✕
-                            </label>
-                            <EditEmbeddedMethod
-                              htmlId={`embeddedVm${index}`}
-                              method={vm}
-                              didDocument={didDocument}
-                              save={(vm: EmbeddedMaterial) => {
-                                setDidDocument(
-                                  produce(didDocument, (draft) => {
-                                    draft.verificationMaterials[index] = vm;
-                                  })
-                                );
-                              }}
-                            />
-                          </div>
-                        )}
+            {!didDocument.verificationMaterials.length && (
+              <div className="text-center py-4 text-sm opacity-50">
+                No material associated with DID
+              </div>
+            )}
+            {didDocument.verificationMaterials.map(
+              (vm, index) =>
+                (isEmbeddedMaterial(vm) && (
+                  <div key={index}>
+                    <div className="py-4 flex w-full">
+                      <div className="flex flex-col justify-between mx-2">
+                        <label
+                          htmlFor={`embeddedVm${index}`}
+                          className="btn btn-ghost btn-xs opacity-50 text-success"
+                        >
+                          <FeatherIcon icon="edit" size="18" />
+                        </label>
+                        <input
+                          type="checkbox"
+                          id={`embeddedVm${index}`}
+                          className="modal-toggle"
+                          checked={showEditModal === `embeddedVm${index}`}
+                          onChange={() => {
+                            setShowEditModal(
+                              showEditModal ? null : `embeddedVm${index}`
+                            );
+                          }}
+                        />
+                        <div className="modal">
+                          {showEditModal && (
+                            <div className="modal-box relative">
+                              <label
+                                htmlFor={`embeddedVm${index}`}
+                                className="btn btn-sm btn-circle absolute right-2 top-2"
+                              >
+                                ✕
+                              </label>
+                              <EditEmbeddedMethod
+                                htmlId={`embeddedVm${index}`}
+                                method={vm}
+                                didDocument={didDocument}
+                                save={(vm: EmbeddedMaterial) => {
+                                  setDidDocument(
+                                    produce(didDocument, (draft) => {
+                                      draft.verificationMaterials[index] = vm;
+                                    })
+                                  );
+                                }}
+                              />
+                            </div>
+                          )}
+                        </div>
+                        <button
+                          className="btn btn-ghost btn-xs opacity-50 text-error"
+                          onClick={() => {
+                            setDidDocument(
+                              produce(didDocument, (draft) => {
+                                draft.verificationMaterials.splice(index, 1);
+                              })
+                            );
+                          }}
+                        >
+                          <FeatherIcon icon="trash" size="18" />
+                        </button>
                       </div>
-                      <button
-                        className="btn btn-ghost btn-xs opacity-50 text-error"
-                        onClick={() => {
-                          setDidDocument(
-                            produce(didDocument, (draft) => {
-                              draft.verificationMaterials.splice(index, 1);
-                            })
-                          );
-                        }}
-                      >
-                        <FeatherIcon icon="trash" size="18" />
-                      </button>
+                      <SummarizeEmbeddedMethod method={vm} index={index} />
                     </div>
-                    <SummarizeEmbeddedMethod
-                      method={vm}
-                      index={index}
-                    />
                   </div>
-                </div>
-              ) ||
-              isReferencedMaterial(vm) && (
-                <div key={index}>
-                  <div className="py-4 flex w-full">
-                    <div className="flex flex-col justify-between mx-2">
-                      <label
-                        htmlFor={`referenceVm${index}`}
-                        className="btn btn-ghost btn-xs opacity-50 text-success"
-                      >
-                        <FeatherIcon icon="edit" size="18" />
-                      </label>
-                      <input
-                        type="checkbox"
-                        id={`referenceVm${index}`}
-                        className="modal-toggle"
-                        checked={showEditModal === `referenceVm${index}`}
-                        onChange={() => {
-                          setShowEditModal(
-                            showEditModal ? null : `referenceVm${index}`
-                          );
-                        }}
-                      />
-                      <div className="modal">
-                        {showEditModal && (
-                          <div className="modal-box relative">
-                            <label
-                              htmlFor={`referenceVm${index}`}
-                              className="btn btn-sm btn-circle absolute right-2 top-2"
-                            >
-                              ✕
-                            </label>
-                            <EditReferenceMethod
-                              htmlId={`referenceVm${index}`}
-                              method={vm}
-                              didDocument={didDocument}
-                              save={(vm: ReferencedMaterial) => {
-                                setDidDocument(
-                                  produce(didDocument, (draft) => {
-                                    draft.verificationMaterials[index] = vm;
-                                  })
-                                );
-                              }}
-                            />
-                          </div>
-                        )}
+                )) ||
+                (isReferencedMaterial(vm) && (
+                  <div key={index}>
+                    <div className="py-4 flex w-full">
+                      <div className="flex flex-col justify-between mx-2">
+                        <label
+                          htmlFor={`referenceVm${index}`}
+                          className="btn btn-ghost btn-xs opacity-50 text-success"
+                        >
+                          <FeatherIcon icon="edit" size="18" />
+                        </label>
+                        <input
+                          type="checkbox"
+                          id={`referenceVm${index}`}
+                          className="modal-toggle"
+                          checked={showEditModal === `referenceVm${index}`}
+                          onChange={() => {
+                            setShowEditModal(
+                              showEditModal ? null : `referenceVm${index}`
+                            );
+                          }}
+                        />
+                        <div className="modal">
+                          {showEditModal && (
+                            <div className="modal-box relative">
+                              <label
+                                htmlFor={`referenceVm${index}`}
+                                className="btn btn-sm btn-circle absolute right-2 top-2"
+                              >
+                                ✕
+                              </label>
+                              <EditReferenceMethod
+                                htmlId={`referenceVm${index}`}
+                                method={vm}
+                                didDocument={didDocument}
+                                save={(vm: ReferencedMaterial) => {
+                                  setDidDocument(
+                                    produce(didDocument, (draft) => {
+                                      draft.verificationMaterials[index] = vm;
+                                    })
+                                  );
+                                }}
+                              />
+                            </div>
+                          )}
+                        </div>
+                        <button
+                          className="btn btn-ghost btn-xs opacity-50 text-error"
+                          onClick={() => {
+                            setDidDocument(
+                              produce(didDocument, (draft) => {
+                                draft.verificationMaterials.splice(index, 1);
+                              })
+                            );
+                          }}
+                        >
+                          <FeatherIcon icon="trash" size="18" />
+                        </button>
                       </div>
-                      <button
-                        className="btn btn-ghost btn-xs opacity-50 text-error"
-                        onClick={() => {
-                          setDidDocument(
-                            produce(didDocument, (draft) => {
-                              draft.verificationMaterials.splice(index, 1);
-                            })
-                          );
-                        }}
-                      >
-                        <FeatherIcon icon="trash" size="18" />
-                      </button>
+                      <SummarizeReferenceMethod
+                        method={vm}
+                        didDocument={didDocument}
+                        index={index}
+                      />
                     </div>
-                    <SummarizeReferenceMethod
-                      method={vm}
-                      didDocument={didDocument}
-                      index={index}
-                    />
                   </div>
-                </div>
-              )
+                ))
             )}
           </div>
         </div>
-        <div className="w-2/3">
-          {attemptSerialization(didDocument)}
-        </div>
+        <div className="w-2/3">{attemptSerialization(didDocument)}</div>
       </div>
     </>
   );

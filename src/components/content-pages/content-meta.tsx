@@ -17,6 +17,10 @@ const ContentMeta = ({
   return (
     <Head>
       <title>{title}</title>
+      <link
+        href="https://fonts.googleapis.com/css2?family=Geologica&display=swap"
+        rel="stylesheet"
+      />
       <meta name="twitter:card" content="summary_large_image" />
       <meta name="description" content={description} key="desc" />
       <meta property="og:title" content={title} />

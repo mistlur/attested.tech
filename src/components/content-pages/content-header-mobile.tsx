@@ -45,26 +45,26 @@ const ContentHeaderMobile = ({ className, onClose }: Props) => {
             </Menu.Item>
           ))}
           <Divider />
-          {!!user ? (
-            <Menu.Item>
-              <Link href="/dashboard" passHref>
-                {t("dashboard")}
-              </Link>
-            </Menu.Item>
-          ) : (
-            <>
-              <Menu.Item>
-                <Link href="/login" passHref>
-                  {t("login")}
-                </Link>
-              </Menu.Item>
-              <Menu.Item>
-                <Link href="/signup" passHref>
-                  {t("signUp")}
-                </Link>
-              </Menu.Item>
-            </>
-          )}
+          {/*{!!user ? (*/}
+          {/*  <Menu.Item>*/}
+          {/*    <Link href="/dashboard" passHref>*/}
+          {/*      {t("dashboard")}*/}
+          {/*    </Link>*/}
+          {/*  </Menu.Item>*/}
+          {/*) : (*/}
+          {/*  <>*/}
+          {/*    <Menu.Item>*/}
+          {/*      <Link href="/login" passHref>*/}
+          {/*        {t("login")}*/}
+          {/*      </Link>*/}
+          {/*    </Menu.Item>*/}
+          {/*    <Menu.Item>*/}
+          {/*      <Link href="/signup" passHref>*/}
+          {/*        {t("signUp")}*/}
+          {/*      </Link>*/}
+          {/*    </Menu.Item>*/}
+          {/*  </>*/}
+          {/*)}*/}
         </Menu>
       </div>
     </div>

@@ -23,7 +23,7 @@ const BasejumpHomepage = () => {
           description="Playground for decentralized identifiers"
           socialImage={`/api/og?title=Basejump`}
         />
-        <div className="pt-8 pb-24 md:pt-24 md:36">
+        <div className="p-8 pt-8 pb-24 md:pt-24 md:36">
           {/*<Logo size="lg" className="mx-auto" />*/}
           <h2 className="h2 text-center my-2">
             <span className="text-accent">

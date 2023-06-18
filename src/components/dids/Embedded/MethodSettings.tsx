@@ -1,10 +1,15 @@
 import { DidDocument } from "@/lib/DidDocument";
 import { EmbeddedMaterial } from "@/lib/DidMaterial";
-import { deriveIdentificationFragment } from "@/lib/keys";
-import { KeyFormat, Representation, UsageFormat, verificationRelationships } from "@/types/dids";
+import {
+  EmbeddedType,
+  KeyFormat,
+  Representation,
+  UsageFormat,
+  verificationRelationships,
+} from "@/types/dids";
 import { useState } from "react";
 import DidInput from "../DidInput";
-
+import { deriveIdentificationFragment } from "@/lib/keys";
 
 export default function EmbeddedMethodSettings({
   htmlId,
@@ -16,11 +21,15 @@ export default function EmbeddedMethodSettings({
   didDocument: DidDocument;
   save: (vm: EmbeddedMaterial) => void;
 }): JSX.Element {
-  const material = method.material.keyMaterial
+  const material = method.material.keyMaterial;
   const [id, setId] = useState<string>(method.id);
-  const [controller, setController] = useState<string>(method.material.controller);
+  const [controller, setController] = useState<string>(
+    method.material.controller
+  );
   const [format, setFormat] = useState<KeyFormat>(method.material.format);
-  const [methods, setMethods] = useState<UsageFormat<Representation>>(method.material.usage);
+  const [methods, setMethods] = useState<UsageFormat<Representation>>(
+    method.material.usage
+  );
 
   return (
     <div>
@@ -44,8 +53,9 @@ export default function EmbeddedMethodSettings({
               value={controller}
               label="Controller"
               callback={(e) => {
-                setController(e.did?.serialize() || "")
-              }} />
+                setController(e.did?.serialize() || "");
+              }}
+            />
           </div>
         </div>
 
@@ -130,17 +140,21 @@ export default function EmbeddedMethodSettings({
       </div>
       <label
         htmlFor={htmlId}
-        className={`btn btn-info btn-outline btn-block mt-4 ${controller !== "" ? "" : "btn-disabled"}`}
-        onClick={() => {
-          const newVerificationMethod: EmbeddedMaterial =
-            new EmbeddedMaterial(id || `#${deriveIdentificationFragment(format, material)}`,
-              {
-                format,
-                curve: "P-256",
-                controller,
-                usage: methods,
-                keyMaterial: material,
-              });
+        className={`btn btn-info btn-outline btn-block mt-4 ${controller !== "" ? "" : "btn-disabled"
+          }`}
+        onClick={async () => {
+          const finalMaterial: EmbeddedType = {
+            format,
+            curve: method.material.curve,
+            controller,
+            usage: methods,
+            keyMaterial: material,
+          }
+          let finalId = id || await deriveIdentificationFragment(finalMaterial)
+          const newVerificationMethod: EmbeddedMaterial = new EmbeddedMaterial(
+            finalId,
+            finalMaterial
+          );
           save(newVerificationMethod);
         }}
       >

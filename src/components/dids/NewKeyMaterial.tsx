@@ -1,9 +1,9 @@
 import { DidDocument } from "@/lib/DidDocument";
 import { EmbeddedMaterial } from "@/lib/DidMaterial";
-import { decodeP256Jwk, exportPrivateKey } from "@/lib/keys";
-import { ec as EC } from "elliptic";
+import { generateKeyPair, decodeJwk } from "@/lib/keys";
 import { useState } from "react";
 import { publicKeyJwkSchema } from "../../lib/didParser";
+import { SupportedCurves } from "@/types/dids";
 
 export default function NewKeyMaterial({
   didDocument,
@@ -12,6 +12,7 @@ export default function NewKeyMaterial({
   didDocument: DidDocument;
   setMethod: (km: EmbeddedMaterial) => void;
 }): JSX.Element {
+  const [curve, setCurve] = useState<SupportedCurves>("Ed25519");
   const [isGeneratedKey, setIsGeneratedKey] = useState<boolean>(true);
   const [importedKeyValidationStatus, setImportedKeyValidationStatus] =
     useState<string | undefined>(undefined);
@@ -23,15 +24,13 @@ export default function NewKeyMaterial({
   function completeSetup() {
     if (!keyMaterial) throw Error("KeyMaterial is undefined");
     const format = "JsonWebKey2020";
-    const method: EmbeddedMaterial = new EmbeddedMaterial(
-      undefined,
-      {
-        controller: didDocument.id,
-        format,
-        curve: "P-256",
-        usage: {},
-        keyMaterial,
-      });
+    const method: EmbeddedMaterial = new EmbeddedMaterial(undefined, {
+      controller: didDocument.id,
+      format,
+      curve,
+      usage: {},
+      keyMaterial,
+    });
     setMethod(method);
   }
 
@@ -57,15 +56,44 @@ export default function NewKeyMaterial({
       </div>
       {isGeneratedKey ? (
         <div>
+          <div>
+            <div className="form-control">
+              <label className="label cursor-pointer">
+                <span className="label-text">Ed25519</span>
+                <input
+                  type="radio"
+                  name="radio-10"
+                  className="radio checked:bg-red-500"
+                  onClick={() => setCurve("Ed25519")}
+                  checked={curve === "Ed25519"}
+                />
+              </label>
+            </div>
+            <div className="form-control">
+              <label className="label cursor-pointer">
+                <span className="label-text">P-256</span>
+                <input
+                  type="radio"
+                  name="radio-10"
+                  className="radio checked:bg-blue-500"
+                  onClick={() => setCurve("P-256")}
+                  checked={curve === "P-256"}
+                />
+              </label>
+            </div>
+          </div>
           <button
             className="btn btn-block mb-4 mt-8"
             onClick={() => {
-              const ec = new EC("p256");
-              const keypair = ec.genKeyPair();
-              const pk = JSON.stringify(exportPrivateKey(keypair), null, 2);
-              setPrivateKey(pk);
+              const keyPair = generateKeyPair(curve);
+              const privateKey = JSON.stringify(
+                keyPair.privateKey,
+                null,
+                2
+              );
+              setPrivateKey(privateKey);
               setKeyMaterial(
-                new Uint8Array(keypair.getPublic().encode("array", false))
+                keyPair.publicKey
               );
             }}
           >
@@ -99,7 +127,7 @@ export default function NewKeyMaterial({
         <div className="form-control">
           <label className="label">
             <span className="label-text">
-              Import a JWK formatted P-256 Public Key
+              Import a JWK formatted Public Key. P-256 and Ed25519 curves are supported.
             </span>
             <span
               className={`label-text-alt ${importedKeyValidationStatus === "Valid" ? "text-success" : ""
@@ -127,9 +155,10 @@ export default function NewKeyMaterial({
               try {
                 const parsedJson = JSON.parse(e.target.value);
                 const parsedSchema = publicKeyJwkSchema.parse(parsedJson);
-                const decoded = decodeP256Jwk(parsedSchema);
+                const decoded = decodeJwk(parsedSchema);
                 setImportedKeyValidationStatus("Valid");
                 setKeyMaterial(decoded);
+                setCurve(parsedSchema.crv === "P-256" ? "P-256" : "Ed25519")
               } catch (e) {
                 setImportedKeyValidationStatus("Invalid key or key format");
               }

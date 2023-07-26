@@ -1,3 +1,5 @@
+import { NSupportedCurves } from "@/lib/curves";
+
 export const verificationRelationships = [
   "authentication",
   "assertionMethod",
@@ -20,7 +22,7 @@ export type UsageFormat<Type extends Representation> = {
 
 export type EmbeddedType = {
   controller?: string;
-  curve: SupportedCurves;
+  curve: NSupportedCurves;
   keyMaterial: Uint8Array;
   format: KeyFormat;
   usage: UsageFormat<Representation>;

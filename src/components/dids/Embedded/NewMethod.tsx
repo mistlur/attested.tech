@@ -17,7 +17,7 @@ export default function NewEmbeddedMethod({
   const [method, setMethod] = useState<EmbeddedMaterial | undefined>(undefined);
   return (
     <>
-      <h3 className="text-lg font-bold">{"Add Verification Method"}</h3>
+      <h3 className="text-lg font-bold">{"Add Embedded Material"}</h3>
       {!method ? (
         <NewKeyMaterial
           didDocument={didDocument}

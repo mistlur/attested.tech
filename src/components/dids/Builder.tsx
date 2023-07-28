@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useEffect } from "react";
+import { useCallback, useEffect, useState } from "react";
 import FeatherIcon from "feather-icons-react";
 import { documentSchema } from "../../lib/didParser";
 import { didDocumentDeserializer } from "../../lib/verificationMaterialBuilder";
@@ -22,7 +22,7 @@ import EditDidController from "./EditDidController";
 import EditDidSubject from "./EditDidSubject";
 import ImportDocument from "./ImportDocument";
 
-const attemptSerialization = (didDocument: DidDocument): JSX.Element => {
+function AttemptSerialization({ didDocument }: { didDocument: DidDocument }) {
   const [isJsonLd, setIsJsonLd] = useState<boolean>(true);
   let result: string;
   let validDocument: boolean;
@@ -96,7 +96,7 @@ const attemptSerialization = (didDocument: DidDocument): JSX.Element => {
       )}
     </div>
   );
-};
+}
 
 export default function DidBuilder({
   id,
@@ -127,6 +127,23 @@ export default function DidBuilder({
   const [showImportDocumentModal, setShowImportDocumentModal] =
     useState<boolean>(false);
 
+  useEffect(() => {
+    const handleEsc = (event) => {
+      if (event.key === "Escape") {
+        setShowNewEmbeddedMethodModal(false);
+        setShowNewReferenceMethodModal(false);
+        setShowEditDidControllerModal(false);
+        setShowEditDidSubjectModal(false);
+        setShowImportDocumentModal(false);
+      }
+    };
+    window.addEventListener("keydown", handleEsc);
+
+    return () => {
+      window.removeEventListener("keydown", handleEsc);
+    };
+  }, []);
+
   const onKeyup = useCallback(
     (event) => {
       if (event.key === "Escape") {
@@ -151,7 +168,7 @@ export default function DidBuilder({
         {/* START DID Subject */}
         <div>
           <label htmlFor="editDidSubject" className="btn btn-ghost btn-sm">
-            Edit DID Subject
+            Edit Subject
           </label>
         </div>
         <input
@@ -168,7 +185,7 @@ export default function DidBuilder({
             <div className="modal-box relative max-w-none w-1/2">
               <label
                 htmlFor="editDidSubject"
-                className="btn btn-sm btn-circle absolute right-2 top-2"
+                className="btn btn-sm btn-circle absolute right-4 top-4"
               >
                 ✕
               </label>
@@ -190,7 +207,7 @@ export default function DidBuilder({
         {/* START DID Controller */}
         <div>
           <label htmlFor="editDidController" className="btn btn-ghost btn-sm">
-            Edit DID Controller
+            Edit Controller
           </label>
         </div>
         <input
@@ -204,10 +221,10 @@ export default function DidBuilder({
         />
         <div className="modal">
           {showEditDidControllerModal && (
-            <div className="modal-box relative">
+            <div className="modal-box relative max-w-none w-1/2">
               <label
                 htmlFor="editDidController"
-                className="btn btn-sm btn-circle absolute right-2 top-2"
+                className="btn btn-sm btn-circle absolute right-4 top-4"
               >
                 ✕
               </label>
@@ -488,7 +505,9 @@ export default function DidBuilder({
             )}
           </div>
         </div>
-        <div className="w-2/3">{attemptSerialization(didDocument)}</div>
+        <div className="w-2/3">
+          <AttemptSerialization didDocument={didDocument} />
+        </div>
       </div>
     </>
   );

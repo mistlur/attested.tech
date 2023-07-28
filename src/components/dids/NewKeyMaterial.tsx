@@ -1,6 +1,6 @@
 import { DidDocument } from "@/lib/DidDocument";
 import { EmbeddedMaterial } from "@/lib/DidMaterial";
-import { generateKeyPair, decodeJwk } from "@/lib/keys";
+import { decodeJwk, generateKeyPair } from "@/lib/keys";
 import { useState } from "react";
 import { publicKeyJwkSchema } from "../../lib/didParser";
 import { SupportedCurves } from "@/types/dids";
@@ -43,7 +43,7 @@ export default function NewKeyMaterial({
             setIsGeneratedKey(true);
           }}
         >
-          Generate new material
+          Generate new key
         </button>
         <button
           className={`btn w-1/2 ${!isGeneratedKey ? "btn-active" : ""}`}
@@ -51,7 +51,7 @@ export default function NewKeyMaterial({
             setIsGeneratedKey(false);
           }}
         >
-          Import material
+          Import key
         </button>
       </div>
       {isGeneratedKey ? (
@@ -86,15 +86,9 @@ export default function NewKeyMaterial({
             className="btn btn-block mb-4 mt-8"
             onClick={() => {
               const keyPair = generateKeyPair(curve);
-              const privateKey = JSON.stringify(
-                keyPair.privateKey,
-                null,
-                2
-              );
+              const privateKey = JSON.stringify(keyPair.privateKey, null, 2);
               setPrivateKey(privateKey);
-              setKeyMaterial(
-                keyPair.publicKey
-              );
+              setKeyMaterial(keyPair.publicKey);
             }}
           >
             {privateKey === "" ? "Generate new key" : "Regenerate key"}
@@ -127,26 +121,31 @@ export default function NewKeyMaterial({
         <div className="form-control">
           <label className="label">
             <span className="label-text">
-              Import a JWK formatted Public Key. P-256 and Ed25519 curves are supported.
+              Import a JWK formatted Public Key.
+              <br /> Supported curves: Ed25519 and P-256.
             </span>
             <span
-              className={`label-text-alt ${importedKeyValidationStatus === "Valid" ? "text-success" : ""
-                } ${importedKeyValidationStatus &&
-                  importedKeyValidationStatus !== "Valid"
+              className={`label-text-alt ${
+                importedKeyValidationStatus === "Valid" ? "text-success" : ""
+              } ${
+                importedKeyValidationStatus &&
+                importedKeyValidationStatus !== "Valid"
                   ? "text-error"
                   : ""
-                }`}
+              }`}
             >
               {importedKeyValidationStatus}
             </span>
           </label>
           <textarea
-            className={`textarea bg-base-300 textarea-bordered w-full h-36 font-mono text-xs ${importedKeyValidationStatus === "Valid" ? "textarea-success" : ""
-              } ${importedKeyValidationStatus &&
-                importedKeyValidationStatus !== "Valid"
+            className={`textarea bg-base-300 textarea-bordered w-full h-36 font-mono text-xs ${
+              importedKeyValidationStatus === "Valid" ? "textarea-success" : ""
+            } ${
+              importedKeyValidationStatus &&
+              importedKeyValidationStatus !== "Valid"
                 ? "textarea-error"
                 : ""
-              }`}
+            }`}
             onChange={(e) => {
               if (e.target.value === "") {
                 setImportedKeyValidationStatus(undefined);
@@ -158,7 +157,7 @@ export default function NewKeyMaterial({
                 const decoded = decodeJwk(parsedSchema);
                 setImportedKeyValidationStatus("Valid");
                 setKeyMaterial(decoded);
-                setCurve(parsedSchema.crv === "P-256" ? "P-256" : "Ed25519")
+                setCurve(parsedSchema.crv === "P-256" ? "P-256" : "Ed25519");
               } catch (e) {
                 setImportedKeyValidationStatus("Invalid key or key format");
               }
@@ -167,8 +166,9 @@ export default function NewKeyMaterial({
         </div>
       )}
       <button
-        className={`btn btn-block mt-4 btn-success ${!keyMaterial ? "btn-disabled" : ""
-          }`}
+        className={`btn btn-block mt-4 btn-success ${
+          !keyMaterial ? "btn-disabled" : ""
+        }`}
         onClick={() => {
           completeSetup();
         }}

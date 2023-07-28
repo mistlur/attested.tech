@@ -22,28 +22,33 @@ const DidInput = forwardRef(
     { label, helpText, errorMessage, color, callback, ...props }: Props,
     ref: ForwardedRef<HTMLInputElement>
   ) => {
-
-    const [didCandidate, setDidCandidate] = useState<string>(props.value?.toString() || "")
-    const [isDidValid, setIsDidValid] = useState<boolean>(Did.validate(didCandidate))
+    const [didCandidate, setDidCandidate] = useState<string>(
+      props.value?.toString() || ""
+    );
+    const [isDidValid, setIsDidValid] = useState<boolean>(
+      Did.validate(didCandidate)
+    );
 
     return (
       <Input
         label={label || "Enter a DID"}
         helpText={helpText}
-        errorMessage={isDidValid ? "" : "DID is not valid"}
+        errorMessage={
+          isDidValid || didCandidate === "" ? "" : "DID is not valid"
+        }
         successMessage={isDidValid ? "Valid" : ""}
         data-testid="name"
         placeholder="did:web:..."
         value={didCandidate}
         onChange={(e) => {
-          const isValid = Did.validate(e.target.value)
+          const isValid = Did.validate(e.target.value);
           callback({
             valid: isValid,
             value: e.target.value,
-            did: isValid && new Did(e.target.value) || null
-          })
-          setIsDidValid(isValid)
-          setDidCandidate(e.target.value)
+            did: (isValid && new Did(e.target.value)) || null,
+          });
+          setIsDidValid(isValid);
+          setDidCandidate(e.target.value);
         }}
       />
     );

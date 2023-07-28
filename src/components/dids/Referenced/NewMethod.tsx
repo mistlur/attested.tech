@@ -13,7 +13,7 @@ export default function NewReferenceMethod({
 }): JSX.Element {
   return (
     <>
-      <h3 className="text-lg font-bold">{"New Reference method"}</h3>
+      <h3 className="text-lg font-bold mb-8">{"New Reference method"}</h3>
       <ReferenceMethodSettings
         htmlId={htmlId}
         didDocument={didDocument}

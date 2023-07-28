@@ -27,11 +27,7 @@ export default function EditDidController({
           Edit DID Controller{" "}
           <div
             className="tooltip tooltip-bottom z-50"
-            data-tip="A DID Controller is an entity that has the capability to make
-            changes to a DID document. A DID might have more than one DID
-            controller. The DID controller(s) can be denoted by the optional
-            controller property at the top level DID document. Note that a DID
-            controller might be the DID subject."
+            data-tip="The controller of a DID is the entity (person, organization, or autonomous software) that has the capability—as defined by a DID method—to make changes to a DID document. This capability is typically asserted by the control of a set of cryptographic keys used by software acting on behalf of the controller, though it might also be asserted via other mechanisms. Note that a DID might have more than one controller, and the DID subject can be the DID controller, or one of them."
           >
             <InformationCircleIcon className="h-6 w-6 text-info inline" />
           </div>

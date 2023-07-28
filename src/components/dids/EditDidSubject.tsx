@@ -31,9 +31,7 @@ export default function EditDidSubject({
           Edit DID Subject{" "}
           <div
             className="tooltip tooltip-bottom z-50"
-            data-tip="A DID subject is an entity identified by a DID and described by a
-            DID document. Anything can be a DID subject: person, group,
-            organization, physical digital thing, logical thing, etc."
+            data-tip="The subject of a DID is, by definition, the entity identified by the DID. The DID subject might also be the DID controller. Anything can be the subject of a DID: person, group, organization, thing, or concept."
           >
             <InformationCircleIcon className="h-6 w-6 text-info inline" />
           </div>

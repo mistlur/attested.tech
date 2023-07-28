@@ -21,6 +21,7 @@ import {
 import EditDidController from "./EditDidController";
 import EditDidSubject from "./EditDidSubject";
 import ImportDocument from "./ImportDocument";
+import Modal from "@/components/core/Modal";
 
 function AttemptSerialization({ didDocument }: { didDocument: DidDocument }) {
   const [isJsonLd, setIsJsonLd] = useState<boolean>(true);
@@ -180,29 +181,23 @@ export default function DidBuilder({
             setShowEditDidSubjectModal(!showEditDidSubjectModal);
           }}
         />
-        <div className="modal">
-          {showEditDidSubjectModal && (
-            <div className="modal-box relative max-w-none w-1/2">
-              <label
-                htmlFor="editDidSubject"
-                className="btn btn-sm btn-circle absolute right-4 top-4"
-              >
-                ✕
-              </label>
-              <EditDidSubject
-                htmlId="editDidSubject"
-                existingSubject={didDocument.id}
-                save={(did: string) =>
-                  setDidDocument(
-                    produce(didDocument, (draft) => {
-                      draft.setIdentifier(did);
-                    })
-                  )
-                }
-              />
-            </div>
-          )}
-        </div>
+        <Modal
+          show={showEditDidSubjectModal}
+          htmlFor={"editDidSubject"}
+          className={"max-w-none w-1/2"}
+        >
+          <EditDidSubject
+            htmlId="editDidSubject"
+            existingSubject={didDocument.id}
+            save={(did: string) =>
+              setDidDocument(
+                produce(didDocument, (draft) => {
+                  draft.setIdentifier(did);
+                })
+              )
+            }
+          />
+        </Modal>
         {/* END DID Subject*/}
         {/* START DID Controller */}
         <div>
@@ -219,30 +214,24 @@ export default function DidBuilder({
             setShowEditDidControllerModal(!showEditDidControllerModal);
           }}
         />
-        <div className="modal">
-          {showEditDidControllerModal && (
-            <div className="modal-box relative max-w-none w-1/2">
-              <label
-                htmlFor="editDidController"
-                className="btn btn-sm btn-circle absolute right-4 top-4"
-              >
-                ✕
-              </label>
-              <EditDidController
-                htmlId="editDidController"
-                existingControllers={didDocument.controller}
-                subject={didDocument.id}
-                save={(controller: DidController | null) =>
-                  setDidDocument(
-                    produce(didDocument, (draft) => {
-                      draft.setController(controller);
-                    })
-                  )
-                }
-              />
-            </div>
-          )}
-        </div>
+        <Modal
+          show={showEditDidControllerModal}
+          htmlFor={"editDidController"}
+          className={"max-w-none w-1/2"}
+        >
+          <EditDidController
+            htmlId="editDidController"
+            existingControllers={didDocument.controller}
+            subject={didDocument.id}
+            save={(controller: DidController | null) =>
+              setDidDocument(
+                produce(didDocument, (draft) => {
+                  draft.setController(controller);
+                })
+              )
+            }
+          />
+        </Modal>
         {/* END DID Controller */}
 
         {/* START Embedded */}
@@ -263,29 +252,22 @@ export default function DidBuilder({
             setShowNewEmbeddedMethodModal(!showNewEmbeddedMethodModal);
           }}
         />
-        <div className="modal">
-          {showNewEmbeddedMethodModal && (
-            <div className="modal-box relative">
-              <label
-                htmlFor="newVerificationMaterial"
-                className="btn btn-sm btn-circle absolute right-2 top-2"
-              >
-                ✕
-              </label>
-              <NewEmbeddedMethod
-                htmlId="newVerificationMaterial"
-                didDocument={didDocument}
-                save={(vm: EmbeddedMaterial) =>
-                  setDidDocument(
-                    produce(didDocument, (draft) => {
-                      draft.addVerificationMethod(vm);
-                    })
-                  )
-                }
-              />
-            </div>
-          )}
-        </div>
+        <Modal
+          show={showNewEmbeddedMethodModal}
+          htmlFor={"newVerificationMaterial"}
+        >
+          <NewEmbeddedMethod
+            htmlId="newVerificationMaterial"
+            didDocument={didDocument}
+            save={(vm: EmbeddedMaterial) =>
+              setDidDocument(
+                produce(didDocument, (draft) => {
+                  draft.addVerificationMethod(vm);
+                })
+              )
+            }
+          />
+        </Modal>
         {/* END Embedded */}
 
         {/* START Reference */}
@@ -306,29 +288,22 @@ export default function DidBuilder({
             setShowNewReferenceMethodModal(!showNewReferenceMethodModal);
           }}
         />
-        <div className="modal">
-          {showNewReferenceMethodModal && (
-            <div className="modal-box relative">
-              <label
-                htmlFor="newReferenceVerificationMaterial"
-                className="btn btn-sm btn-circle absolute right-2 top-2"
-              >
-                ✕
-              </label>
-              <NewReferenceMethod
-                htmlId="newReferenceVerificationMaterial"
-                didDocument={didDocument}
-                save={(vm: ReferencedMaterial) =>
-                  setDidDocument(
-                    produce(didDocument, (draft) => {
-                      draft.addVerificationMethod(vm);
-                    })
-                  )
-                }
-              />
-            </div>
-          )}
-        </div>
+        <Modal
+          show={showNewReferenceMethodModal}
+          htmlFor={"newReferenceVerificationMaterial"}
+        >
+          <NewReferenceMethod
+            htmlId="newReferenceVerificationMaterial"
+            didDocument={didDocument}
+            save={(vm: ReferencedMaterial) =>
+              setDidDocument(
+                produce(didDocument, (draft) => {
+                  draft.addVerificationMethod(vm);
+                })
+              )
+            }
+          />
+        </Modal>
         {/* END Reference */}
         {/* START Import Document */}
         <div className="ml-auto">
@@ -345,22 +320,12 @@ export default function DidBuilder({
             setShowImportDocumentModal(!showImportDocumentModal);
           }}
         />
-        <div className="modal">
-          {showImportDocumentModal && (
-            <div className="modal-box relative max-w-none w-1/2">
-              <label
-                htmlFor="importDocument"
-                className="btn btn-sm btn-circle absolute right-2 top-2"
-              >
-                ✕
-              </label>
-              <ImportDocument
-                htmlId="importDocument"
-                save={(document: DidDocument) => setDidDocument(document)}
-              />
-            </div>
-          )}
-        </div>
+        <Modal show={showImportDocumentModal} htmlFor={"importDocument"}>
+          <ImportDocument
+            htmlId="importDocument"
+            save={(document: DidDocument) => setDidDocument(document)}
+          />
+        </Modal>
         {/* END Import Document*/}
       </div>
 

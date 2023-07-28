@@ -40,7 +40,8 @@ const BasejumpHomepage = () => {
             &nbsp;that enables verifiable, decentralized digital identity.
             <br />
             <br />
-            This site allows you to learn and play around with DID Documents.
+            <span className={"font-bold"}>Attested.tech</span> is a playground
+            that allows you to create and verify DID Documents.
           </h2>
         </div>
       </div>

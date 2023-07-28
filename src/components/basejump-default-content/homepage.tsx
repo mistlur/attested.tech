@@ -34,6 +34,7 @@ const BasejumpHomepage = () => {
               className={"underline"}
               href={"https://www.w3.org/TR/did-core/"}
               passHref
+              target={"_blank"}
             >
               open standard
             </Link>

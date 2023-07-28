@@ -41,7 +41,7 @@ const BasejumpHomepage = () => {
             <br />
             <br />
             <span className={"font-bold"}>Attested.tech</span> is a playground
-            that allows you to create and verify DID Documents.
+            for DID Documents.
           </h2>
         </div>
       </div>

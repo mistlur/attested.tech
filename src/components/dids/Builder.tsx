@@ -169,22 +169,16 @@ export default function DidBuilder({
         {/* START DID Subject */}
         <div>
           <label htmlFor="editDidSubject" className="btn btn-ghost btn-sm">
-            Edit Subject
+            Edit DID Subject
           </label>
         </div>
-        <input
-          type="checkbox"
-          id="editDidSubject"
-          className="modal-toggle"
-          checked={showEditDidSubjectModal}
+        <Modal
+          show={showEditDidSubjectModal}
+          id={"editDidSubject"}
+          className={"max-w-none w-1/2"}
           onChange={() => {
             setShowEditDidSubjectModal(!showEditDidSubjectModal);
           }}
-        />
-        <Modal
-          show={showEditDidSubjectModal}
-          htmlFor={"editDidSubject"}
-          className={"max-w-none w-1/2"}
         >
           <EditDidSubject
             htmlId="editDidSubject"
@@ -202,22 +196,16 @@ export default function DidBuilder({
         {/* START DID Controller */}
         <div>
           <label htmlFor="editDidController" className="btn btn-ghost btn-sm">
-            Edit Controller
+            Edit DID Controller
           </label>
         </div>
-        <input
-          type="checkbox"
-          id="editDidController"
-          className="modal-toggle"
-          checked={showEditDidControllerModal}
+        <Modal
+          show={showEditDidControllerModal}
+          id={"editDidController"}
+          className={"max-w-none w-1/2"}
           onChange={() => {
             setShowEditDidControllerModal(!showEditDidControllerModal);
           }}
-        />
-        <Modal
-          show={showEditDidControllerModal}
-          htmlFor={"editDidController"}
-          className={"max-w-none w-1/2"}
         >
           <EditDidController
             htmlId="editDidController"
@@ -235,26 +223,12 @@ export default function DidBuilder({
         {/* END DID Controller */}
 
         {/* START Embedded */}
-        <div>
-          <label
-            htmlFor="newVerificationMaterial"
-            className="btn btn-ghost btn-sm"
-          >
-            Add Embedded Material
-          </label>
-        </div>
-        <input
-          type="checkbox"
-          id="newVerificationMaterial"
-          className="modal-toggle"
-          checked={showNewEmbeddedMethodModal}
+        <Modal
+          show={showNewEmbeddedMethodModal}
+          id={"newVerificationMaterial"}
           onChange={() => {
             setShowNewEmbeddedMethodModal(!showNewEmbeddedMethodModal);
           }}
-        />
-        <Modal
-          show={showNewEmbeddedMethodModal}
-          htmlFor={"newVerificationMaterial"}
         >
           <NewEmbeddedMethod
             htmlId="newVerificationMaterial"
@@ -271,26 +245,12 @@ export default function DidBuilder({
         {/* END Embedded */}
 
         {/* START Reference */}
-        <div>
-          <label
-            htmlFor="newReferenceVerificationMaterial"
-            className="btn btn-ghost btn-sm"
-          >
-            Add Referenced Material
-          </label>
-        </div>
-        <input
-          type="checkbox"
-          id="newReferenceVerificationMaterial"
-          className="modal-toggle"
-          checked={showNewReferenceMethodModal}
+        <Modal
+          show={showNewReferenceMethodModal}
+          id={"newReferenceVerificationMaterial"}
           onChange={() => {
             setShowNewReferenceMethodModal(!showNewReferenceMethodModal);
           }}
-        />
-        <Modal
-          show={showNewReferenceMethodModal}
-          htmlFor={"newReferenceVerificationMaterial"}
         >
           <NewReferenceMethod
             htmlId="newReferenceVerificationMaterial"
@@ -311,16 +271,13 @@ export default function DidBuilder({
             Import Document
           </label>
         </div>
-        <input
-          type="checkbox"
-          id="importDocument"
-          className="modal-toggle"
-          checked={showImportDocumentModal}
+        <Modal
+          show={showImportDocumentModal}
+          id={"importDocument"}
           onChange={() => {
             setShowImportDocumentModal(!showImportDocumentModal);
           }}
-        />
-        <Modal show={showImportDocumentModal} htmlFor={"importDocument"}>
+        >
           <ImportDocument
             htmlId="importDocument"
             save={(document: DidDocument) => setDidDocument(document)}
@@ -468,6 +425,22 @@ export default function DidBuilder({
                   </div>
                 ))
             )}
+            <button
+              className="btn btn-outline text-neutral-content btn-default m-4"
+              onClick={() =>
+                setShowNewEmbeddedMethodModal(!showNewEmbeddedMethodModal)
+              }
+            >
+              Add Embedded Material
+            </button>
+            <button
+              className="btn btn-outline text-neutral-content btn-default mx-4"
+              onClick={() =>
+                setShowNewReferenceMethodModal(!showNewEmbeddedMethodModal)
+              }
+            >
+              Add Referenced Material
+            </button>
           </div>
         </div>
         <div className="w-2/3">

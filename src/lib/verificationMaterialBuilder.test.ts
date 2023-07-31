@@ -230,8 +230,8 @@ describe("Deserialize DID Document", () => {
     const deserializedDocument = didDocumentDeserializer(document);
     expect(deserializedDocument.id).toBe("did:example:1234");
     expect(deserializedDocument.controller).toBe("did:example:456");
-    expect(deserializedDocument.verificationMaterials.length).toBe(2);
-    deserializedDocument.verificationMaterials.forEach((vm) => {
+    expect(deserializedDocument.verificationMethods.length).toBe(2);
+    deserializedDocument.verificationMethods.forEach((vm) => {
       expect(vm.usage).toEqual({
         verificationMethod: expect.any(String),
         authentication: expect.any(String),
@@ -273,7 +273,7 @@ describe("Deserialize DID Document", () => {
     const deserializedDocument = didDocumentDeserializer(document);
     expect(deserializedDocument.id).toBe("did:example:1234");
     expect(deserializedDocument.controller).toBe("did:example:456");
-    expect(deserializedDocument.verificationMaterials.length).toBe(1);
+    expect(deserializedDocument.verificationMethods.length).toBe(1);
   });
 });
 

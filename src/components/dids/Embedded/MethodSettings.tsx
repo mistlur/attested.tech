@@ -10,6 +10,7 @@ import {
 import { useState } from "react";
 import DidInput from "../DidInput";
 import { deriveIdentificationFragment } from "@/lib/keys";
+import Link from "next/link";
 
 export default function EmbeddedMethodSettings({
   htmlId,
@@ -32,7 +33,7 @@ export default function EmbeddedMethodSettings({
   );
 
   return (
-    <div>
+    <div className="flex flex-col gap-y-8 text-base-content">
       <div className="flex flex-col gap-y-8 text-base-content">
         <div>
           <div>
@@ -64,8 +65,9 @@ export default function EmbeddedMethodSettings({
           <div className="flex w-full">
             <div className="btn-group w-full">
               <button
-                className={`btn w-1/2 ${format === "JsonWebKey2020" ? "btn-active " : ""
-                  }`}
+                className={`btn w-1/2 ${
+                  format === "JsonWebKey2020" ? "btn-active " : ""
+                }`}
                 onClick={() => {
                   setFormat("JsonWebKey2020");
                 }}
@@ -73,8 +75,9 @@ export default function EmbeddedMethodSettings({
                 JWK
               </button>
               <button
-                className={`btn w-1/2 ${format === "Multibase" ? "btn-active" : ""
-                  }`}
+                className={`btn w-1/2 ${
+                  format === "Multibase" ? "btn-active" : ""
+                }`}
                 onClick={() => {
                   setFormat("Multibase");
                 }}
@@ -96,11 +99,11 @@ export default function EmbeddedMethodSettings({
                   </div>
                   <div className="btn-group">
                     <button
-                      className={`btn btn-xs ${methods[method] === "Embedded" ? "btn-primary" : ""
-                        }`}
+                      className={`btn btn-xs ${
+                        methods[method] === "Embedded" ? "btn-primary" : ""
+                      }`}
                       onClick={() => {
                         setMethods({
-                          ...methods,
                           [method]: "Embedded",
                         });
                       }}
@@ -109,11 +112,31 @@ export default function EmbeddedMethodSettings({
                     </button>
 
                     <button
-                      className={`btn btn-xs ${methods[method] === "Reference" ? "btn-secondary" : ""
-                        }`}
+                      className={`btn btn-xs ${
+                        methods[method] === "Reference" ? "btn-secondary" : ""
+                      }`}
                       onClick={() => {
+                        const embeddedMethodsToUpdate = Object.entries(
+                          methods
+                        ).reduce<UsageFormat<Representation>>(
+                          (acc, [key, value]) => {
+                            if (value === "Embedded") {
+                              return {
+                                ...acc,
+                                [key]: "Reference",
+                              };
+                            }
+
+                            return {
+                              ...acc,
+                              [key]: value,
+                            };
+                          },
+                          {}
+                        );
+
                         setMethods({
-                          ...methods,
+                          ...embeddedMethodsToUpdate,
                           [method]: "Reference",
                         });
                       }}
@@ -122,8 +145,9 @@ export default function EmbeddedMethodSettings({
                     </button>
 
                     <button
-                      className={`btn btn-xs ${!methods[method] ? "btn-active" : ""
-                        }`}
+                      className={`btn btn-xs ${
+                        !methods[method] ? "btn-active" : ""
+                      }`}
                       onClick={() => {
                         const { [method]: remove, ...keep } = methods;
                         setMethods(keep);
@@ -140,8 +164,9 @@ export default function EmbeddedMethodSettings({
       </div>
       <label
         htmlFor={htmlId}
-        className={`btn btn-info btn-outline btn-block mt-4 ${controller !== "" ? "" : "btn-disabled"
-          }`}
+        className={`btn btn-info btn-outline btn-block mt-4 ${
+          controller !== "" ? "" : "btn-disabled"
+        }`}
         onClick={async () => {
           const finalMaterial: EmbeddedType = {
             format,
@@ -149,8 +174,9 @@ export default function EmbeddedMethodSettings({
             controller,
             usage: methods,
             keyMaterial: material,
-          }
-          let finalId = id || await deriveIdentificationFragment(finalMaterial)
+          };
+          let finalId =
+            id || (await deriveIdentificationFragment(finalMaterial));
           const newVerificationMethod: EmbeddedMaterial = new EmbeddedMaterial(
             finalId,
             finalMaterial
@@ -160,6 +186,23 @@ export default function EmbeddedMethodSettings({
       >
         Save to Document
       </label>
+      <div className="prose">
+        <p>
+          Verification methods can be embedded in or referenced from properties
+          associated with various verification relationships. Referencing
+          verification methods allows them to be used by more than one
+          verification relationship. See the{" "}
+          <Link
+            className={"underline"}
+            href={"https://w3c.github.io/did-core/#verification-methods"}
+            passHref
+            target={"_blank"}
+          >
+            Verification Methods Documentation
+          </Link>{" "}
+          for more information of each usage.
+        </p>
+      </div>
     </div>
   );
 }

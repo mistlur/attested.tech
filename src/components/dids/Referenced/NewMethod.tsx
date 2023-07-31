@@ -18,7 +18,17 @@ export default function NewReferenceMethod({
         htmlId={htmlId}
         didDocument={didDocument}
         save={save}
-        method={new ReferencedMaterial("", { usage: {} })}
+        method={
+          new ReferencedMaterial("", {
+            usage: {
+              authentication: "Reference",
+              assertionMethod: "Reference",
+              keyAgreement: "Reference",
+              capabilityInvocation: "Reference",
+              capabilityDelegation: "Reference",
+            },
+          })
+        }
       />
     </>
   );

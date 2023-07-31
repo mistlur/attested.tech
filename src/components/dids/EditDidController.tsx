@@ -21,25 +21,9 @@ export default function EditDidController({
   const [isSubject, setIsSubject] = useState<boolean>(controllers.has(subject));
   const [isNewDidValid, setIsNewDidValid] = useState<boolean>(false);
   return (
-    <div>
-      <div className="mb-8">
-        <h3 className="text-xl font-bold">
-          Edit DID Controller{" "}
-          <div
-            className="tooltip tooltip-bottom z-50"
-            data-tip="The controller of a DID is the entity (person, organization, or autonomous software) that has the capability—as defined by a DID method—to make changes to a DID document. This capability is typically asserted by the control of a set of cryptographic keys used by software acting on behalf of the controller, though it might also be asserted via other mechanisms. Note that a DID might have more than one controller, and the DID subject can be the DID controller, or one of them."
-          >
-            <InformationCircleIcon className="h-6 w-6 text-info inline" />
-          </div>
-          <Link
-            className={"underline text-xs mx-2"}
-            href={"https://w3c.github.io/did-core/#did-controller"}
-            passHref
-            target={"_blank"}
-          >
-            See documentation
-          </Link>
-        </h3>
+    <div className="flex flex-col gap-y-8 text-base-content">
+      <div>
+        <h3 className="text-xl font-bold">Edit DID Controller</h3>
       </div>
       <div className="flex flex-col text-base-content">
         <div>
@@ -127,6 +111,27 @@ export default function EditDidController({
         >
           Save to Document
         </label>
+      </div>
+      <div className="prose max-w-max">
+        <p>
+          The controller of a DID is the entity (person, organization, or
+          autonomous software) that has the capability—as defined by a DID
+          method—to make changes to a DID document. This capability is typically
+          asserted by the control of a set of cryptographic keys used by
+          software acting on behalf of the controller, though it might also be
+          asserted via other mechanisms. Note that a DID might have more than
+          one controller, and the DID subject can be the DID controller, or one
+          of them. See the{" "}
+          <Link
+            className={"underline"}
+            href={"https://w3c.github.io/did-core/#did-controller"}
+            passHref
+            target={"_blank"}
+          >
+            DID Controller documentation
+          </Link>{" "}
+          for more information.
+        </p>
       </div>
     </div>
   );

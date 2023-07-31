@@ -25,25 +25,9 @@ export default function EditDidSubject({
   );
 
   return (
-    <div>
-      <div className="mb-8">
-        <h3 className="text-xl font-bold">
-          Edit DID Subject{" "}
-          <div
-            className="tooltip tooltip-bottom z-50"
-            data-tip="The subject of a DID is, by definition, the entity identified by the DID. The DID subject might also be the DID controller. Anything can be the subject of a DID: person, group, organization, thing, or concept."
-          >
-            <InformationCircleIcon className="h-6 w-6 text-info inline" />
-          </div>
-          <Link
-            className={"underline text-xs mx-2"}
-            href={"https://w3c.github.io/did-core/#did-subject"}
-            passHref
-            target={"_blank"}
-          >
-            See documentation
-          </Link>
-        </h3>
+    <div className="flex flex-col gap-y-8 text-base-content">
+      <div>
+        <h3 className="text-xl font-bold">Edit DID Subject </h3>
       </div>
       <div className="flex flex-col gap-y-8 text-base-content">
         <div className="font-mono bg-neutral text-neutral-content w-full text-center overflow-scroll whitespace-nowrap p-8 px-4">
@@ -83,6 +67,18 @@ export default function EditDidSubject({
               </span>
             </div>
           )}
+          <p className="text-xs text-neutral-content/50 mt-4">
+            The{" "}
+            <Link
+              className={"underline"}
+              href={"https://w3c.github.io/did-core/#did-syntax"}
+              passHref
+              target={"_blank"}
+            >
+              DID Syntax
+            </Link>{" "}
+            consist of different parts, you can hover to discover these parts.
+          </p>
         </div>
         <DidInput
           value={existingSubject}
@@ -94,7 +90,7 @@ export default function EditDidSubject({
       </div>
       <label
         htmlFor={htmlId}
-        className={`btn btn-info btn-outline btn-block mt-4 ${
+        className={`btn btn-info btn-outline btn-block ${
           isDidValid ? "" : "btn-disabled"
         }`}
         onClick={() => {
@@ -103,6 +99,23 @@ export default function EditDidSubject({
       >
         Save to Document
       </label>
+      <div className="prose max-w-max">
+        <p>
+          The subject of a DID is, by definition, the entity identified by the
+          DID. The DID subject might also be the DID controller. Anything can be
+          the subject of a DID: person, group, organization, thing, or concept.
+          See the{" "}
+          <Link
+            className={"underline"}
+            href={"https://w3c.github.io/did-core/#did-subject"}
+            passHref
+            target={"_blank"}
+          >
+            DID Subject documentation
+          </Link>{" "}
+          for more information.
+        </p>
+      </div>
     </div>
   );
 }

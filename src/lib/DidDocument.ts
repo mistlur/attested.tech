@@ -95,13 +95,13 @@ export class DidDocument {
       // Check if the material is referenced by any relationship(s). If it is,
       // add it to the list of verification methods
       if (isEmbeddedMaterial(material) && material.isUsedAsReference()) {
-        if (relationships["verificationMaterial"])
-          relationships["verificationMaterial"] = [
-            ...relationships["verificationMaterial"],
+        if (relationships["verificationMethod"])
+          relationships["verificationMethod"] = [
+            ...relationships["verificationMethod"],
             material.serialize("Embedded"),
           ];
         else
-          relationships["verificationMaterial"] = [
+          relationships["verificationMethod"] = [
             material.serialize("Embedded"),
           ];
       }

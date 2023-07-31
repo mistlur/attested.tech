@@ -4,7 +4,14 @@ import { decodeJwk, generateKeyPair } from "@/lib/keys";
 import { useState } from "react";
 import { publicKeyJwkSchema } from "../../lib/didParser";
 import Link from "next/link";
-import { Curve, CurveEd25519, CurveP256, curveFromName, isEd25519, isP256 } from "@/lib/curves";
+import {
+  Curve,
+  CurveEd25519,
+  CurveP256,
+  curveFromName,
+  isEd25519,
+  isP256,
+} from "@/lib/curves";
 
 export default function NewKeyMaterial({
   didDocument,
@@ -147,25 +154,29 @@ export default function NewKeyMaterial({
                 P-256.
               </span>
               <span
-                className={`label-text-alt ${importedKeyValidationStatus === "Valid" ? "text-success" : ""
-                  } ${importedKeyValidationStatus &&
-                    importedKeyValidationStatus !== "Valid"
+                className={`label-text-alt ${
+                  importedKeyValidationStatus === "Valid" ? "text-success" : ""
+                } ${
+                  importedKeyValidationStatus &&
+                  importedKeyValidationStatus !== "Valid"
                     ? "text-error"
                     : ""
-                  }`}
+                }`}
               >
                 {importedKeyValidationStatus}
               </span>
             </label>
             <textarea
-              className={`textarea bg-base-300 textarea-bordered w-full h-36 font-mono text-xs ${importedKeyValidationStatus === "Valid"
-                ? "textarea-success"
-                : ""
-                } ${importedKeyValidationStatus &&
-                  importedKeyValidationStatus !== "Valid"
+              className={`textarea bg-base-300 textarea-bordered w-full h-36 font-mono text-xs ${
+                importedKeyValidationStatus === "Valid"
+                  ? "textarea-success"
+                  : ""
+              } ${
+                importedKeyValidationStatus &&
+                importedKeyValidationStatus !== "Valid"
                   ? "textarea-error"
                   : ""
-                }`}
+              }`}
               onChange={(e) => {
                 if (e.target.value === "") {
                   setImportedKeyValidationStatus(undefined);
@@ -187,8 +198,9 @@ export default function NewKeyMaterial({
         )}
       </div>
       <button
-        className={`btn btn-block btn-success ${!keyMaterial ? "btn-disabled" : ""
-          }`}
+        className={`btn btn-block btn-success ${
+          !keyMaterial ? "btn-disabled" : ""
+        }`}
         onClick={() => {
           completeSetup();
         }}

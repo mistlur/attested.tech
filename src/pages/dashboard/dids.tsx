@@ -4,19 +4,19 @@ import usePersonalAccount from "@/utils/api/use-personal-account";
 import DidHandler from "@/components/dids/DidHandler";
 
 const PersonalDids = () => {
-    const { data: account } = usePersonalAccount();
+  const { data: account } = usePersonalAccount();
 
-    const { t } = useTranslation("dashboard");
-    return (
-        <>
-            <DashboardMeta
-                title={t("dashboardMeta.teamDidDocuments", { teamName: account?.team_name })}
-            />
-            {
-                account && <DidHandler accountId={account.id}/>
-            }
-        </>
-    );
+  const { t } = useTranslation("dashboard");
+  return (
+    <>
+      <DashboardMeta
+        title={t("dashboardMeta.teamDidDocuments", {
+          teamName: account?.team_name,
+        })}
+      />
+      {account && <DidHandler accountId={account.id} />}
+    </>
+  );
 };
 
 export default PersonalDids;

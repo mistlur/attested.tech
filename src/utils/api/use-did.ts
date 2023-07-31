@@ -1,13 +1,15 @@
-import { v4 as uuidv4 } from 'uuid';
+import { v4 as uuidv4 } from "uuid";
 import { useQuery, UseQueryOptions } from "@tanstack/react-query";
 import handleSupabaseErrors from "../handle-supabase-errors";
 import { Database } from "@/types/supabase-types";
 import { useSupabaseClient } from "@supabase/auth-helpers-react";
-import {getInitialDidDocument} from "@/lib/did";
+import { getInitialDidDocument } from "@/lib/did";
 
 export default function useDid(
   accountId: string,
-  options?: UseQueryOptions<Database["public"]["Tables"]["did_documents"]["Row"]>
+  options?: UseQueryOptions<
+    Database["public"]["Tables"]["did_documents"]["Row"]
+  >
 ) {
   const supabaseClient = useSupabaseClient<Database>();
   return useQuery<Database["public"]["Tables"]["did_documents"]["Row"], Error>(
@@ -23,7 +25,7 @@ export default function useDid(
 
       // TODO: fix this
       // insert an initial did document if none exist
-      const id = uuidv4()
+      const id = uuidv4();
       const { data: insert, error: insertError } = await supabaseClient
         .from("did_documents")
         .insert({
@@ -35,13 +37,13 @@ export default function useDid(
         .select();
 
       handleSupabaseErrors(insert, insertError);
-      if (!insert[0]) throw new Error('No initial did created')
+      if (!insert[0]) throw new Error("No initial did created");
 
-      return insert[0]
+      return insert[0];
     },
-      {
-          ...options,
-          enabled: !!accountId && !!supabaseClient,
-      }
+    {
+      ...options,
+      enabled: !!accountId && !!supabaseClient,
+    }
   );
 }

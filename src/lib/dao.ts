@@ -1,28 +1,25 @@
 import supabase from "../utils/supabase";
 import { documentSchema } from "./didParser";
 
-export async function fetchDidDocument(
-  did: string
-) {
+export async function fetchDidDocument(did: string) {
   const { data, error } = await supabase
     .from("did_documents")
-    .select('document')
+    .select("document")
     .eq("id", did)
     .single();
-  if (error) throw new Error(error.message)
+  if (error) throw new Error(error.message);
   if (!data) return undefined;
-  return data.document
+  return data.document;
 }
 
 export async function updateDidDocument(
   id: string,
   didDocument: Record<string, any>
 ) {
-
   try {
     documentSchema.parse(didDocument);
   } catch (e) {
-    throw new Error('Invalid Document provided, will not store') // TODO: Specify
+    throw new Error("Invalid Document provided, will not store"); // TODO: Specify
   }
 
   const result = await supabase
@@ -31,6 +28,6 @@ export async function updateDidDocument(
     .match({ id })
     .select();
 
-  if (result.error) throw new Error(result.error.message)
+  if (result.error) throw new Error(result.error.message);
   return result.data![0];
 }

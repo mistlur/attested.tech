@@ -20,7 +20,13 @@ const DidDocument = () => {
         description={t("didDocumentDescription")}
         socialDescription={t("didDocumentDescription")}
       />
-      {id && <DidBuilder id={id} name={"DID Document Playground"} document={getInitialDidDocument(id)} />}
+      {id && (
+        <DidBuilder
+          id={id}
+          name={"DID Document Playground"}
+          document={getInitialDidDocument(id)}
+        />
+      )}
     </div>
   );
 };

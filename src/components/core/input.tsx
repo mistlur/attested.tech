@@ -37,7 +37,9 @@ const Input = forwardRef(
         <InnerInput
           {...props}
           ref={ref}
-          color={!!errorMessage ? "error" : !!successMessage ? "success" : color}
+          color={
+            !!errorMessage ? "error" : !!successMessage ? "success" : color
+          }
         />
       </div>
     );

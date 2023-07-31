@@ -10,7 +10,8 @@
     "type-check": "tsc",
     "test": "NEXT_PUBLIC_SUPABASE_URL=http://localhost NEXT_PUBLIC_SUPABASE_ANON_KEY=anon-key jest",
     "generate-types": "supabase gen types typescript --local > ./src/types/supabase-types.ts && eslint ./src/types/supabase-types.ts --fix",
-    "sync-stripe": "npx tsx scripts/sync-stripe.ts"
+    "sync-stripe": "npx tsx scripts/sync-stripe.ts",
+    "prepare": "husky install"
   },
   "dependencies": {
     "@heroicons/react": "^1.0.6",
@@ -63,6 +64,7 @@
     "prettier": "^2.7.1",
     "tailwindcss": "^3.2.2",
     "ts-jest": "^29.0.3",
-    "typescript": "^4.8.4"
+    "typescript": "^4.8.4",
+    "husky": "^8.0.0"
   }
 }

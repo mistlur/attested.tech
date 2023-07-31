@@ -8,7 +8,11 @@ import {
 } from "@/types/dids";
 import { z } from "zod";
 import { verificationRelationshipSchema } from "./didParser";
-import { deriveIdentificationFragment, encodeJsonWebKey, encodeMultibaseKey } from "./keys";
+import {
+  deriveIdentificationFragment,
+  encodeJsonWebKey,
+  encodeMultibaseKey,
+} from "./keys";
 import { isEd25519 } from "./curves";
 
 export function isEmbeddedType(
@@ -55,7 +59,7 @@ export class EmbeddedMaterial implements DidMaterial {
   // TODO: add use as verfication method without reference
 
   constructor(id: string, material: EmbeddedType) {
-    this.id = id
+    this.id = id;
     this.material = material;
   }
 

@@ -45,7 +45,7 @@ export default function SummarizeEmbeddedMethod({
             {method.id}
           </div>
 
-          <div><span className="opacity-50">Curve:</span> {method.material.curve}</div>
+          <div><span className="opacity-50">Curve:</span> {method.material.curve.name.display}</div>
           <div className="flex flex-wrap gap-2">
             <span className="opacity-50">Usage:</span>{" "}
             {usages.length > 0 ? usages : "Unused"}

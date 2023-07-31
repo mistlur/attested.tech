@@ -2,10 +2,11 @@ import { z } from 'zod'
 import { documentSchema, verificationRelationshipSchema, verificationRelationshipsSchema } from './didParser'
 import * as b58 from 'multiformats/bases/base58'
 import { ec as EC } from 'elliptic'
-import { Representation, SupportedCurves, VerificationRelationship, KeyFormat, verificationRelationships } from '@/types/dids'
+import { Representation, VerificationRelationship, KeyFormat, verificationRelationships } from '@/types/dids'
 import { DidMaterial, EmbeddedMaterial, isEmbeddedType, ReferencedMaterial } from './DidMaterial'
-import { decodeP256Jwk } from './keys'
 import { DidDocument } from './DidDocument'
+import { decodeJwk } from './keys'
+import { Curve } from './curves'
 
 export const decodeVerificationRelationship = (verificationMethod: z.infer<typeof verificationRelationshipSchema>, method: VerificationRelationship): DidMaterial => {
     if (typeof verificationMethod === "string") {
@@ -13,18 +14,18 @@ export const decodeVerificationRelationship = (verificationMethod: z.infer<typeo
     }
 
     let keyMaterial
-    let curve: SupportedCurves | undefined
+    let curve: Curve | undefined
     let representation: Representation | undefined
     let format: KeyFormat | undefined
 
     if (verificationMethod.type) {
-        const ec = new EC('p256')
+        const ec = new EC(curveFromName())
         curve = 'P-256'
         representation = 'Embedded'
         if (verificationMethod.type === 'JsonWebKey2020') {
             format = 'JsonWebKey2020'
             if (!verificationMethod.publicKeyJwk) throw new Error('Invalid type: "JsonWebKey2020" must contain "publicKeyJwk"')
-            keyMaterial = decodeP256Jwk(verificationMethod.publicKeyJwk)
+            keyMaterial = decodeJwk(verificationMethod.publicKeyJwk)
         }
         else if (verificationMethod.type === 'P256Key2021') {
             format = 'Multibase'
@@ -80,6 +81,6 @@ export const didDocumentDeserializer = (document: z.infer<typeof documentSchema>
             }
         }
     }
-    return new DidDocument(document.id, document.controller, denormalized)
+    return new DidDocument(document.id, new Set<string>(document.controller), denormalized)
 }
 

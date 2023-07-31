@@ -5,7 +5,6 @@ import {
   KeyFormat,
   Representation,
   UsageFormat,
-  verificationRelationships,
 } from "@/types/dids";
 import { useState } from "react";
 import DidInput from "../DidInput";
@@ -90,7 +89,7 @@ export default function EmbeddedMethodSettings({
         <div>
           <span className="opacity-50 font-bold">Used for</span>
           <div className="form-control">
-            {verificationRelationships.map((method, indexMethod) => {
+            {method.material.curve.capabilities.map((method, indexMethod) => {
               return (
                 <div key={indexMethod} className="flex justify-between w-full">
                   <div>

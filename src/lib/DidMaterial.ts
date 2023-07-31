@@ -9,6 +9,7 @@ import {
 import { z } from "zod";
 import { verificationRelationshipSchema } from "./didParser";
 import { deriveIdentificationFragment, encodeJsonWebKey, encodeMultibaseKey } from "./keys";
+import { isEd25519 } from "./curves";
 
 export function isEmbeddedType(
   vm: EmbeddedType | ReferencedType
@@ -109,7 +110,7 @@ export class EmbeddedMaterial implements DidMaterial {
       return this.id;
     }
     let serializedKey = "";
-    if (this.material.curve == "Ed25519") {
+    if (isEd25519(this.material.curve)) {
       if (this.material.format === "JsonWebKey2020") {
         return {
           id: this.id,

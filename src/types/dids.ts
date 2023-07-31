@@ -1,4 +1,4 @@
-import { NSupportedCurves } from "@/lib/curves";
+import { Curve } from "@/lib/curves";
 
 export const verificationRelationships = [
   "authentication",
@@ -9,7 +9,6 @@ export const verificationRelationships = [
 ] as const;
 
 export type KeyFormat = "JsonWebKey2020" | "Multibase";
-export type SupportedCurves = "P-256" | "Ed25519";
 
 export type ReferencedMaterialFormat = "Reference";
 export type EmbeddedMaterialFormat = "Embedded";
@@ -22,7 +21,7 @@ export type UsageFormat<Type extends Representation> = {
 
 export type EmbeddedType = {
   controller?: string;
-  curve: NSupportedCurves;
+  curve: Curve;
   keyMaterial: Uint8Array;
   format: KeyFormat;
   usage: UsageFormat<Representation>;

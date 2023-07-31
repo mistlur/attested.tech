@@ -3,10 +3,9 @@ import * as b58 from "multiformats/bases/base58";
 import * as b64 from "multiformats/bases/base64";
 import {
   EmbeddedType,
-  SupportedCurves,
 } from "@/types/dids";
 import * as jose from 'jose'
-import { NSupportedCurves, curveName, isEd25519, isP256 } from "./curves";
+import { Curve, curveFromName, curveToName, isEd25519, isP256 } from "./curves";
 
 export async function deriveIdentificationFragment(
   material: EmbeddedType
@@ -24,8 +23,8 @@ export async function deriveIdentificationFragment(
   return `${fragmentDelimiter}${fragment}`
 }
 
-export function generateKeyPair(curve: NSupportedCurves): { privateKey: JsonWebKey, publicKey: Uint8Array } {
-  const ec = new EC(curveName(curve, 'elliptic'))
+export function generateKeyPair(curve: Curve): { privateKey: JsonWebKey, publicKey: Uint8Array } {
+  const ec = new EC(curveToName(curve, 'elliptic'))
   const keyPair = ec.genKeyPair();
   const publicKey = isP256(curve) ? new Uint8Array(keyPair.getPublic().encode("array", false)) : new Uint8Array(keyPair.getPublic().getX().toArray())
   const privateKey = exportPrivateKey(keyPair, curve)
@@ -39,13 +38,13 @@ export function generateKeyPair(curve: NSupportedCurves): { privateKey: JsonWebK
 // GENERIC HELPERS
 // -----------------------------------------------------------------------------
 
-function getCryptoSuite(curve: NSupportedCurves) {
-  const c = curveName(curve, 'elliptic')
-  if (isP256(c)) {
+function getCryptoSuite(curve: Curve) {
+  const c = curveToName(curve, 'elliptic')
+  if (isP256(curve)) {
     return new EC(c);
-  } else if (isEd25519(c)) {
+  } else if (isEd25519(curve)) {
     return new EdDSA(c);
-  } else throw Error(`CryptographyError: Unsupported curve: ${curve}`)
+  } else throw Error(`CryptographyError: Unsupported curve ${curve}`)
 }
 
 function getKeyCompactForm(material: EmbeddedType): { bytes: Uint8Array, points: Record<string, number[]> } {
@@ -93,7 +92,7 @@ export function encodeMultibaseKey(material: EmbeddedType): string {
 // JWK
 // -----------------------------------------------------------------------------
 
-function getJwkKty(curve: NSupportedCurves): string {
+function getJwkKty(curve: Curve): string {
   if (isP256(curve)) return "EC"
   else if (isEd25519(curve)) return "OKP"
   else throw Error(`EncodingError: JWK encoding unsupported for curve ${curve}`)
@@ -105,7 +104,7 @@ export function encodeJsonWebKey(
   const kty = getJwkKty(material.curve)
   const keyMaterialCompactForm = getKeyCompactForm(material)
   return {
-    crv: curveName(material.curve, 'jwk'),
+    crv: curveToName(material.curve, 'jwk'),
     kty,
     ...keyMaterialCompactForm.points,
   }
@@ -113,7 +112,7 @@ export function encodeJsonWebKey(
 
 export function decodeJwk(key: JsonWebKey): Uint8Array {
   if (!key.crv) throw new Error('Invalid key')
-  const curve = key.crv as NSupportedCurves
+  const curve = curveFromName(key.crv)
   const ec = getCryptoSuite(curve)
   let bytes: Uint8Array
   if (isEd25519(curve)) {
@@ -137,7 +136,7 @@ export function decodeJwk(key: JsonWebKey): Uint8Array {
 
 export function exportPrivateKey(
   keypair: EC.KeyPair,
-  curve: NSupportedCurves
+  curve: Curve
 ): JsonWebKey {
   const dBytes = new Uint8Array(keypair.getPrivate().toArray());
   const xBytes = new Uint8Array(keypair.getPublic().getX().toArray());
@@ -162,7 +161,7 @@ export function exportPrivateKey(
   else throw new Error(`KeyExportError: Private key export for curve ${curve} not supported`)
 
   return {
-    crv: curveName(curve, 'jwk'),
+    crv: curveToName(curve, 'jwk'),
     d,
     kty,
     ...points,

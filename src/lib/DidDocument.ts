@@ -21,20 +21,20 @@ export class DidDocument {
   [immerable] = true;
   public id: string | undefined;
   public controller: DidController | undefined;
-  public verificationMaterials: DidMaterial[];
+  public verificationMethod: DidMaterial[];
 
   constructor(
     id: string | undefined,
     controller: DidController | null,
-    verificationMaterials: DidMaterial[]
+    verificationMethod: DidMaterial[]
   ) {
     this.id = id;
     this.controller = controller || new Set([]);
-    this.verificationMaterials = verificationMaterials;
+    this.verificationMethod = verificationMethod;
   }
 
   addVerificationMethod(material: DidMaterial) {
-    this.verificationMaterials.push(material);
+    this.verificationMethod.push(material);
   }
 
   setIdentifier(did: string) {
@@ -54,19 +54,21 @@ export class DidDocument {
     else return asArray;
   }
 
-  getContexts(): string[] {
-    const uniqueRepresentations = this.verificationMaterials
-      .filter(
-        (vm) =>
-          isEmbeddedMaterial(vm) &&
-          Object.values(vm.getUsage()).includes("Embedded")
-      )
+  getContexts(): (string | Record<string, any>)[] {
+    const uniqueRepresentations = this.verificationMethod
+      .filter((vm) => isEmbeddedMaterial(vm))
       .map((vm) => (vm as EmbeddedMaterial).material.format)
       .filter((value, index, array) => array.indexOf(value) === index);
     const representationsUsed = uniqueRepresentations.map((representation) => {
       switch (representation) {
         case "JsonWebKey2020":
-          return "https://w3id.org/security/suites/jws-2020/v1";
+          return {
+            JsonWebKey2020: "https://w3id.org/security/suites/jws-2020/v1",
+            publicKeyJwk: {
+              "@id": "https://w3id.org/security#publicKeyJwk",
+              "@type": "@json",
+            },
+          };
         case "Multibase":
           return "https://w3id.org/security/suites/multikey-2021/v1";
         default:
@@ -77,7 +79,7 @@ export class DidDocument {
   }
 
   getRelationship(relationship: VerificationRelationship): DidMaterial[] {
-    return this.verificationMaterials.filter((method) =>
+    return this.verificationMethod.filter((method) =>
       method.isUsedInRelationship(relationship)
     );
   }
@@ -86,7 +88,7 @@ export class DidDocument {
     representation: SerializedRepresentation = "JSONLD"
   ): z.infer<typeof documentSchema> {
     const relationships: Record<string, (string | object)[]> = {};
-    const allMaterials = this.verificationMaterials;
+    const allMaterials = this.verificationMethod;
     const controller = this.serializeController();
 
     allMaterials.forEach((material) => {
@@ -98,11 +100,11 @@ export class DidDocument {
         if (relationships["verificationMethod"])
           relationships["verificationMethod"] = [
             ...relationships["verificationMethod"],
-            material.serialize("Embedded"),
+            material.serialize("Embedded", this.id),
           ];
         else
           relationships["verificationMethod"] = [
-            material.serialize("Embedded"),
+            material.serialize("Embedded", this.id),
           ];
       }
 

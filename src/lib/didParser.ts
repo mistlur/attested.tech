@@ -43,7 +43,7 @@ export const documentSchema = z.object({
   ["@context"]: z
     .literal("https://w3.org/ns/did/v1")
     .or(z.string())
-    .or(z.array(z.string()))
+    .or(z.array(z.string().or(z.record(z.string(), z.any()))))
     .optional(),
   id: z.string(),
   alsoKnownAs: z.string().optional(),

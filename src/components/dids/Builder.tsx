@@ -289,12 +289,12 @@ export default function DidBuilder({
       <div className="flex justify-between mb-8">
         <div className="w-1/3 bg-neutral text-neutral-content shadow-[inset_-147px_0px_180px_-180px_rgba(0,0,0,1)]">
           <div className="flex flex-col">
-            {!didDocument.verificationMaterials.length && (
+            {!didDocument.verificationMethod.length && (
               <div className="text-center py-4 text-sm opacity-50">
                 No material associated with DID
               </div>
             )}
-            {didDocument.verificationMaterials.map(
+            {didDocument.verificationMethod.map(
               (vm, index) =>
                 (isEmbeddedMaterial(vm) && (
                   <div key={index}>
@@ -333,7 +333,7 @@ export default function DidBuilder({
                                 save={(vm: EmbeddedMaterial) => {
                                   setDidDocument(
                                     produce(didDocument, (draft) => {
-                                      draft.verificationMaterials[index] = vm;
+                                      draft.verificationMethod[index] = vm;
                                     })
                                   );
                                 }}
@@ -346,7 +346,7 @@ export default function DidBuilder({
                           onClick={() => {
                             setDidDocument(
                               produce(didDocument, (draft) => {
-                                draft.verificationMaterials.splice(index, 1);
+                                draft.verificationMethod.splice(index, 1);
                               })
                             );
                           }}
@@ -395,7 +395,7 @@ export default function DidBuilder({
                                 save={(vm: ReferencedMaterial) => {
                                   setDidDocument(
                                     produce(didDocument, (draft) => {
-                                      draft.verificationMaterials[index] = vm;
+                                      draft.verificationMethod[index] = vm;
                                     })
                                   );
                                 }}
@@ -408,7 +408,7 @@ export default function DidBuilder({
                           onClick={() => {
                             setDidDocument(
                               produce(didDocument, (draft) => {
-                                draft.verificationMaterials.splice(index, 1);
+                                draft.verificationMethod.splice(index, 1);
                               })
                             );
                           }}

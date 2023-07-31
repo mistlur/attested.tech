@@ -100,7 +100,8 @@ export class EmbeddedMaterial implements DidMaterial {
   }
 
   public serialize(
-    representation: Representation
+    representation: Representation,
+    subject: string = ""
   ): z.infer<typeof verificationRelationshipSchema> {
     if (!this.material.controller)
       throw Error(
@@ -110,21 +111,24 @@ export class EmbeddedMaterial implements DidMaterial {
       throw Error(
         "Malformed verification method: Embedded material must contain id"
       );
+
     if (representation === "Reference") {
       return this.id;
     }
-    let serializedKey = "";
+
+    const fullId = subject + this.id;
+
     if (isEd25519(this.material.curve)) {
       if (this.material.format === "JsonWebKey2020") {
         return {
-          id: this.id,
+          id: fullId,
           type: this.material.format,
           controller: this.material.controller,
           publicKeyJwk: encodeJsonWebKey(this.material),
         };
       } else if (this.material.format === "Multibase") {
         return {
-          id: this.id,
+          id: fullId,
           type: "ED25519Key2020",
           controller: this.material.controller,
           publicKeyMultibase: encodeMultibaseKey(this.material),
@@ -139,14 +143,14 @@ export class EmbeddedMaterial implements DidMaterial {
     } else {
       if (this.material.format === "JsonWebKey2020") {
         return {
-          id: this.id,
+          id: fullId,
           type: this.material.format,
           controller: this.material.controller,
           publicKeyJwk: encodeJsonWebKey(this.material),
         };
       } else if (this.material.format === "Multibase") {
         return {
-          id: this.id,
+          id: fullId,
           type: "P256Key2021",
           controller: this.material.controller,
           publicKeyMultibase: encodeMultibaseKey(this.material),

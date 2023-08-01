@@ -48,8 +48,8 @@ const AttestedHomepage = () => {
           </h2>
         </div>
       </div>
-      <div className="bg-base-300">
-        <div id="#dids" className="w-full mx-auto">
+      <div className="bg-base-100">
+        <div id="#dids" className="max-w-screen-xl mx-auto">
           {id && (
             <DidBuilder
               id={id}

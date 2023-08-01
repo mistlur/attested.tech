@@ -175,7 +175,7 @@ export default function DidBuilder({
   }, []);
 
   return (
-    <>
+    <div className="bg-base-300">
       <div className="flex gap-x-4 gap-4 p-4 bg-base-300">
         {/* START DID Subject */}
         <div>
@@ -297,7 +297,7 @@ export default function DidBuilder({
         {/* END Import Document*/}
       </div>
 
-      <div className="flex justify-between mb-8">
+      <div className="flex justify-between">
         <div className="w-1/3 bg-neutral text-neutral-content shadow-[inset_-147px_0px_180px_-180px_rgba(0,0,0,1)]">
           <div className="flex flex-col">
             {!didDocument.verificationMethod.length && (
@@ -458,7 +458,7 @@ export default function DidBuilder({
           <AttemptSerialization didDocument={didDocument} />
         </div>
       </div>
-      <div className="bg-base-300 h-8"></div>
-    </>
+      <div className="bg-base-300 h-16"></div>
+    </div>
   );
 }

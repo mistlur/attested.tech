@@ -24,8 +24,14 @@ import ImportDocument from "./ImportDocument";
 import Modal from "@/components/core/Modal";
 import Infobox from "../attested-default-content/infobox";
 
+import { Light as SyntaxHighlighter } from "react-syntax-highlighter";
+import { json } from "react-syntax-highlighter/dist/cjs/languages/hljs";
+import { syntaxHighlightingTheme } from "@/utils/syntaxHighlightingTheme";
+SyntaxHighlighter.registerLanguage("json", json);
+
 function AttemptSerialization({ didDocument }: { didDocument: DidDocument }) {
   const [isJsonLd, setIsJsonLd] = useState<boolean>(true);
+
   let result: string;
   let validDocument: boolean;
   try {
@@ -93,7 +99,11 @@ function AttemptSerialization({ didDocument }: { didDocument: DidDocument }) {
       )}
       {validDocument && (
         <div className="bg-base-200">
-          <pre className="p-4 text-xs overflow-scroll">{result}</pre>
+          <pre className="p-4 text-xs overflow-scroll">
+            <SyntaxHighlighter language="json" style={syntaxHighlightingTheme}>
+              {result}
+            </SyntaxHighlighter>
+          </pre>
         </div>
       )}
     </div>
@@ -166,7 +176,7 @@ export default function DidBuilder({
 
   return (
     <>
-      <div className="flex gap-x-4 gap-4 p-4 bg-base-200">
+      <div className="flex gap-x-4 gap-4 p-4 bg-base-300">
         {/* START DID Subject */}
         <div>
           <label htmlFor="editDidSubject" className="btn btn-ghost btn-sm">
@@ -448,6 +458,7 @@ export default function DidBuilder({
           <AttemptSerialization didDocument={didDocument} />
         </div>
       </div>
+      <div className="bg-base-300 h-8"></div>
     </>
   );
 }

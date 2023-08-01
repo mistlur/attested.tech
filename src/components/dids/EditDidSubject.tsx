@@ -2,7 +2,7 @@ import { Did } from "@/lib/did";
 import { useState } from "react";
 import DidInput from "./DidInput";
 import Link from "next/link";
-import Infobox from "../attested-default-content/infobox";
+import AnnotatedHeader from "../attested-default-content/annotatedHeader";
 
 export default function EditDidSubject({
   existingSubject,
@@ -27,8 +27,9 @@ export default function EditDidSubject({
   return (
     <div className="flex flex-col gap-y-8 text-base-content">
       <div>
-        <h3 className="text-xl font-bold">Edit DID Subject </h3>
-        <Infobox
+        <AnnotatedHeader
+          headerText="Edit DID Subject"
+          headerSize="text-xl"
           body="The subject of a DID is, by definition, the entity identified by the
         DID. The DID subject might also be the DID controller. Anything can be
         the subject of a DID: person, group, organization, thing, or concept."

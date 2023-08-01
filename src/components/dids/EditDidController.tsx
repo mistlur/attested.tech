@@ -1,7 +1,7 @@
 import { DidController } from "@/lib/DidDocument";
 import { useState } from "react";
 import DidInput from "./DidInput";
-import Infobox from "../attested-default-content/infobox";
+import AnnotatedHeader from "../attested-default-content/annotatedHeader";
 
 export default function EditDidController({
   existingControllers,
@@ -22,8 +22,9 @@ export default function EditDidController({
   return (
     <div className="flex flex-col gap-y-2 text-base-content">
       <div>
-        <h3 className="text-xl font-bold">Edit DID Controller</h3>
-        <Infobox
+        <AnnotatedHeader
+          headerText="Edit DID Controller"
+          headerSize="text-xl"
           body="The controller of a DID is the entity (person, organization, or
           autonomous software) that has the capability—as defined by a DID
           method—to make changes to a DID document. This capability is typically

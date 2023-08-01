@@ -10,7 +10,7 @@ import { useState } from "react";
 import DidInput from "../DidInput";
 import { deriveIdentificationFragment } from "@/lib/keys";
 import Link from "next/link";
-import Infobox from "@/components/attested-default-content/infobox";
+import AnnotatedHeader from "@/components/attested-default-content/annotatedHeader";
 
 export default function EmbeddedMethodSettings({
   htmlId,
@@ -58,8 +58,9 @@ export default function EmbeddedMethodSettings({
       </div>
       <div className="divider my-1" />
       <div>
-        <h1 className="opacity-50 text-xl">Verification Relationships</h1>
-        <Infobox
+        <AnnotatedHeader
+          headerText="Verification Relationships"
+          headerSize="text-lg"
           body="Verification methods can be embedded in or referenced from properties
           associated with various verification relationships. Referencing
           verification methods allows them to be used by more than one
@@ -141,7 +142,13 @@ export default function EmbeddedMethodSettings({
       </div>
       <div className="divider my-1" />
       <div>
-        <h1 className="opacity-50 text-xl">Format</h1>
+        <AnnotatedHeader
+          headerText="Format"
+          headerSize="text-lg"
+          body='The format is the structured representation of the keys. The cryptographic type "type" is expected to be used to determine its compatibility with verification method processes. Properties such as "publicKeyJwk", "publicKeyMultibase" et cetera provides the public key value in a specific encoding (e.g., JWK or base58).'
+          externalDocsLink="https://www.w3.org/TR/did-core/#verification-material"
+          externalDocsDesc="Verification Material Documentation"
+        />
         <div>
           <div className="form-control">
             <label className="label cursor-pointer">

@@ -22,7 +22,6 @@ import EditDidController from "./EditDidController";
 import EditDidSubject from "./EditDidSubject";
 import ImportDocument from "./ImportDocument";
 import Modal from "@/components/core/Modal";
-import Infobox from "../attested-default-content/infobox";
 
 import { Light as SyntaxHighlighter } from "react-syntax-highlighter";
 import { json } from "react-syntax-highlighter/dist/cjs/languages/hljs";

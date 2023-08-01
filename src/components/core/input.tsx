@@ -40,6 +40,7 @@ const Input = forwardRef(
           color={
             !!errorMessage ? "error" : !!successMessage ? "success" : color
           }
+          className="bg-base-300"
         />
       </div>
     );

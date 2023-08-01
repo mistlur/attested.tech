@@ -19,13 +19,14 @@ import {
   ReferencedMaterial,
 } from "./DidMaterial";
 import { DidDocument } from "./DidDocument";
-import { decodeJwk } from "./keys";
-import { Curve } from "./curves";
+import { decodeJwk, getCryptoSuite } from "./keys";
+import { Curve, CurveEd25519, curveFromName, CurveP256 } from "./curves";
 
 export const decodeVerificationRelationship = (
   verificationMethod: z.infer<typeof verificationRelationshipSchema>,
-  method: VerificationRelationship
+  method: VerificationRelationship | "verificationMethod"
 ): DidMaterial => {
+  // Referenced method
   if (typeof verificationMethod === "string") {
     return new ReferencedMaterial(verificationMethod, {
       usage: { [method]: "Reference" },
@@ -37,38 +38,46 @@ export const decodeVerificationRelationship = (
   let representation: Representation | undefined;
   let format: KeyFormat | undefined;
 
+  console.log("verificationMethod.type", verificationMethod.type);
   if (verificationMethod.type) {
-    const ec = new EC(curveFromName());
-    curve = "P-256";
     representation = "Embedded";
+    console.log("before ec");
+    console.log("before if");
     if (verificationMethod.type === "JsonWebKey2020") {
+      curve = curveFromName(verificationMethod.publicKeyJwk.crv);
       format = "JsonWebKey2020";
       if (!verificationMethod.publicKeyJwk)
         throw new Error(
           'Invalid type: "JsonWebKey2020" must contain "publicKeyJwk"'
         );
       keyMaterial = decodeJwk(verificationMethod.publicKeyJwk);
-    } else if (verificationMethod.type === "P256Key2021") {
+    } else {
+      curve = curveFromName(verificationMethod.type);
+      console.log("before ec", curve.name.elliptic);
+      const ec = getCryptoSuite(curve);
+      console.log("after ec");
       format = "Multibase";
       if (!verificationMethod.publicKeyMultibase)
         throw new Error("Invalid key"); // TODO: better error handling
       const multibase = b58.base58btc.decode(
         verificationMethod.publicKeyMultibase
       );
+      console.log("multibase", multibase);
       // Omitting the first two codec bytes (0x12, 0x00) TODO: This can probably be done better by multicodec...
       const keyBytes = multibase.slice(2);
+      console.log("keyBytes", keyBytes);
       const keypair = ec.keyFromPublic(keyBytes);
+      console.log("keypair", keypair);
       keyMaterial = new Uint8Array(keypair.getPublic(false, "array"));
-    } else {
-      throw new Error(`Unsupported type: ${verificationMethod.type}`);
     }
   }
 
   if (!keyMaterial || !curve || !representation || !format)
     throw Error("Invalid key");
 
+  console.log("here we are");
   return new EmbeddedMaterial(verificationMethod.id, {
-    curve: curve,
+    curve,
     controller: verificationMethod.controller,
     keyMaterial,
     format,
@@ -81,11 +90,15 @@ export const didDocumentDeserializer = (
 ): DidDocument => {
   const incomingDidMaterial: DidMaterial[] = [];
 
-  verificationRelationships.map((relationship) => {
+  const relationships = [
+    ...verificationRelationships,
+    "verificationMethod",
+  ] as const;
+  relationships.map((relationship) => {
     if (document[relationship]) {
-      document[relationship]!.forEach((vm) =>
+      document[relationship]!.forEach((verificationMethod) =>
         incomingDidMaterial.push(
-          decodeVerificationRelationship(vm, relationship)
+          decodeVerificationRelationship(verificationMethod, relationship)
         )
       );
     }

@@ -5,6 +5,7 @@ export type Curve = {
     display: string;
     jwk: string;
     elliptic: string;
+    multibase: string;
   };
   capabilities: VerificationRelationship[];
 };
@@ -14,6 +15,7 @@ export const CurveP256: Curve = {
     display: "P-256",
     jwk: "P-256",
     elliptic: "p256",
+    multibase: "P256Key2021",
   },
   capabilities: [
     "authentication",
@@ -29,6 +31,7 @@ export const CurveEd25519: Curve = {
     display: "Ed25519",
     jwk: "Ed25519",
     elliptic: "ed25519",
+    multibase: "ED25519Key2020",
   },
   capabilities: [
     "authentication",
@@ -47,8 +50,14 @@ export const isEd25519 = (curve: Curve): boolean => {
 };
 
 export function curveFromName(name: string): Curve {
-  if (name === "p256" || name === "P-256") return CurveP256;
-  else if (name === "Ed25519" || name === "ed25519") return CurveEd25519;
+  if (name === "p256" || name === "P-256" || name === "P256Key2021")
+    return CurveP256;
+  else if (
+    name === "Ed25519" ||
+    name === "ed25519" ||
+    name === "ED25519Key2020"
+  )
+    return CurveEd25519;
   else throw new Error(`UnsupportedCurveError: ${name}`);
 }
 

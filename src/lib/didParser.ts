@@ -20,19 +20,11 @@ export const verificationMethodSchema = z.object({
   controller: z.string(),
   publicKeyJwk: publicKeyJwkSchema.optional(),
   publicKeyMultibase: z.string().optional(),
-  blockchainAccountId: z.string().optional(),
 });
 
-export const verificationRelationshipSchema = z
-  .object({
-    id: z.string(),
-    type: z.string(),
-    controller: z.string(),
-    publicKeyJwk: publicKeyJwkSchema.optional(),
-    publicKeyMultibase: z.string().optional(),
-    blockchainAccountId: z.string().optional(),
-  })
-  .or(z.string());
+export const verificationRelationshipSchema = verificationMethodSchema.or(
+  z.string()
+);
 
 export const verificationMethodsSchema = z.array(verificationMethodSchema);
 export const verificationRelationshipsSchema = z.array(

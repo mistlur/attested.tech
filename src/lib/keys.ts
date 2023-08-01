@@ -44,7 +44,7 @@ export function generateKeyPair(curve: Curve): {
 // GENERIC HELPERS
 // -----------------------------------------------------------------------------
 
-function getCryptoSuite(curve: Curve) {
+export function getCryptoSuite(curve: Curve) {
   const c = curveToName(curve, "elliptic");
   if (isP256(curve)) {
     return new EC(c);

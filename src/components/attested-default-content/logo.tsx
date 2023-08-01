@@ -21,19 +21,6 @@ const Logo = ({ size = "lg", className }: Props) => {
         className
       )}
     >
-      <div
-        className={cx({
-          "w-24 md:w-auto": size === "lg",
-          "w-14 md:w-auto": size === "sm",
-        })}
-      >
-        {/* <ShieldCheckIcon
-          className={cx({
-            "w-24 h-24 text-teal-600": size === "lg",
-            "w-10 h-10 text-teal-600": size === "sm",
-          })}
-        /> */}
-      </div>
       <h1
         className={cx("font-ultrablack", {
           "text-3xl md:text-7xl": size === "lg",

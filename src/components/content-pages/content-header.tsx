@@ -20,7 +20,7 @@ const ContentHeader = ({ toggleSidebar }: Props) => {
 
   return (
     <div className="bg-neutral text-neutral-content">
-      <Navbar className="flex justify-between items-center md:px-8 py-4 max-w-screen-xl mx-auto">
+      <Navbar className="flex justify-between items-center md:px-4 py-4 max-w-screen-xl mx-auto">
         <div className="flex gap-2">
           <Link href="/" passHref className="mr-4 cursor-pointer">
             <Logo size="lg" />

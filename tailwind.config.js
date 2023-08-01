@@ -10,7 +10,8 @@ module.exports = {
   ],
   theme: {
     fontFamily: {
-      sans: ['"Geologica"', "sans-serif"],
+      sans: ['"Abel"', "sans-serif"],
+      ultrablack: ['"Unbounded"', "sans-serif"]
     },
   },
   plugins: [
@@ -72,4 +73,23 @@ module.exports = {
       });
     }),
   ],
+  daisyui: {
+    themes: [
+      "light",
+      {
+        attested: {
+          ...require("daisyui/src/colors/themes")["[data-theme=business]"],
+          "primary": "#efeeec",
+          "secondary": "#a4cbc4",
+          "accent": "#ea8136",
+          "neutral": "#4b555b",
+          "base-100": "#2f3238",
+          "info": "#0B8098",
+          "success": "#36D399",
+          "warning": "#FBBD23",
+          "error": "#F87272",
+        },
+      },
+    ],
+  },
 };

@@ -2,7 +2,7 @@ import { Did } from "@/lib/did";
 import { useState } from "react";
 import DidInput from "./DidInput";
 import Link from "next/link";
-import { InformationCircleIcon } from "@heroicons/react/outline";
+import Infobox from "../attested-default-content/infobox";
 
 export default function EditDidSubject({
   existingSubject,
@@ -28,9 +28,16 @@ export default function EditDidSubject({
     <div className="flex flex-col gap-y-8 text-base-content">
       <div>
         <h3 className="text-xl font-bold">Edit DID Subject </h3>
+        <Infobox
+          body="The subject of a DID is, by definition, the entity identified by the
+        DID. The DID subject might also be the DID controller. Anything can be
+        the subject of a DID: person, group, organization, thing, or concept."
+          externalDocsLink="https://w3c.github.io/did-core/#did-subject"
+          externalDocsDesc="DID Subject documentation"
+        />
       </div>
-      <div className="flex flex-col gap-y-8 text-base-content">
-        <div className="font-mono bg-neutral text-neutral-content w-full text-center overflow-scroll whitespace-nowrap p-8 px-4">
+      <div className="flex flex-col gap-y-8 border-2 border-neutral text-base-content">
+        <div className="font-mono text-neutral-content w-full text-center overflow-scroll whitespace-nowrap p-8 px-4">
           <span className="opacity-40">did</span>
           {did.method && (
             <div className="tooltip" data-tip="Method">
@@ -80,14 +87,14 @@ export default function EditDidSubject({
             consist of different parts, you can hover to discover these parts.
           </p>
         </div>
-        <DidInput
-          value={existingSubject}
-          callback={(e) => {
-            setIsDidValid(e.valid);
-            if (e.did) setDid(e.did);
-          }}
-        />
       </div>
+      <DidInput
+        value={existingSubject}
+        callback={(e) => {
+          setIsDidValid(e.valid);
+          if (e.did) setDid(e.did);
+        }}
+      />
       <label
         htmlFor={htmlId}
         className={`btn btn-info btn-outline btn-block ${
@@ -99,23 +106,6 @@ export default function EditDidSubject({
       >
         Save to Document
       </label>
-      <div className="prose max-w-max">
-        <p>
-          The subject of a DID is, by definition, the entity identified by the
-          DID. The DID subject might also be the DID controller. Anything can be
-          the subject of a DID: person, group, organization, thing, or concept.
-          See the{" "}
-          <Link
-            className={"underline"}
-            href={"https://w3c.github.io/did-core/#did-subject"}
-            passHref
-            target={"_blank"}
-          >
-            DID Subject documentation
-          </Link>{" "}
-          for more information.
-        </p>
-      </div>
     </div>
   );
 }

@@ -11,9 +11,9 @@ export default function useHeaderNavigation() {
     //   title: t("blog"),
     //   href: "/blog",
     // },
-    {
-      title: t("DIDs"),
-      href: "#dids",
-    },
+    // {
+    //   title: t("DIDs"),
+    //   href: "#dids",
+    // },
   ];
 }

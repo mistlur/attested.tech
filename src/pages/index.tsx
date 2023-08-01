@@ -1,5 +1,5 @@
-import BasejumpHomepage from "@/components/basejump-default-content/homepage";
+import AttestedHomepage from "@/components/attested-default-content/homepage";
 
-const IndexPage = () => <BasejumpHomepage />;
+const IndexPage = () => <AttestedHomepage />;
 
 export default IndexPage;

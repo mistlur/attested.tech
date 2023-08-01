@@ -2,7 +2,6 @@ import { DidController } from "@/lib/DidDocument";
 import { useState } from "react";
 import DidInput from "./DidInput";
 import Link from "next/link";
-import { InformationCircleIcon } from "@heroicons/react/outline";
 
 export default function EditDidController({
   existingControllers,

@@ -1,19 +1,17 @@
-import { Button, Divider, Navbar } from "react-daisyui";
+import { Button, Navbar } from "react-daisyui";
 import Link from "next/link";
-import { useUser } from "@supabase/auth-helpers-react";
 import { useRouter } from "next/router";
-import Logo from "@/components/basejump-default-content/logo";
+import Logo from "@/components/attested-default-content/logo";
 import useTranslation from "next-translate/useTranslation";
 import { MenuIcon } from "@heroicons/react/outline";
 import useHeaderNavigation from "@/utils/content/use-header-navigation";
-import ThemeSelector from "@/components/dashboard/sidebar/theme-selector";
+import ThemeSelector from "@/components/core/theme-selector";
 
 type Props = {
   toggleSidebar: () => void;
 };
 
 const ContentHeader = ({ toggleSidebar }: Props) => {
-  const user = useUser();
   const router = useRouter();
 
   const { t } = useTranslation("content");
@@ -39,22 +37,6 @@ const ContentHeader = ({ toggleSidebar }: Props) => {
               </Link>
             ))}
           </div>
-        </div>
-        <div className="hidden lg:flex">
-          {/*{!!user ? (*/}
-          {/*  <Link href="/dashboard" passHref className="btn btn-ghost">*/}
-          {/*    {t("dashboard")}*/}
-          {/*  </Link>*/}
-          {/*) : (*/}
-          {/*  <>*/}
-          {/*    <Link href="/login" passHref className="btn btn-ghost">*/}
-          {/*      {t("login")}*/}
-          {/*    </Link>*/}
-          {/*    <Link href="/signup" passHref className="btn btn-ghost">*/}
-          {/*      {t("signUp")}*/}
-          {/*    </Link>*/}
-          {/*  </>*/}
-          {/*)}*/}
         </div>
         <ThemeSelector />
         <div className="block lg:hidden">

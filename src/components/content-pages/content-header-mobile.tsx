@@ -1,10 +1,9 @@
 import { Button, Divider, Menu } from "react-daisyui";
 import cx from "classnames";
 import { XIcon } from "@heroicons/react/outline";
-import Logo from "@/components/basejump-default-content/logo";
+import Logo from "@/components/attested-default-content/logo";
 import Link from "next/link";
 import useHeaderNavigation from "@/utils/content/use-header-navigation";
-import { useUser } from "@supabase/auth-helpers-react";
 import useTranslation from "next-translate/useTranslation";
 
 type Props = {
@@ -13,7 +12,6 @@ type Props = {
 };
 const ContentHeaderMobile = ({ className, onClose }: Props) => {
   const navigation = useHeaderNavigation();
-  const user = useUser();
   const { t } = useTranslation("content");
   return (
     <div
@@ -45,26 +43,6 @@ const ContentHeaderMobile = ({ className, onClose }: Props) => {
             </Menu.Item>
           ))}
           <Divider />
-          {/*{!!user ? (*/}
-          {/*  <Menu.Item>*/}
-          {/*    <Link href="/dashboard" passHref>*/}
-          {/*      {t("dashboard")}*/}
-          {/*    </Link>*/}
-          {/*  </Menu.Item>*/}
-          {/*) : (*/}
-          {/*  <>*/}
-          {/*    <Menu.Item>*/}
-          {/*      <Link href="/login" passHref>*/}
-          {/*        {t("login")}*/}
-          {/*      </Link>*/}
-          {/*    </Menu.Item>*/}
-          {/*    <Menu.Item>*/}
-          {/*      <Link href="/signup" passHref>*/}
-          {/*        {t("signUp")}*/}
-          {/*      </Link>*/}
-          {/*    </Menu.Item>*/}
-          {/*  </>*/}
-          {/*)}*/}
         </Menu>
       </div>
     </div>

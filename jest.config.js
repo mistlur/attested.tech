@@ -21,7 +21,7 @@ const customJestConfig = {
    * This is where you'll define node_module libraries that need to be transformed still
    * By default all node_modules are ignored
    */
-  transformIgnorePatterns: ["/node_modules/(?!(@supabase|jose)/)"],
+  transformIgnorePatterns: ["/node_modules/(?!(jose)/)"],
   globals: {
     "ts-jest": {
       tsconfig: "<rootDir>/tsconfig.json",
@@ -40,7 +40,7 @@ module.exports = async () => {
   // Next forces the transformIgnorePatterns to include `node_modules`, but that breaks b/c of the supabase transform issue
   // so we need to override it with our own transformIgnorePatterns
   nextDefaults.transformIgnorePatterns = [
-    "/node_modules/(?!(@supabase|jose)/)",
+    "/node_modules/(?!(jose)/)",
     "^.+\\.module\\.(css|sass|scss)$",
   ];
 

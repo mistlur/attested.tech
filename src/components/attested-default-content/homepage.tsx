@@ -7,7 +7,7 @@ import Link from "next/link";
 import DidBuilder from "@/components/dids/Builder";
 import { getInitialDidDocument } from "@/lib/did";
 
-const BasejumpHomepage = () => {
+const AttestedHomepage = () => {
   const [id, setId] = useState();
   const { t } = useTranslation("content");
 
@@ -21,7 +21,7 @@ const BasejumpHomepage = () => {
         <ContentMeta
           title="Attested.tech"
           description="Playground for decentralized identifiers"
-          socialImage={`/api/og?title=Basejump`}
+          socialImage={`/api/og?title=Attested.tech`}
         />
         <div className="p-8 pt-8 pb-24 md:pt-24 md:36">
           {/*<Logo size="lg" className="mx-auto" />*/}
@@ -64,4 +64,4 @@ const BasejumpHomepage = () => {
   );
 };
 
-export default BasejumpHomepage;
+export default AttestedHomepage;

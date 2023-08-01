@@ -2,7 +2,7 @@ import { useLocalStorage } from "react-use";
 import { useTheme } from "react-daisyui";
 import { useEffect } from "react";
 
-const THEME_STORAGE_KEY = "basejump-theme";
+const THEME_STORAGE_KEY = "attested-theme";
 export default function useThemeStorage(defaultTheme?: string) {
   const [value, setValue, remove] = useLocalStorage(
     THEME_STORAGE_KEY,

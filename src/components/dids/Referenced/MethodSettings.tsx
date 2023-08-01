@@ -4,6 +4,7 @@ import { verificationRelationships, UsageFormat } from "@/types/dids";
 import { useState } from "react";
 import DidInput from "../DidInput";
 import Link from "next/link";
+import AnnotatedHeader from "@/components/attested-default-content/annotatedHeader";
 
 export default function ReferenceMethodSettings({
   htmlId,
@@ -22,16 +23,25 @@ export default function ReferenceMethodSettings({
 
   return (
     <div className="flex flex-col gap-y-8 text-base-content">
-      <div className="flex flex-col gap-y-8 text-base-content">
+      <div className="flex flex-col gap-y-2 text-base-content">
         <DidInput
           value={method.id}
           callback={(e) => {
             setId(e.did?.serialize() || "");
           }}
         />
-
+        <div className="divider my-1" />
         <div>
-          <span className="opacity-50">Use in</span>
+          <AnnotatedHeader
+            headerText="Verification Relationships"
+            headerSize="text-lg"
+            body="Verification methods can be embedded in or referenced from properties
+          associated with various verification relationships. Referencing
+          verification methods allows them to be used by more than one
+          verification relationship."
+            externalDocsLink="https://w3c.github.io/did-core/#verification-methods"
+            externalDocsDesc="Verification Methods Documentation"
+          />
           <div className="form-control">
             {verificationRelationships.map((method, indexMethod) => {
               return (
@@ -88,20 +98,6 @@ export default function ReferenceMethodSettings({
       >
         Save to Document
       </label>
-      <div className="prose">
-        <p>
-          See the{" "}
-          <Link
-            className={"underline"}
-            href={"https://w3c.github.io/did-core/#verification-methods"}
-            passHref
-            target={"_blank"}
-          >
-            Verification Methods Documentation
-          </Link>{" "}
-          for more information of each usage.
-        </p>
-      </div>
     </div>
   );
 }

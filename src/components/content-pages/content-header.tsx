@@ -38,7 +38,6 @@ const ContentHeader = ({ toggleSidebar }: Props) => {
             ))}
           </div>
         </div>
-        <ThemeSelector />
         <div className="block lg:hidden">
           <Button color="ghost" onClick={toggleSidebar}>
             <MenuIcon className="w-6 h-6" />

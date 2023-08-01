@@ -9,7 +9,6 @@ import { getInitialDidDocument } from "@/lib/did";
 
 const AttestedHomepage = () => {
   const [id, setId] = useState();
-  const [isShowBanner, setIsShowBanner] = useState(true);
   const { t } = useTranslation("content");
 
   useEffect(() => {
@@ -25,9 +24,7 @@ const AttestedHomepage = () => {
           socialImage={`/api/og?title=Attested.tech`}
         />
         <div
-          className={`p-8 pt-8 pb-24 md:pt-24 md:36 flex flex-col items-center gap-8 ${
-            !isShowBanner ? "hidden" : ""
-          }`}
+          className={`p-8 pt-8 md:pb-16 md:pt-16 md:36 flex flex-col items-center gap-8`}
         >
           {/*<Logo size="lg" className="mx-auto" />*/}
           <h2 className="h2 text-center my-2">
@@ -44,17 +41,11 @@ const AttestedHomepage = () => {
               open standard
             </Link>
             &nbsp;that enables verifiable, decentralized digital identity.
-            <br />
-            <br />
-            <span className={"font-bold"}>Attested.tech</span> is a playground
-            for DID Documents.
           </h2>
-          <button
-            className="btn btn-wide btn-info"
-            onClick={() => setIsShowBanner(false)}
-          >
-            Ok, let{`&#39;`}s go!
-          </button>
+          <h2 className="h2 text-center my-2">
+            <span className={"font-black mt-4"}>Attested.tech</span> is a
+            playground for DID Documents.
+          </h2>
         </div>
       </div>
       <div className="bg-base-300">

@@ -435,7 +435,7 @@ export default function DidBuilder({
               Add Embedded Material
             </button>
             <button
-              className="btn btn-outline text-neutral-content btn-default mx-4"
+              className="btn btn-outline text-neutral-content btn-default mx-4 mb-8"
               onClick={() =>
                 setShowNewReferenceMethodModal(!showNewEmbeddedMethodModal)
               }

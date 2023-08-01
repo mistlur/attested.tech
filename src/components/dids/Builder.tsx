@@ -22,6 +22,7 @@ import EditDidController from "./EditDidController";
 import EditDidSubject from "./EditDidSubject";
 import ImportDocument from "./ImportDocument";
 import Modal from "@/components/core/Modal";
+import Infobox from "../attested-default-content/infobox";
 
 function AttemptSerialization({ didDocument }: { didDocument: DidDocument }) {
   const [isJsonLd, setIsJsonLd] = useState<boolean>(true);

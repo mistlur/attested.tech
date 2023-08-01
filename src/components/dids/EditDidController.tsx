@@ -1,7 +1,7 @@
 import { DidController } from "@/lib/DidDocument";
 import { useState } from "react";
 import DidInput from "./DidInput";
-import Link from "next/link";
+import Infobox from "../attested-default-content/infobox";
 
 export default function EditDidController({
   existingControllers,
@@ -20,9 +20,21 @@ export default function EditDidController({
   const [isSubject, setIsSubject] = useState<boolean>(controllers.has(subject));
   const [isNewDidValid, setIsNewDidValid] = useState<boolean>(false);
   return (
-    <div className="flex flex-col gap-y-8 text-base-content">
+    <div className="flex flex-col gap-y-2 text-base-content">
       <div>
         <h3 className="text-xl font-bold">Edit DID Controller</h3>
+        <Infobox
+          body="The controller of a DID is the entity (person, organization, or
+          autonomous software) that has the capability—as defined by a DID
+          method—to make changes to a DID document. This capability is typically
+          asserted by the control of a set of cryptographic keys used by
+          software acting on behalf of the controller, though it might also be
+          asserted via other mechanisms. Note that a DID might have more than
+          one controller, and the DID subject can be the DID controller, or one
+          of them."
+          externalDocsLink="https://w3c.github.io/did-core/#did-controller"
+          externalDocsDesc="DID Controller documentation"
+        />
       </div>
       <div className="flex flex-col text-base-content">
         <div>
@@ -110,27 +122,6 @@ export default function EditDidController({
         >
           Save to Document
         </label>
-      </div>
-      <div className="prose max-w-max">
-        <p>
-          The controller of a DID is the entity (person, organization, or
-          autonomous software) that has the capability—as defined by a DID
-          method—to make changes to a DID document. This capability is typically
-          asserted by the control of a set of cryptographic keys used by
-          software acting on behalf of the controller, though it might also be
-          asserted via other mechanisms. Note that a DID might have more than
-          one controller, and the DID subject can be the DID controller, or one
-          of them. See the{" "}
-          <Link
-            className={"underline"}
-            href={"https://w3c.github.io/did-core/#did-controller"}
-            passHref
-            target={"_blank"}
-          >
-            DID Controller documentation
-          </Link>{" "}
-          for more information.
-        </p>
       </div>
     </div>
   );

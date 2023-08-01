@@ -18,7 +18,11 @@ const ContentMeta = ({
     <Head>
       <title>{title}</title>
       <link
-        href="https://fonts.googleapis.com/css2?family=Geologica&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Abel&display=swap"
+        rel="stylesheet"
+      />
+      <link
+        href="https://fonts.googleapis.com/css2?family=Unbounded:wght@900&display=swap"
         rel="stylesheet"
       />
       <meta name="twitter:card" content="summary_large_image" />

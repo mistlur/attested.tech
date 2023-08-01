@@ -22,9 +22,6 @@ const ContentHeaderMobile = ({ className, onClose }: Props) => {
     >
       <div className="grid gap-y-4">
         <div className="flex justify-between items-center px-2 py-4">
-          <Link href="/" passHref>
-            <Logo size="sm" />
-          </Link>
           <Button
             className="md:hidden"
             shape="square"

@@ -11,17 +11,7 @@ export const AVAILABLE_THEMES = {
   },
   dark: {
     name: "Dark",
-    id: "dark",
-    Icon: MoonIcon,
-  },
-  night: {
-    name: "Night",
-    id: "night",
-    Icon: MoonIcon,
-  },
-  dracula: {
-    name: "Dracula",
-    id: "dracula",
+    id: "attested",
     Icon: MoonIcon,
   },
 };

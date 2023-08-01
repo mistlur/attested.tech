@@ -9,6 +9,7 @@ import { getInitialDidDocument } from "@/lib/did";
 
 const AttestedHomepage = () => {
   const [id, setId] = useState();
+  const [isShowBanner, setIsShowBanner] = useState(true);
   const { t } = useTranslation("content");
 
   useEffect(() => {
@@ -23,7 +24,11 @@ const AttestedHomepage = () => {
           description="Playground for decentralized identifiers"
           socialImage={`/api/og?title=Attested.tech`}
         />
-        <div className="p-8 pt-8 pb-24 md:pt-24 md:36">
+        <div
+          className={`p-8 pt-8 pb-24 md:pt-24 md:36 flex flex-col items-center gap-8 ${
+            !isShowBanner ? "hidden" : ""
+          }`}
+        >
           {/*<Logo size="lg" className="mx-auto" />*/}
           <h2 className="h2 text-center my-2">
             <span className="text-accent">
@@ -44,13 +49,16 @@ const AttestedHomepage = () => {
             <span className={"font-bold"}>Attested.tech</span> is a playground
             for DID Documents.
           </h2>
+          <button
+            className="btn btn-wide btn-info"
+            onClick={() => setIsShowBanner(false)}
+          >
+            Ok, let{`&#39;`}s go!
+          </button>
         </div>
       </div>
       <div className="bg-base-300">
-        <div id="#dids" className="max-w-screen-xl mx-auto pt-2 pb-4">
-          <div className="p-4">
-            <h1 className="text-2xl font-extrabold">DID Document Playground</h1>
-          </div>
+        <div id="#dids" className="w-full mx-auto">
           {id && (
             <DidBuilder
               id={id}

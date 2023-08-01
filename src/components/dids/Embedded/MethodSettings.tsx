@@ -10,6 +10,7 @@ import { useState } from "react";
 import DidInput from "../DidInput";
 import { deriveIdentificationFragment } from "@/lib/keys";
 import Link from "next/link";
+import Infobox from "@/components/attested-default-content/infobox";
 
 export default function EmbeddedMethodSettings({
   htmlId,
@@ -32,132 +33,139 @@ export default function EmbeddedMethodSettings({
   );
 
   return (
-    <div className="flex flex-col gap-y-8 text-base-content">
-      <div className="flex flex-col gap-y-8 text-base-content">
-        <div>
-          <div>
-            <div className="form-control w-full">
-              <label className="label">
-                <span className="label-text">Id</span>
-                <span className="label-text-alt">Leave blank to derive Id</span>
-              </label>
-              <input
-                type="text"
-                value={id}
-                onChange={(e) => setId(e.target.value)}
-                placeholder="#lwg2wFClmq7gEjv..."
-                className={`input input-bordered w-full`}
-              />
-            </div>
-            <DidInput
-              value={controller}
-              label="Controller"
-              callback={(e) => {
-                setController(e.did?.serialize() || "");
-              }}
-            />
-          </div>
+    <div className="flex flex-col gap-y-2 text-base-content">
+      <div>
+        <div className="form-control w-full">
+          <label className="label">
+            <span className="label-text">Id</span>
+            <span className="label-text-alt">Leave blank to derive Id</span>
+          </label>
+          <input
+            type="text"
+            value={id}
+            onChange={(e) => setId(e.target.value)}
+            placeholder="#lwg2wFClmq7gEjv..."
+            className={`input input-bordered w-full`}
+          />
         </div>
+        <DidInput
+          value={controller}
+          label="Controller"
+          callback={(e) => {
+            setController(e.did?.serialize() || "");
+          }}
+        />
+      </div>
+      <div className="divider my-1" />
+      <div>
+        <h1 className="opacity-50 text-xl">Verification Relationships</h1>
+        <Infobox
+          body="Verification methods can be embedded in or referenced from properties
+          associated with various verification relationships. Referencing
+          verification methods allows them to be used by more than one
+          verification relationship."
+          externalDocsLink="https://w3c.github.io/did-core/#verification-methods"
+          externalDocsDesc="Verification Methods Documentation"
+        />
+        <div className="form-control">
+          {method.material.curve.capabilities.map((method, indexMethod) => {
+            return (
+              <div key={indexMethod} className="flex justify-between w-full">
+                <div>
+                  <span>{method}</span>
+                  <span className="opacity-50"> as</span>
+                </div>
+                <div className="btn-group">
+                  <button
+                    className={`btn btn-xs ${
+                      methods[method] === "Embedded" ? "btn-primary" : ""
+                    }`}
+                    onClick={() => {
+                      setMethods({
+                        [method]: "Embedded",
+                      });
+                    }}
+                  >
+                    Embedded
+                  </button>
 
-        <div>
-          <span className="opacity-50 font-bold">Format</span>
-          <div className="flex w-full">
-            <div className="btn-group w-full">
-              <button
-                className={`btn w-1/2 ${
-                  format === "JsonWebKey2020" ? "btn-active " : ""
-                }`}
-                onClick={() => {
-                  setFormat("JsonWebKey2020");
-                }}
-              >
-                JWK
-              </button>
-              <button
-                className={`btn w-1/2 ${
-                  format === "Multibase" ? "btn-active" : ""
-                }`}
-                onClick={() => {
-                  setFormat("Multibase");
-                }}
-              >
-                Multibase
-              </button>
-            </div>
-          </div>
-        </div>
-        <div>
-          <span className="opacity-50 font-bold">Used for</span>
-          <div className="form-control">
-            {method.material.curve.capabilities.map((method, indexMethod) => {
-              return (
-                <div key={indexMethod} className="flex justify-between w-full">
-                  <div>
-                    <span>{method}</span>
-                    <span className="opacity-50"> as</span>
-                  </div>
-                  <div className="btn-group">
-                    <button
-                      className={`btn btn-xs ${
-                        methods[method] === "Embedded" ? "btn-primary" : ""
-                      }`}
-                      onClick={() => {
-                        setMethods({
-                          [method]: "Embedded",
-                        });
-                      }}
-                    >
-                      Embedded
-                    </button>
-
-                    <button
-                      className={`btn btn-xs ${
-                        methods[method] === "Reference" ? "btn-secondary" : ""
-                      }`}
-                      onClick={() => {
-                        const embeddedMethodsToUpdate = Object.entries(
-                          methods
-                        ).reduce<UsageFormat<Representation>>(
-                          (acc, [key, value]) => {
-                            if (value === "Embedded") {
-                              return {
-                                ...acc,
-                                [key]: "Reference",
-                              };
-                            }
-
+                  <button
+                    className={`btn btn-xs ${
+                      methods[method] === "Reference" ? "btn-secondary" : ""
+                    }`}
+                    onClick={() => {
+                      const embeddedMethodsToUpdate = Object.entries(
+                        methods
+                      ).reduce<UsageFormat<Representation>>(
+                        (acc, [key, value]) => {
+                          if (value === "Embedded") {
                             return {
                               ...acc,
-                              [key]: value,
+                              [key]: "Reference",
                             };
-                          },
-                          {}
-                        );
+                          }
 
-                        setMethods({
-                          ...embeddedMethodsToUpdate,
-                          [method]: "Reference",
-                        });
-                      }}
-                    >
-                      Referenced
-                    </button>
+                          return {
+                            ...acc,
+                            [key]: value,
+                          };
+                        },
+                        {}
+                      );
 
-                    <button
-                      className={`btn btn-xs ${
-                        !methods[method] ? "btn-active" : ""
-                      }`}
-                      onClick={() => {
-                        const { [method]: remove, ...keep } = methods;
-                        setMethods(keep);
-                      }}
-                    >
-                      Unused
-                    </button>
-                  </div>
+                      setMethods({
+                        ...embeddedMethodsToUpdate,
+                        [method]: "Reference",
+                      });
+                    }}
+                  >
+                    Referenced
+                  </button>
+
+                  <button
+                    className={`btn btn-xs ${
+                      !methods[method] ? "btn-active" : ""
+                    }`}
+                    onClick={() => {
+                      const { [method]: remove, ...keep } = methods;
+                      setMethods(keep);
+                    }}
+                  >
+                    Unused
+                  </button>
                 </div>
-              );
-            })}
+              </div>
+            );
+          })}
+        </div>
+      </div>
+      <div className="divider my-1" />
+      <div>
+        <h1 className="opacity-50 text-xl">Format</h1>
+        <div>
+          <div className="form-control">
+            <label className="label cursor-pointer">
+              <span className="label-text">JWK</span>
+              <input
+                type="radio"
+                name="radio-10"
+                className="radio checked:bg-red-500"
+                onClick={() => setFormat("JsonWebKey2020")}
+                checked={format === "JsonWebKey2020"}
+              />
+            </label>
+          </div>
+          <div className="form-control">
+            <label className="label cursor-pointer">
+              <span className="label-text">Multibase</span>
+              <input
+                type="radio"
+                name="radio-10"
+                className="radio checked:bg-blue-500"
+                onClick={() => setFormat("Multibase")}
+                checked={format === "Multibase"}
+              />
+            </label>
           </div>
         </div>
       </div>
@@ -185,23 +193,6 @@ export default function EmbeddedMethodSettings({
       >
         Save to Document
       </label>
-      <div className="prose">
-        <p>
-          Verification methods can be embedded in or referenced from properties
-          associated with various verification relationships. Referencing
-          verification methods allows them to be used by more than one
-          verification relationship. See the{" "}
-          <Link
-            className={"underline"}
-            href={"https://w3c.github.io/did-core/#verification-methods"}
-            passHref
-            target={"_blank"}
-          >
-            Verification Methods Documentation
-          </Link>{" "}
-          for more information of each usage.
-        </p>
-      </div>
     </div>
   );
 }

@@ -17,17 +17,15 @@ const AttestedHomepage = () => {
 
   return (
     <>
-      <div className="max-w-screen-xl mx-auto bg-base-100">
+      <div className="bg-base-200">
         <ContentMeta
           title="Attested.tech"
           description="Playground for decentralized identifiers"
           socialImage={`/api/og?title=Attested.tech`}
         />
-        <div
-          className={`p-8 pt-8 md:pb-16 md:pt-16 md:36 flex flex-col items-center gap-8`}
-        >
+        <div className="p-8 pt-8 md:pb-16 md:pt-16 md:36 flex flex-col items-center gap-8 max-w-screen-xl mx-auto">
           {/*<Logo size="lg" className="mx-auto" />*/}
-          <h2 className="h2 text-center my-2">
+          <h2 className="h2 text-center">
             <span className="text-accent">
               Decentralized identifiers (DIDs)
             </span>{" "}
@@ -42,13 +40,13 @@ const AttestedHomepage = () => {
             </Link>
             &nbsp;that enables verifiable, decentralized digital identity.
           </h2>
-          <h2 className="h2 text-center my-2">
+          <h2 className="h2 text-center">
             <span className={"font-black mt-4"}>Attested.tech</span> is a
             playground for DID Documents.
           </h2>
         </div>
       </div>
-      <div className="bg-base-100">
+      <div className="bg-base-300">
         <div id="#dids" className="max-w-screen-xl mx-auto">
           {id && (
             <DidBuilder
@@ -57,6 +55,55 @@ const AttestedHomepage = () => {
               document={getInitialDidDocument(id)}
             />
           )}
+        </div>
+      </div>
+      <div className="bg-base-200">
+        <div className="p-8 pt-8 md:pb-16 md:pt-16 md:36 flex flex-col items-center gap-8 max-w-screen-xl mx-auto">
+          <p className="text-center">
+            Attested.tech is brought to you by{" "}
+            <Link
+              className={"underline"}
+              href={"https://github.com/johanssonanton"}
+              passHref
+              target={"_blank"}
+            >
+              Anton Johansson
+            </Link>{" "}
+            and{" "}
+            <Link
+              className={"underline"}
+              href={"https://github.com/johannessjoberg"}
+              passHref
+              target={"_blank"}
+            >
+              Johannes Sjöberg
+            </Link>
+            .
+          </p>
+          <p className="text-center">
+            We created this playground to increase understanding and adoption of
+            DIDs. The{" "}
+            <Link
+              className={"underline"}
+              href={"https://www.w3.org/TR/did-core/"}
+              passHref
+              target={"_blank"}
+            >
+              DID specification
+            </Link>{" "}
+            can be challenging for newcomers to grasp and utilize effectively,
+            something we ourselves experienced. If you have any issues or
+            feedback, or want to contribute, head over to{" "}
+            <Link
+              className={"underline"}
+              href={"https://github.com/mistlur/attested.tech"}
+              passHref
+              target={"_blank"}
+            >
+              github
+            </Link>
+            .
+          </p>
         </div>
       </div>
     </>

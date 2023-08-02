@@ -8,7 +8,7 @@ import { ToastContainer } from "react-toastify";
 import { useEffect } from "react";
 
 function MyApp({ Component, pageProps, router }: AppProps) {
-  const { theme } = useThemeStorage();
+  const { theme } = useThemeStorage("attested");
 
   useEffect(() => {
     // our dropdowns are used for navigation a lot
@@ -20,7 +20,7 @@ function MyApp({ Component, pageProps, router }: AppProps) {
     }
   }, [router.asPath]);
   return (
-    <Theme dataTheme={theme}>
+    <Theme dataTheme={theme} className="bg-base-300">
       <ContentLayout>
         <Component {...pageProps} />
       </ContentLayout>

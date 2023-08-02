@@ -31,6 +31,12 @@ export const verificationRelationshipsSchema = z.array(
   verificationRelationshipSchema
 );
 
+export const serviceSchema = z.object({
+  id: z.string(),
+  type: z.union([z.string(), z.array(z.string())]),
+  serviceEndpoint: z.union([z.string(), z.array(z.string())]),
+});
+
 export const documentSchema = z.object({
   ["@context"]: z
     .literal("https://w3.org/ns/did/v1")
@@ -46,5 +52,5 @@ export const documentSchema = z.object({
   keyAgreement: verificationRelationshipsSchema.optional(),
   capabilityInvocation: verificationRelationshipsSchema.optional(),
   capabilityDelegation: verificationRelationshipsSchema.optional(),
-  service: z.string().optional(),
+  services: z.array(serviceSchema).optional(),
 });

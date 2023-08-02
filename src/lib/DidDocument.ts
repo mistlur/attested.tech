@@ -1,4 +1,4 @@
-import { VerificationRelationship } from "@/types/dids";
+import { Service, VerificationRelationship } from "@/types/dids";
 import { immerable } from "immer";
 import { z } from "zod";
 import {
@@ -10,7 +10,6 @@ import { documentSchema } from "./didParser";
 
 export type DidController = Set<string>;
 export type SerializedRepresentation = "JSON" | "JSONLD";
-
 export type LogicDocument = {
   id: string; // TODO: Proper Id type
   controller: DidController | undefined;
@@ -23,14 +22,18 @@ export class DidDocument {
   public controller: DidController | undefined;
   public verificationMethod: DidMaterial[];
 
+  public services: Service[] = [];
+
   constructor(
     id: string | undefined,
     controller: DidController | null,
-    verificationMethod: DidMaterial[]
+    verificationMethod: DidMaterial[],
+    services?: Service[]
   ) {
     this.id = id;
     this.controller = controller || new Set([]);
     this.verificationMethod = verificationMethod;
+    this.services = services || [];
   }
 
   addVerificationMethod(material: DidMaterial) {
@@ -43,6 +46,10 @@ export class DidDocument {
 
   setController(controller: DidController | null) {
     this.controller = controller;
+  }
+
+  setServices(services: Service[]) {
+    this.services = services;
   }
 
   serializeController() {
@@ -128,6 +135,7 @@ export class DidDocument {
       id: this.id,
       ...(controller && { controller }),
       ...relationships,
+      ...(this.services.length && { services: this.services }),
     };
   }
 }

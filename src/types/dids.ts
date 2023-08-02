@@ -1,5 +1,11 @@
 import { Curve } from "@/lib/curves";
 
+export type Service = {
+  id: string;
+  type: string | string[];
+  serviceEndpoint: string | string[];
+};
+
 export const verificationRelationships = [
   "authentication",
   "assertionMethod",

@@ -26,6 +26,9 @@ import Modal from "@/components/core/Modal";
 import { Light as SyntaxHighlighter } from "react-syntax-highlighter";
 import { json } from "react-syntax-highlighter/dist/cjs/languages/hljs";
 import { syntaxHighlightingTheme } from "@/utils/syntaxHighlightingTheme";
+import EditServices from "@/components/dids/EditServices";
+import { Service } from "@/types/dids";
+
 SyntaxHighlighter.registerLanguage("json", json);
 
 function AttemptSerialization({ didDocument }: { didDocument: DidDocument }) {
@@ -48,7 +51,7 @@ function AttemptSerialization({ didDocument }: { didDocument: DidDocument }) {
   }
 
   return (
-    <div>
+    <div className="bg-base-100">
       <div className="bg-base-300 text-base-content p-4 flex justify-between">
         <div>
           <h2 className="font-bold text-lg">DID Document</h2>
@@ -56,13 +59,13 @@ function AttemptSerialization({ didDocument }: { didDocument: DidDocument }) {
             <h3 className="text-sm">Format</h3>
             <div className="btn-group">
               <button
-                className={`btn btn-xs ${isJsonLd ? "btn-active" : ""}`}
+                className={`btn btn-xs ${isJsonLd ? "btn-success" : ""}`}
                 onClick={() => setIsJsonLd(!isJsonLd)}
               >
                 JSON-LD
               </button>
               <button
-                className={`btn btn-xs ${isJsonLd ? "" : "btn-active"}`}
+                className={`btn btn-xs ${isJsonLd ? "" : "btn-success"}`}
                 onClick={() => setIsJsonLd(!isJsonLd)}
               >
                 JSON
@@ -97,12 +100,17 @@ function AttemptSerialization({ didDocument }: { didDocument: DidDocument }) {
         </div>
       )}
       {validDocument && (
-        <div className="bg-base-200">
-          <pre className="p-4 text-xs overflow-scroll">
-            <SyntaxHighlighter language="json" style={syntaxHighlightingTheme}>
-              {result}
-            </SyntaxHighlighter>
-          </pre>
+        <div className="bg-base-300 pr-4">
+          <div className="bg-base-100">
+            <pre className="p-4 text-xs overflow-scroll">
+              <SyntaxHighlighter
+                language="json"
+                style={syntaxHighlightingTheme}
+              >
+                {result}
+              </SyntaxHighlighter>
+            </pre>
+          </div>
         </div>
       )}
     </div>
@@ -134,6 +142,7 @@ export default function DidBuilder({
     useState<boolean>(false);
   const [showEditDidSubjectModal, setShowEditDidSubjectModal] =
     useState<boolean>(false);
+  const [showEditServices, setShowEditServicesModal] = useState<boolean>(false);
   const [showEditModal, setShowEditModal] = useState<string | null>(null);
   const [showImportDocumentModal, setShowImportDocumentModal] =
     useState<boolean>(false);
@@ -146,6 +155,7 @@ export default function DidBuilder({
         setShowEditDidControllerModal(false);
         setShowEditDidSubjectModal(false);
         setShowImportDocumentModal(false);
+        setShowEditServicesModal(false);
       }
     };
     window.addEventListener("keydown", handleEsc);
@@ -203,6 +213,7 @@ export default function DidBuilder({
           />
         </Modal>
         {/* END DID Subject*/}
+
         {/* START DID Controller */}
         <div>
           <label htmlFor="editDidController" className="btn btn-ghost btn-sm">
@@ -231,6 +242,34 @@ export default function DidBuilder({
           />
         </Modal>
         {/* END DID Controller */}
+
+        {/* START Services */}
+        <div>
+          <label htmlFor="editServices" className="btn btn-ghost btn-sm">
+            Edit Services
+          </label>
+        </div>
+        <Modal
+          show={showEditServices}
+          id={"editServices"}
+          className={"max-w-none w-1/2"}
+          onChange={() => {
+            setShowEditServicesModal(!showEditServices);
+          }}
+        >
+          <EditServices
+            htmlId="editServices"
+            existingServices={didDocument.services}
+            save={(services: Service[]) =>
+              setDidDocument(
+                produce(didDocument, (draft) => {
+                  draft.setServices(services);
+                })
+              )
+            }
+          />
+        </Modal>
+        {/* END Services */}
 
         {/* START Embedded */}
         <Modal
@@ -296,7 +335,7 @@ export default function DidBuilder({
         {/* END Import Document*/}
       </div>
 
-      <div className="flex justify-between">
+      <div className="flex justify-between pl-4">
         <div className="w-1/3 bg-neutral text-neutral-content shadow-[inset_-147px_0px_180px_-180px_rgba(0,0,0,1)]">
           <div className="flex flex-col">
             {!didDocument.verificationMethod.length && (
@@ -457,7 +496,7 @@ export default function DidBuilder({
           <AttemptSerialization didDocument={didDocument} />
         </div>
       </div>
-      <div className="bg-base-300 h-16"></div>
+      <div className="bg-base-300 h-8"></div>
     </div>
   );
 }

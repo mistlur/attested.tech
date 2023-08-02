@@ -61,29 +61,26 @@ export default function EditDidController({
               </button>
             </div>
             <ul className="my-4 divide-y divide-solid divide-neutral divide-opacity-25">
-              {
-                //@ts-ignore
-                !controllers.has(subject) &&
-                  [...controllers].map((controller, i) => (
-                    <li key={i} className="font-mono text-xs py-2 truncate">
-                      <button
-                        className="btn btn-square btn-xs mr-4"
-                        onClick={
-                          //@ts-ignore
-                          () =>
-                            setControllers(
-                              new Set(
-                                [...controllers].filter((c) => c !== controller)
-                              )
+              {!controllers.has(subject) &&
+                [...controllers].map((controller, i) => (
+                  <li key={i} className="font-mono text-xs py-2 truncate">
+                    <button
+                      className="btn btn-square btn-xs mr-4"
+                      onClick={
+                        //@ts-ignore
+                        () =>
+                          setControllers(
+                            new Set(
+                              [...controllers].filter((c) => c !== controller)
                             )
-                        }
-                      >
-                        X
-                      </button>
-                      {controller}
-                    </li>
-                  ))
-              }
+                          )
+                      }
+                    >
+                      X
+                    </button>
+                    {controller}
+                  </li>
+                ))}
             </ul>
           </div>
         </div>

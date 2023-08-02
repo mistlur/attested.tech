@@ -23,7 +23,7 @@ The project is configured to use ESLint and Prettier. Prettier is run through ES
 
 ## License
 
-Distributed under the [MIT License](https://github.com/mistlur/attested.tech/blob/main/LICENSE). See `LICENSE` for more information.
+Distributed under the [MIT License](https://github.com/mistlur/attested.tech/blob/main/LICENSE.md).
 
 <!-- ACKNOWLEDGEMENTS -->
 

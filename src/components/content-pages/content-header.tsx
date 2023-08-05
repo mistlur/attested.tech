@@ -20,29 +20,27 @@ const ContentHeader = ({ toggleSidebar }: Props) => {
 
   return (
     <div className="bg-neutral text-neutral-content">
-      <Navbar className="flex justify-between items-center md:px-4 py-4 max-w-screen-xl mx-auto">
-        <div className="flex gap-2">
-          <Link href="/" passHref className="mr-4 cursor-pointer">
-            <Logo size="lg" />
-          </Link>
-          <div className="hidden lg:flex gap-4">
-            {navigation.map((nav) => (
-              <Link
-                key={nav.href}
-                href={nav.href}
-                passHref
-                className="btn btn-ghost"
-              >
-                {nav.title}
-              </Link>
-            ))}
-          </div>
-        </div>
-        <div className="block lg:hidden">
-          <Button color="ghost" onClick={toggleSidebar}>
-            <MenuIcon className="w-6 h-6" />
-          </Button>
-        </div>
+      <Navbar className="flex md:justify-between items-center px-5 py-4 max-w-screen-xl">
+        <Link href="/" passHref className="cursor-pointer">
+          <Logo size="lg" />
+        </Link>
+        {/*<div className="hidden lg:flex gap-4">*/}
+        {/*  {navigation.map((nav) => (*/}
+        {/*    <Link*/}
+        {/*      key={nav.href}*/}
+        {/*      href={nav.href}*/}
+        {/*      passHref*/}
+        {/*      className="btn btn-ghost"*/}
+        {/*    >*/}
+        {/*      {nav.title}*/}
+        {/*    </Link>*/}
+        {/*  ))}*/}
+        {/*</div>*/}
+        {/*<div className="block hidden">*/}
+        {/*  <Button color="ghost" onClick={toggleSidebar}>*/}
+        {/*    <MenuIcon className="w-6 h-6" />*/}
+        {/*  </Button>*/}
+        {/*</div>*/}
       </Navbar>
     </div>
   );

@@ -71,7 +71,10 @@ export default function EmbeddedMethodSettings({
         <div className="form-control">
           {method.material.curve.capabilities.map((method, indexMethod) => {
             return (
-              <div key={indexMethod} className="flex justify-between w-full">
+              <div
+                key={indexMethod}
+                className="flex flex-col my-2 md:my-0 md:flex-row justify-between w-full"
+              >
                 <div>
                   <span>{method}</span>
                   <span className="opacity-50"> as</span>

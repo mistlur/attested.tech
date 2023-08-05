@@ -2,7 +2,7 @@ export const syntaxHighlightingTheme = {
   hljs: {
     display: "block",
     overflowX: "auto",
-    padding: "0.5em",
+    padding: "0em",
     background: "#2f3238",
     color: "#4b555b",
   },

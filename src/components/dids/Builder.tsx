@@ -28,6 +28,7 @@ import { json } from "react-syntax-highlighter/dist/cjs/languages/hljs";
 import { syntaxHighlightingTheme } from "@/utils/syntaxHighlightingTheme";
 import EditServices from "@/components/dids/EditServices";
 import { Service } from "@/types/dids";
+import { Divider } from "react-daisyui";
 
 SyntaxHighlighter.registerLanguage("json", json);
 
@@ -100,9 +101,9 @@ function AttemptSerialization({ didDocument }: { didDocument: DidDocument }) {
         </div>
       )}
       {validDocument && (
-        <div className="bg-base-300 pr-4">
+        <div className="bg-base-300 md:pr-4">
           <div className="bg-base-100">
-            <pre className="p-4 text-xs overflow-scroll">
+            <pre className="p-4 md:min-h-[144px] text-xs overflow-scroll">
               <SyntaxHighlighter
                 language="json"
                 style={syntaxHighlightingTheme}
@@ -186,158 +187,58 @@ export default function DidBuilder({
   return (
     <div className="bg-base-300">
       <div className="flex gap-x-4 gap-4 p-4 bg-base-300">
-        {/* START DID Subject */}
         <div>
           <label htmlFor="editDidSubject" className="btn btn-ghost btn-sm">
             Edit DID Subject
           </label>
         </div>
-        <Modal
-          show={showEditDidSubjectModal}
-          id={"editDidSubject"}
-          className={"max-w-none w-1/2"}
-          onChange={() => {
-            setShowEditDidSubjectModal(!showEditDidSubjectModal);
-          }}
-        >
-          <EditDidSubject
-            htmlId="editDidSubject"
-            existingSubject={didDocument.id}
-            save={(did: string) =>
-              setDidDocument(
-                produce(didDocument, (draft) => {
-                  draft.setIdentifier(did);
-                })
-              )
-            }
-          />
-        </Modal>
-        {/* END DID Subject*/}
-
-        {/* START DID Controller */}
         <div>
           <label htmlFor="editDidController" className="btn btn-ghost btn-sm">
             Edit DID Controller
           </label>
         </div>
-        <Modal
-          show={showEditDidControllerModal}
-          id={"editDidController"}
-          className={"max-w-none w-1/2"}
-          onChange={() => {
-            setShowEditDidControllerModal(!showEditDidControllerModal);
-          }}
-        >
-          <EditDidController
-            htmlId="editDidController"
-            existingControllers={didDocument.controller}
-            subject={didDocument.id}
-            save={(controller: DidController | null) =>
-              setDidDocument(
-                produce(didDocument, (draft) => {
-                  draft.setController(controller);
-                })
-              )
-            }
-          />
-        </Modal>
-        {/* END DID Controller */}
-
-        {/* START Services */}
         <div>
           <label htmlFor="editServices" className="btn btn-ghost btn-sm">
             Edit Services
           </label>
         </div>
-        <Modal
-          show={showEditServices}
-          id={"editServices"}
-          className={"max-w-none w-1/2"}
-          onChange={() => {
-            setShowEditServicesModal(!showEditServices);
-          }}
-        >
-          <EditServices
-            htmlId="editServices"
-            existingServices={didDocument.services}
-            save={(services: Service[]) =>
-              setDidDocument(
-                produce(didDocument, (draft) => {
-                  draft.setServices(services);
-                })
-              )
+        <div className="ml-auto md:inline hidden">
+          <label htmlFor="importDocument" className="btn btn-sm">
+            Import Document
+          </label>
+        </div>
+      </div>
+      <div className="flex gap-x-4 gap-4 px-4 pb-4 bg-base-300 md:hidden">
+        <div>
+          <button
+            className="btn btn-outline text-neutral-content btn-default"
+            onClick={() =>
+              setShowNewEmbeddedMethodModal(!showNewEmbeddedMethodModal)
             }
-          />
-        </Modal>
-        {/* END Services */}
-
-        {/* START Embedded */}
-        <Modal
-          show={showNewEmbeddedMethodModal}
-          id={"newVerificationMaterial"}
-          onChange={() => {
-            setShowNewEmbeddedMethodModal(!showNewEmbeddedMethodModal);
-          }}
-        >
-          <NewEmbeddedMethod
-            htmlId="newVerificationMaterial"
-            didDocument={didDocument}
-            save={(vm: EmbeddedMaterial) =>
-              setDidDocument(
-                produce(didDocument, (draft) => {
-                  draft.addVerificationMethod(vm);
-                })
-              )
+          >
+            Add Embedded Material
+          </button>
+        </div>
+        <div>
+          <button
+            className="btn btn-outline text-neutral-content btn-default"
+            onClick={() =>
+              setShowNewReferenceMethodModal(!showNewReferenceMethodModal)
             }
-          />
-        </Modal>
-        {/* END Embedded */}
-
-        {/* START Reference */}
-        <Modal
-          show={showNewReferenceMethodModal}
-          id={"newReferenceVerificationMaterial"}
-          onChange={() => {
-            setShowNewReferenceMethodModal(!showNewReferenceMethodModal);
-          }}
-        >
-          <NewReferenceMethod
-            htmlId="newReferenceVerificationMaterial"
-            didDocument={didDocument}
-            save={(vm: ReferencedMaterial) =>
-              setDidDocument(
-                produce(didDocument, (draft) => {
-                  draft.addVerificationMethod(vm);
-                })
-              )
-            }
-          />
-        </Modal>
-        {/* END Reference */}
-        {/* START Import Document */}
+          >
+            Add Referenced Material
+          </button>
+        </div>
         <div className="ml-auto">
           <label htmlFor="importDocument" className="btn btn-sm">
             Import Document
           </label>
         </div>
-        <Modal
-          show={showImportDocumentModal}
-          id={"importDocument"}
-          onChange={() => {
-            setShowImportDocumentModal(!showImportDocumentModal);
-          }}
-        >
-          <ImportDocument
-            htmlId="importDocument"
-            save={(document: DidDocument) => setDidDocument(document)}
-          />
-        </Modal>
-        {/* END Import Document*/}
       </div>
 
-      <div className="flex justify-between pl-4">
+      <div className="flex justify-between md:pl-4">
         <div className="w-1/3 bg-neutral text-neutral-content shadow-[inset_-147px_0px_180px_-180px_rgba(0,0,0,1)]">
-          <div className="flex flex-col">
+          <div className="flex flex-col p-4">
             {!didDocument.verificationMethod.length && (
               <div className="text-center py-4 text-sm opacity-50">
                 No material associated with DID
@@ -347,8 +248,9 @@ export default function DidBuilder({
               (vm, index) =>
                 (isEmbeddedMaterial(vm) && (
                   <div key={index}>
-                    <div className="py-4 flex w-full">
-                      <div className="flex flex-col justify-between mx-2">
+                    <div className="md:py-4 flex flex-col-reverse md:flex-row w-full">
+                      <div className="divider md:hidden m-2" />
+                      <div className="flex flex-row md:flex-col justify-between m-2 md:mx-2 md:my-0">
                         <label
                           htmlFor={`embeddedVm${index}`}
                           className="btn btn-ghost btn-xs opacity-50 text-success"
@@ -409,8 +311,9 @@ export default function DidBuilder({
                 )) ||
                 (isReferencedMaterial(vm) && (
                   <div key={index}>
-                    <div className="py-4 flex w-full">
-                      <div className="flex flex-col justify-between mx-2">
+                    <div className="md:py-4 flex flex-col-reverse md:flex-row w-full">
+                      <div className="divider md:hidden m-2" />
+                      <div className="flex flex-row md:flex-col justify-between m-2 md:mx-2 md:my-0">
                         <label
                           htmlFor={`referenceVm${index}`}
                           className="btn btn-ghost btn-xs opacity-50 text-success"
@@ -475,7 +378,7 @@ export default function DidBuilder({
                 ))
             )}
             <button
-              className="btn btn-outline text-neutral-content btn-default m-4"
+              className="btn btn-outline text-neutral-content btn-default my-4 hidden md:block"
               onClick={() =>
                 setShowNewEmbeddedMethodModal(!showNewEmbeddedMethodModal)
               }
@@ -483,7 +386,7 @@ export default function DidBuilder({
               Add Embedded Material
             </button>
             <button
-              className="btn btn-outline text-neutral-content btn-default mx-4 mb-8"
+              className="btn btn-outline text-neutral-content btn-default mb-4 hidden md:block"
               onClick={() =>
                 setShowNewReferenceMethodModal(!showNewEmbeddedMethodModal)
               }
@@ -496,7 +399,117 @@ export default function DidBuilder({
           <AttemptSerialization didDocument={didDocument} />
         </div>
       </div>
-      <div className="bg-base-300 h-8"></div>
+      <Modal
+        show={showEditDidSubjectModal}
+        id={"editDidSubject"}
+        className={"max-w-none md:w-1/2"}
+        onChange={() => {
+          setShowEditDidSubjectModal(!showEditDidSubjectModal);
+        }}
+      >
+        <EditDidSubject
+          htmlId="editDidSubject"
+          existingSubject={didDocument.id}
+          save={(did: string) =>
+            setDidDocument(
+              produce(didDocument, (draft) => {
+                draft.setIdentifier(did);
+              })
+            )
+          }
+        />
+      </Modal>
+      <Modal
+        show={showEditDidControllerModal}
+        id={"editDidController"}
+        className={"max-w-none md:w-1/2"}
+        onChange={() => {
+          setShowEditDidControllerModal(!showEditDidControllerModal);
+        }}
+      >
+        <EditDidController
+          htmlId="editDidController"
+          existingControllers={didDocument.controller}
+          subject={didDocument.id}
+          save={(controller: DidController | null) =>
+            setDidDocument(
+              produce(didDocument, (draft) => {
+                draft.setController(controller);
+              })
+            )
+          }
+        />
+      </Modal>
+      <Modal
+        show={showEditServices}
+        id={"editServices"}
+        className={"max-w-none md:w-1/2"}
+        onChange={() => {
+          setShowEditServicesModal(!showEditServices);
+        }}
+      >
+        <EditServices
+          htmlId="editServices"
+          existingServices={didDocument.services}
+          save={(services: Service[]) =>
+            setDidDocument(
+              produce(didDocument, (draft) => {
+                draft.setServices(services);
+              })
+            )
+          }
+        />
+      </Modal>
+      <Modal
+        show={showNewEmbeddedMethodModal}
+        id={"newVerificationMaterial"}
+        onChange={() => {
+          setShowNewEmbeddedMethodModal(!showNewEmbeddedMethodModal);
+        }}
+      >
+        <NewEmbeddedMethod
+          htmlId="newVerificationMaterial"
+          didDocument={didDocument}
+          save={(vm: EmbeddedMaterial) =>
+            setDidDocument(
+              produce(didDocument, (draft) => {
+                draft.addVerificationMethod(vm);
+              })
+            )
+          }
+        />
+      </Modal>
+      <Modal
+        show={showNewReferenceMethodModal}
+        id={"newReferenceVerificationMaterial"}
+        onChange={() => {
+          setShowNewReferenceMethodModal(!showNewReferenceMethodModal);
+        }}
+      >
+        <NewReferenceMethod
+          htmlId="newReferenceVerificationMaterial"
+          didDocument={didDocument}
+          save={(vm: ReferencedMaterial) =>
+            setDidDocument(
+              produce(didDocument, (draft) => {
+                draft.addVerificationMethod(vm);
+              })
+            )
+          }
+        />
+      </Modal>
+      <Modal
+        show={showImportDocumentModal}
+        id={"importDocument"}
+        onChange={() => {
+          setShowImportDocumentModal(!showImportDocumentModal);
+        }}
+      >
+        <ImportDocument
+          htmlId="importDocument"
+          save={(document: DidDocument) => setDidDocument(document)}
+        />
+      </Modal>
     </div>
   );
 }

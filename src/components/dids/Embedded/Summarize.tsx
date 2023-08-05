@@ -1,7 +1,5 @@
-import { DidDocument } from "@/lib/DidDocument";
 import { EmbeddedMaterial } from "@/lib/DidMaterial";
 import { VerificationRelationship } from "@/types/dids";
-import FeatherIcon from "feather-icons-react";
 
 function getRelationShipIcon(
   relationship: VerificationRelationship
@@ -38,8 +36,9 @@ export default function SummarizeEmbeddedMethod({
             method.material.usage[relationship as VerificationRelationship]
           }`}
         >
-          {getRelationShipIcon(relationship as VerificationRelationship)}{" "}
-          {index === arr.length - 1 ? "" : "·"}
+          {getRelationShipIcon(relationship as VerificationRelationship)}
+          {index === arr.length - 1 ? "" : " -"}
+          &nbsp;
         </div>
       </div>
     )
@@ -50,6 +49,11 @@ export default function SummarizeEmbeddedMethod({
       <div className="flex flex-col min-w-0 pr-1" key={index}>
         <div className="text-sm">
           <div className="truncate">
+            <span className="opacity-50 text-neutral-content">
+              Embedded material
+            </span>
+          </div>
+          <div className="truncate">
             <span className="opacity-50">Id:</span> {method.id}
           </div>
 
@@ -57,8 +61,8 @@ export default function SummarizeEmbeddedMethod({
             <span className="opacity-50">Curve:</span>{" "}
             {method.material.curve.name.display}
           </div>
-          <div className="flex flex-wrap gap-2">
-            <span className="opacity-50">Usage:</span>{" "}
+          <div className="flex flex-wrap">
+            <span className="opacity-50 mr-1">Usage:</span>
             {usages.length > 0 ? usages : "Unused"}
           </div>
         </div>

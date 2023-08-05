@@ -123,9 +123,10 @@ export default function NewKeyMaterial({
               {privateKey === "" ? "Generate new key" : "Regenerate key"}
             </button>
             <div className={`${privateKey === "" ? "hidden" : ""}`}>
-              <div className="w-full bg-base-300 mt-4 font-mono text-xs flex justify-between">
-                <pre className="p-4">{privateKey}</pre>
+              <div className="w-full bg-base-300 mt-4 font-mono text-xs flex flex-col md:flex-row justify-between">
+                <pre className="p-4 overflow-scroll">{privateKey}</pre>
                 <div
+                  className="hidden md:block"
                   onClick={() => {
                     navigator.clipboard.writeText(privateKey);
                   }}
@@ -141,8 +142,24 @@ export default function NewKeyMaterial({
                   </button>
                 </div>
               </div>
-              <div className="p-2 font-bold text-xs bg-warning text-warning-content w-full">
-                Save this key. You will not be able to retrieve it later
+              <div className="flex">
+                <button
+                  className="btn btn-square btn-sm md:hidden"
+                  onClick={() => {
+                    navigator.clipboard.writeText(privateKey);
+                  }}
+                >
+                  <svg
+                    className="w-5 h-5 fill-current"
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 32 32"
+                  >
+                    <path d="M 16 3 C 14.742188 3 13.847656 3.890625 13.40625 5 L 6 5 L 6 28 L 26 28 L 26 5 L 18.59375 5 C 18.152344 3.890625 17.257813 3 16 3 Z M 16 5 C 16.554688 5 17 5.445313 17 6 L 17 7 L 20 7 L 20 9 L 12 9 L 12 7 L 15 7 L 15 6 C 15 5.445313 15.445313 5 16 5 Z M 8 7 L 10 7 L 10 11 L 22 11 L 22 7 L 24 7 L 24 26 L 8 26 Z"></path>
+                  </svg>
+                </button>
+                <div className="p-2 font-bold text-xs bg-warning text-warning-content w-full">
+                  Save this key. You will not be able to retrieve it later
+                </div>
               </div>
             </div>
           </div>

@@ -62,7 +62,6 @@ export function curveFromName(name: string): Curve {
 }
 
 export function curveToName(curve: Curve, format: "jwk" | "elliptic"): string {
-  console.log(curve);
   if (isP256(curve)) {
     if (format === "elliptic") return "p256";
     if (format === "jwk") return "P-256";

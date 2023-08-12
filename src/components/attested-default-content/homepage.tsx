@@ -60,7 +60,7 @@ const AttestedHomepage = () => {
       <div className="bg-base-200">
         <div className="p-8 pt-8 md:pb-16 md:pt-16 md:36 flex flex-col items-center gap-8 max-w-screen-xl mx-auto">
           <p className="text-center">
-            Attested.tech is brought to you by{" "}
+            Attested.tech is maintained by{" "}
             <Link
               className={"underline"}
               href={"https://github.com/johanssonanton"}

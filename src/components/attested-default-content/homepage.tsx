@@ -19,9 +19,9 @@ const AttestedHomepage = () => {
     <>
       <div className="bg-base-200">
         <ContentMeta
-          title="Attested.tech"
+          title="ATTESTED.TECH"
           description="Playground for decentralized identifiers"
-          socialImage={`/api/og?title=Attested.tech`}
+          socialImage={`/meta_banner.png`}
         />
         <div className="p-8 pt-8 md:pb-16 md:pt-16 md:36 flex flex-col items-center gap-8 max-w-screen-xl mx-auto">
           {/*<Logo size="lg" className="mx-auto" />*/}

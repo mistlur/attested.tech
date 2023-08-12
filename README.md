@@ -10,7 +10,7 @@ npm run dev
 ```
 
 ## Description
-Playground for DID Documents running live at [https://attested.tech](https://attested.tech)
+Playground for DID Documents - running at [https://attested.tech](https://attested.tech)
 
 ## Code Formatting and linting
 

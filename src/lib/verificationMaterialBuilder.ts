@@ -64,7 +64,6 @@ export const decodeVerificationRelationship = (
 
   const minimzedId =
     "#" + verificationMethod.id.split("#")![1] || verificationMethod.id;
-  console.log(minimzedId);
   return new EmbeddedMaterial(minimzedId, {
     curve,
     controller: verificationMethod.controller,

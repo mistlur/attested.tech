@@ -166,7 +166,7 @@ export default function EmbeddedMethodSettings({
                 type="radio"
                 name="radio-10"
                 className="radio checked:bg-red-500"
-                onClick={() => setFormat("JsonWebKey2020")}
+                onChange={() => setFormat("JsonWebKey2020")}
                 checked={format === "JsonWebKey2020"}
               />
             </label>
@@ -178,7 +178,7 @@ export default function EmbeddedMethodSettings({
                 type="radio"
                 name="radio-10"
                 className="radio checked:bg-blue-500"
-                onClick={() => setFormat("Multibase")}
+                onChange={() => setFormat("Multibase")}
                 checked={format === "Multibase"}
               />
             </label>

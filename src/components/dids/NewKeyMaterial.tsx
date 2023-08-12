@@ -88,7 +88,7 @@ export default function NewKeyMaterial({
                     type="radio"
                     name="radio-10"
                     className="radio checked:bg-red-500"
-                    onClick={() => setCurve(CurveEd25519)}
+                    onChange={() => setCurve(CurveEd25519)}
                     checked={isEd25519(curve)}
                   />
                 </label>
@@ -100,7 +100,7 @@ export default function NewKeyMaterial({
                     type="radio"
                     name="radio-10"
                     className="radio checked:bg-blue-500"
-                    onClick={() => setCurve(CurveP256)}
+                    onChange={() => setCurve(CurveP256)}
                     checked={isP256(curve)}
                   />
                 </label>

@@ -62,16 +62,17 @@ export const decodeVerificationRelationship = (
   if (!keyMaterial || !curve || !representation || !format)
     throw Error("Invalid key");
 
-  const minimzedId = '#' + verificationMethod.id.split('#')![1] || verificationMethod.id
-  console.log(minimzedId)
-  return new EmbeddedMaterial(
-    minimzedId,
-     {
+  const minimzedId =
+    "#" + verificationMethod.id.split("#")![1] || verificationMethod.id;
+  console.log(minimzedId);
+  return new EmbeddedMaterial(minimzedId, {
     curve,
     controller: verificationMethod.controller,
     keyMaterial,
     format,
-    ...(method !== 'verificationMethod' && {usage: { [method]: representation }}),
+    ...(method !== "verificationMethod" && {
+      usage: { [method]: representation },
+    }),
   });
 };
 
@@ -84,7 +85,7 @@ export const didDocumentDeserializer = (
   verificationRelationships.map((relationship) => {
     if (document[relationship]) {
       document[relationship]!.forEach((verificationMethod) =>
-      relationships.push(
+        relationships.push(
           decodeVerificationRelationship(verificationMethod, relationship)
         )
       );
@@ -99,15 +100,22 @@ export const didDocumentDeserializer = (
     );
   }
 
-  const refs = []
+  const refs = [];
   for (let material of relationships) {
-      const existingIndex = Math.max(verificationMethods.findIndex((t) => t.id === material.id), verificationMethods.findIndex((t) => t.id === `${document.id}${material.id}`))
-      if(existingIndex >= 0) {
-        verificationMethods[existingIndex].setUsage({ ...verificationMethods[existingIndex].getUsage(), ...material.getUsage()})
-      }
-      else {
-        refs.push(material)
-      }
+    const existingIndex = Math.max(
+      verificationMethods.findIndex((t) => t.id === material.id),
+      verificationMethods.findIndex(
+        (t) => t.id === `${document.id}${material.id}`
+      )
+    );
+    if (existingIndex >= 0) {
+      verificationMethods[existingIndex].setUsage({
+        ...verificationMethods[existingIndex].getUsage(),
+        ...material.getUsage(),
+      });
+    } else {
+      refs.push(material);
+    }
   }
 
   return new DidDocument(

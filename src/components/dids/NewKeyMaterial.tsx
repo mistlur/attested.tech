@@ -35,7 +35,9 @@ export default function NewKeyMaterial({
       controller: didDocument.id,
       format,
       curve,
-      usage: Object.fromEntries(curve.capabilities.map(capability => [capability, 'Reference'])),
+      usage: Object.fromEntries(
+        curve.capabilities.map((capability) => [capability, "Reference"])
+      ),
       keyMaterial,
     });
     setMethod(method);

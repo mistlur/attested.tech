@@ -116,7 +116,7 @@ export class EmbeddedMaterial implements DidMaterial {
       return this.id;
     }
 
-    const fullId = subject + this.id;
+    const fullId = this.id.startsWith(subject) ? this.id : subject + this.id;
 
     if (isEd25519(this.material.curve)) {
       if (this.material.format === "JsonWebKey2020") {

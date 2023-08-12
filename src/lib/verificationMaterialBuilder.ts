@@ -62,56 +62,58 @@ export const decodeVerificationRelationship = (
   if (!keyMaterial || !curve || !representation || !format)
     throw Error("Invalid key");
 
-  return new EmbeddedMaterial(verificationMethod.id, {
+  const minimzedId = '#' + verificationMethod.id.split('#')![1] || verificationMethod.id
+  console.log(minimzedId)
+  return new EmbeddedMaterial(
+    minimzedId,
+     {
     curve,
     controller: verificationMethod.controller,
     keyMaterial,
     format,
-    usage: { [method]: representation },
+    ...(method !== 'verificationMethod' && {usage: { [method]: representation }}),
   });
 };
 
 export const didDocumentDeserializer = (
   document: z.infer<typeof documentSchema>
 ): DidDocument => {
-  const incomingDidMaterial: DidMaterial[] = [];
-  const relationships = [
-    ...verificationRelationships,
-    "verificationMethod",
-  ] as const;
-  relationships.map((relationship) => {
+  const relationships: DidMaterial[] = [];
+  const verificationMethods: DidMaterial[] = [];
+
+  verificationRelationships.map((relationship) => {
     if (document[relationship]) {
       document[relationship]!.forEach((verificationMethod) =>
-        incomingDidMaterial.push(
+      relationships.push(
           decodeVerificationRelationship(verificationMethod, relationship)
         )
       );
     }
   });
 
-  const denormalized: DidMaterial[] = [];
-  for (let material of incomingDidMaterial) {
-    const existingIndex = denormalized.findIndex((t) => t.id === material.id);
-    const other = denormalized[existingIndex];
-    if (existingIndex < 0) denormalized.push(material);
-    else {
-      if (isEmbeddedType(other.material) && isEmbeddedType(material.material)) {
-        if (!material.equals(other)) {
-          denormalized.push(material);
-        } else {
-          other.setUsage({ ...other.getUsage(), ...material.getUsage() });
-          denormalized[existingIndex] = other;
-        }
-      } else {
-        material.setUsage({ ...other.getUsage(), ...material.getUsage() });
-        denormalized[existingIndex] = material;
-      }
-    }
+  if (document["verificationMethod"]) {
+    document["verificationMethod"]!.forEach((verificationMethod) =>
+      verificationMethods.push(
+        decodeVerificationRelationship(verificationMethod, "verificationMethod")
+      )
+    );
   }
+
+  const refs = []
+  for (let material of relationships) {
+      const existingIndex = Math.max(verificationMethods.findIndex((t) => t.id === material.id), verificationMethods.findIndex((t) => t.id === `${document.id}${material.id}`))
+      if(existingIndex >= 0) {
+        verificationMethods[existingIndex].setUsage({ ...verificationMethods[existingIndex].getUsage(), ...material.getUsage()})
+      }
+      else {
+        refs.push(material)
+      }
+  }
+
   return new DidDocument(
     document.id,
     new Set<string>(document.controller),
-    denormalized,
+    [...verificationMethods, ...refs],
     // @ts-ignore
     document.services
   );

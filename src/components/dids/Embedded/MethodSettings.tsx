@@ -43,7 +43,7 @@ export default function EmbeddedMethodSettings({
           <input
             type="text"
             value={id}
-            onChange={(e) => setId(e.target.value)}
+            onChange={(e) => setId(e.target.value.startsWith('#') ? e.target.value : `#${e.target.value}`)}
             placeholder="#lwg2wFClmq7gEjv..."
             className={`input input-bordered w-full`}
           />

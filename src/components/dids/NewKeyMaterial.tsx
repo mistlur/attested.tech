@@ -28,7 +28,6 @@ export default function NewKeyMaterial({
   const [keyMaterial, setKeyMaterial] = useState<Uint8Array | undefined>(
     undefined
   );
-
   function completeSetup() {
     if (!keyMaterial) throw Error("KeyMaterial is undefined");
     const format = "JsonWebKey2020";
@@ -36,13 +35,7 @@ export default function NewKeyMaterial({
       controller: didDocument.id,
       format,
       curve,
-      usage: {
-        authentication: "Reference",
-        assertionMethod: "Reference",
-        keyAgreement: "Reference",
-        capabilityInvocation: "Reference",
-        capabilityDelegation: "Reference",
-      },
+      usage: Object.fromEntries(curve.capabilities.map(capability => [capability, 'Reference'])),
       keyMaterial,
     });
     setMethod(method);

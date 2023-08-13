@@ -1,552 +1,356 @@
-import { ec as EC } from "elliptic";
-// import {
-//   decodeVerificationRelationship,
-//   didDocumentDeserializer,
-// } from "./verificationMaterialBuilder";
-//
-// import { isEmbeddedMaterial } from "@/lib/DidMaterial";
-// import { EmbeddedType } from "@/types/dids";
-// import { Curve } from "@/lib/curves";
-// import { LogicDocument } from "@/lib/DidDocument";
-//
-// describe.only("Deserialize Verification Method", () => {
-//   it("handles P-256 JWK method", async () => {
-//     const verificationMethod = {
-//       id: "did:example:123#key-4",
-//       type: "JsonWebKey2020",
-//       controller: "did:example:123",
-//       publicKeyJwk: {
-//         kty: "EC",
-//         crv: "P-256",
-//         x: "u7KnnZO3wZz8nIC5pHiWgsOXlRUj0inlEoAsuJ3kR7k",
-//         y: "bAR7nCeNMceX4nsd4XqxTCYB96YbFK4TFetgtp9ElbU",
-//       },
-//     };
-//     const deserializedVerificationMethod = await decodeVerificationRelationship(
-//       verificationMethod,
-//       "verificationMethod"
-//     );
-//     console.log(
-//       "deserializedVerificationMethod",
-//       deserializedVerificationMethod
-//     );
-//     expect(deserializedVerificationMethod.id).toBe("did:example:123#key-4");
-//
-//     if (!isEmbeddedMaterial(deserializedVerificationMethod)) throw new Error();
-//     expect(deserializedVerificationMethod.material.curve).toBe("P-256");
-//     expect(deserializedVerificationMethod.material.keyMaterial!.length).toBe(
-//       65
-//     );
-//     expect(deserializedVerificationMethod.material.format).toBe(
-//       "JsonWebKey2020"
-//     );
-//     expect(deserializedVerificationMethod.material.usage).toStrictEqual({
-//       verificationMethod: "Embedded",
-//     });
-//   });
-//
-//   it("handles P-256 Multibase method", async () => {
-//     const verificationMethod = {
-//       id: "did:example:123#key-4",
-//       type: "P256Key2021",
-//       controller:
-//         "did:web:be0f-83-248-113-71.ngrok.io:api:4dbac1c5-2430-459d-8ef6-e3f2327221ff",
-//       publicKeyMultibase: "zDnaeb7hxqexhrMUYTFzCmesbFF1d12sk4uV7yzhJox5PThAP",
-//     };
-//
-//     const deserializedVerificationMethod = await decodeVerificationRelationship(
-//       verificationMethod,
-//       "verificationMethod"
-//     );
-//     expect(deserializedVerificationMethod.id).toBe("did:example:123#key-4");
-//
-//     if (!isEmbeddedMaterial(deserializedVerificationMethod)) throw new Error();
-//
-//     expect(deserializedVerificationMethod.material.curve).toBe("P-256");
-//     // expect(deserializedVerificationMethod.material!.length).toBe(65);
-//     expect(deserializedVerificationMethod.material.format).toBe("Multibase");
-//     expect(deserializedVerificationMethod.material.usage).toStrictEqual({
-//       verificationMethod: "Embedded",
-//     });
-//   });
-//
-//   it("handles Reference method", async () => {
-//     const verificationMethod = "did:example:123456789abcdefghi#keys-1";
-//     const deserializedVerificationMethod = await decodeVerificationRelationship(
-//       verificationMethod,
-//       "verificationMethod"
-//     );
-//     const assertKeyTypeVm = isEmbeddedMaterial(deserializedVerificationMethod);
-//     expect(assertKeyTypeVm).toBeFalsy();
-//     expect(deserializedVerificationMethod.id).toBe(verificationMethod);
-//     expect(deserializedVerificationMethod.material.usage).toStrictEqual({
-//       verificationMethod: "Reference",
-//     });
-//   });
-//
-//   it("throws on unknown key", async () => {
-//     const unsupportedType = "SomeSortOfType";
-//     const verificationMethod = {
-//       id: "did:example:1234#z6MkkLTyVxNkwxXGUJfA4Uw23FHSAA3SoMoNB8NteMT2BAkd",
-//       type: unsupportedType,
-//       controller: "did:example:1234",
-//       publicKeyMultibase: "zXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
-//     };
-//     expect(
-//       await decodeVerificationRelationship(
-//         verificationMethod,
-//         "verificationMethod"
-//       )
-//     ).toThrow(Error);
-//     expect(
-//       await decodeVerificationRelationship(
-//         verificationMethod,
-//         "verificationMethod"
-//       )
-//     ).toThrow(`Unsupported type: ${unsupportedType}`);
-//   });
-//
-//   it("throws on malformed key", async () => {
-//     const malformedType = "JsonWebKey2020"; // The key is of type Multibase
-//     const verificationMethod = {
-//       id: "did:example:123#key-4",
-//       type: malformedType,
-//       controller:
-//         "did:web:be0f-83-248-113-71.ngrok.io:api:4dbac1c5-2430-459d-8ef6-e3f2327221ff",
-//       publicKeyMultibase: "zDnaeb7hxqexhrMUYTFzCmesbFF1d12sk4uV7yzhJox5PThAP",
-//     };
-//     expect(
-//       await decodeVerificationRelationship(
-//         verificationMethod,
-//         "verificationMethod"
-//       )
-//     ).toThrow(Error);
-//     expect(
-//       await decodeVerificationRelationship(
-//         verificationMethod,
-//         "verificationMethod"
-//       )
-//     ).toThrow('Invalid type: "JsonWebKey2020" must contain "publicKeyJwk"');
-//   });
-//
-//   it.skip("throws on invalid key", async () => {
-//     // TODO: Is this within the responsibility of this app?
-//     const verificationMethod = {
-//       id: "did:example:123#key-4",
-//       type: "JsonWebKey2020",
-//       controller: "did:example:123",
-//       publicKeyJwk: {
-//         kty: "EC",
-//         crv: "P-256",
-//         x: "a",
-//         y: "b",
-//       },
-//     };
-//     expect(
-//       await decodeVerificationRelationship(
-//         verificationMethod,
-//         "verificationMethod"
-//       )
-//     ).toThrow(Error);
-//     expect(
-//       await decodeVerificationRelationship(
-//         verificationMethod,
-//         "verificationMethod"
-//       )
-//     ).toThrow(`invalid key`);
-//   });
-//
-//   it("throws on missing key material", async () => {
-//     const verificationMethod = {
-//       id: "did:example:1234#z6MkkLTyVxNkwxXGUJfA4Uw23FHSAA3SoMoNB8NteMT2BAkd",
-//       type: "P256Key2021",
-//       controller: "did:example:1234",
-//       publicKeyMultibase: "",
-//     };
-//     expect(
-//       await decodeVerificationRelationship(
-//         verificationMethod,
-//         "verificationMethod"
-//       )
-//     ).toThrow(Error);
-//     expect(
-//       await decodeVerificationRelationship(
-//         verificationMethod,
-//         "verificationMethod"
-//       )
-//     ).toThrow(`Invalid key`);
-//   });
-// });
-//
-// describe("Deserialize DID Document", () => {
-//   it("handles document with only id", async () => {
-//     const document = {
-//       id: "did:example:1234",
-//     };
-//     const deserializedDocument = await didDocumentDeserializer(document);
-//     expect(deserializedDocument.id).toBe("did:example:1234");
-//   });
-//
-//   it("handles document with controller", async () => {
-//     const document = {
-//       id: "did:example:1234",
-//       controller: "did:example:456",
-//     };
-//     const deserializedDocument = await didDocumentDeserializer(document);
-//     expect(deserializedDocument.id).toBe("did:example:1234");
-//     expect(deserializedDocument.controller).toBe("did:example:456");
-//   });
-//
-//   it("handles document with verification methods", async () => {
-//     const referencedVerificationMaterial = "did:example:456#abc";
-//     const embeddedVerificationMaterial = {
-//       id: "did:example:123#key-4",
-//       type: "JsonWebKey2020",
-//       controller: "did:example:123",
-//       publicKeyJwk: {
-//         kty: "EC",
-//         crv: "P-256",
-//         x: "u7KnnZO3wZz8nIC5pHiWgsOXlRUj0inlEoAsuJ3kR7k",
-//         y: "bAR7nCeNMceX4nsd4XqxTCYB96YbFK4TFetgtp9ElbU",
-//       },
-//     };
-//
-//     const document = {
-//       id: "did:example:1234",
-//       controller: "did:example:456",
-//       verificationMethod: [
-//         embeddedVerificationMaterial,
-//         referencedVerificationMaterial,
-//       ],
-//       authentication: [
-//         embeddedVerificationMaterial,
-//         referencedVerificationMaterial,
-//       ],
-//       assertionMethod: [
-//         embeddedVerificationMaterial,
-//         referencedVerificationMaterial,
-//       ],
-//       keyAgreement: [
-//         embeddedVerificationMaterial,
-//         referencedVerificationMaterial,
-//       ],
-//       capabilityInvocation: [
-//         embeddedVerificationMaterial,
-//         referencedVerificationMaterial,
-//       ],
-//       capabilityDelegation: [
-//         embeddedVerificationMaterial,
-//         referencedVerificationMaterial,
-//       ],
-//     };
-//     // @ts-ignore
-//     const deserializedDocument = await didDocumentDeserializer(document);
-//     expect(deserializedDocument.id).toBe("did:example:1234");
-//     expect(deserializedDocument.controller).toBe("did:example:456");
-//     expect(deserializedDocument.verificationMaterials.length).toBe(2);
-//     deserializedDocument.verificationMaterials.forEach((vm) => {
-//       expect(vm.material.usage).toEqual({
-//         verificationMethod: expect.any(String),
-//         authentication: expect.any(String),
-//         assertionMethod: expect.any(String),
-//         keyAgreement: expect.any(String),
-//         capabilityInvocation: expect.any(String),
-//         capabilityDelegation: expect.any(String),
-//       });
-//     });
-//   });
-//
-//   it("handles denormalization of document with same verification material represented in different forms", async () => {
-//     const jwkMaterial = {
-//       id: "did:example:1234#123",
-//       type: "JsonWebKey2020",
-//       controller: "did:example:1234",
-//       publicKeyJwk: {
-//         crv: "P-256",
-//         kty: "EC",
-//         x: "UD4bplQZgdpma2mDdzbB5fp3X-zrlAqKn7apb97S5Nk",
-//         y: "Q_yzJQkd_BaOvnxD7VrKNxYMG0GiFVzC_U6c8KNTDh8",
-//       },
-//     };
-//
-//     const multibaseMaterial = {
-//       id: "did:example:1234#123",
-//       type: "P256Key2021",
-//       controller: "did:example:1234",
-//       publicKeyMultibase: "zDnaeo4Wxhx9j8MQrx3gGYUon5c7QELjFsWAibfg5rmD7LTNQ",
-//     };
-//
-//     const document = {
-//       id: "did:example:1234",
-//       controller: "did:example:456",
-//       verificationMethod: [jwkMaterial],
-//       authentication: [multibaseMaterial],
-//     };
-//
-//     const deserializedDocument = await didDocumentDeserializer(document);
-//     expect(deserializedDocument.id).toBe("did:example:1234");
-//     expect(deserializedDocument.controller).toBe("did:example:456");
-//     expect(deserializedDocument.verificationMaterials.length).toBe(1);
-//   });
-// });
-//
-// describe("Serialize Verification Method", () => {
-//   const validVerificationMethodP256 = {
-//     id: "did:example:123#456",
-//     curve: "P-256",
-//     controller: "did:example:123",
-//     usage: {},
-//     keyMaterial: new Uint8Array([
-//       4, 187, 178, 167, 157, 147, 183, 193, 156, 252, 156, 128, 185, 164, 120,
-//       150, 130, 195, 151, 149, 21, 35, 210, 41, 229, 18, 128, 44, 184, 157, 228,
-//       71, 185, 108, 4, 123, 156, 39, 141, 49, 199, 151, 226, 123, 29, 225, 122,
-//       177, 76, 38, 1, 247, 166, 27, 20, 174, 19, 21, 235, 96, 182, 159, 68, 149,
-//       181,
-//     ]),
-//   };
-//
-//   const embeddedTestCases: {
-//     deserializedVerificationMethod: EmbeddedType;
-//     expected: any;
-//   }[] = [
-//     {
-//       deserializedVerificationMethod: {
-//         ...validVerificationMethodP256,
-//         format: "Multibase",
-//       },
-//       expected: {
-//         id: validVerificationMethodP256.id,
-//         controller: "did:example:123",
-//         type: "P256Key2021",
-//         publicKeyMultibase: "zDnaevHyfCfHYFyscLiRMYacaoXFqnA6gSDwgJXoZia5hNM9J",
-//       },
-//     },
-//     {
-//       deserializedVerificationMethod: {
-//         ...validVerificationMethodP256,
-//         format: "JsonWebKey2020",
-//       },
-//       expected: {
-//         id: "did:example:123#456",
-//         type: "JsonWebKey2020",
-//         controller: "did:example:123",
-//         publicKeyJwk: {
-//           crv: "P-256",
-//           kty: "EC",
-//           x: "u7KnnZO3wZz8nIC5pHiWgsOXlRUj0inlEoAsuJ3kR7k",
-//           y: "bAR7nCeNMceX4nsd4XqxTCYB96YbFK4TFetgtp9ElbU",
-//         },
-//       },
-//     },
-//   ];
-//
-//   const calculatedIds: Record<string, Record<KeyFormat, string>> = {
-//     ["P-256"]: {
-//       // @ts-ignore
-//       Multibase:
-//         "did:example:123#zDnaevHyfCfHYFyscLiRMYacaoXFqnA6gSDwgJXoZia5hNM9J",
-//       JsonWebKey2020:
-//         "did:example:123#71DzuEySoYKSDysvn4QZM_w6uFcKs5gGexvV80H6aEQ",
-//     },
-//   };
-//
-//   embeddedTestCases.forEach((testCase) => {
-//     it(`handles ${testCase.deserializedVerificationMethod.curve} representation as ${testCase.deserializedVerificationMethod.format}`, () => {
-//       // @ts-ignore
-//       const didDocument = new DidDocument(
-//         "did:example:123",
-//         "did:example:123",
-//         []
-//       );
-//       const serialized = didDocument.serializeMaterial(
-//         testCase.deserializedVerificationMethod,
-//         "Embedded"
-//       );
-//       expect(serialized).toStrictEqual(testCase.expected);
-//     });
-//
-//     it(`handles calculates the id for ${testCase.deserializedVerificationMethod.curve} represented as ${testCase.deserializedVerificationMethod.format}`, () => {
-//       // @ts-ignore
-//       const didDocument = new DidDocument(
-//         "did:example:123",
-//         "did:example:123",
-//         []
-//       );
-//       const freshMethod = {
-//         ...testCase.deserializedVerificationMethod,
-//         id: undefined,
-//       };
-//       const serialized = didDocument.serializeMaterial(freshMethod, "Embedded");
-//       // @ts-ignore
-//       expect(serialized.id).toBe(
-//         calculatedIds[testCase.deserializedVerificationMethod.curve!][
-//           testCase.deserializedVerificationMethod.format
-//         ]
-//       );
-//     });
-//   });
-// });
-//
-// describe("Serialize DID Document", () => {
-//   const validVerificationMethodP256: EmbeddedType[] = [
-//     {
-//       id: "did:example:123#456",
-//       curve: "P-256",
-//       controller: "did:example:123",
-//       format: "Multibase",
-//       // @ts-ignore
-//       usage: { verificationMethod: "Embedded", assertionMethod: "Reference" },
-//       keyMaterial: new Uint8Array([
-//         4, 187, 178, 167, 157, 147, 183, 193, 156, 252, 156, 128, 185, 164, 120,
-//         150, 130, 195, 151, 149, 21, 35, 210, 41, 229, 18, 128, 44, 184, 157,
-//         228, 71, 185, 108, 4, 123, 156, 39, 141, 49, 199, 151, 226, 123, 29,
-//         225, 122, 177, 76, 38, 1, 247, 166, 27, 20, 174, 19, 21, 235, 96, 182,
-//         159, 68, 149, 181,
-//       ]),
-//     },
-//     {
-//       // @ts-ignore
-//       id: "did:example:123#678",
-//       curve: "P-256",
-//       controller: "did:example:123",
-//       format: "JsonWebKey2020",
-//       keyMaterial: new Uint8Array([
-//         4, 74, 75, 165, 56, 77, 105, 2, 249, 70, 40, 4, 129, 140, 97, 20, 75,
-//         144, 186, 233, 13, 21, 114, 102, 28, 149, 201, 161, 227, 240, 123, 159,
-//         252, 130, 181, 204, 135, 17, 137, 83, 80, 18, 90, 97, 55, 97, 164, 128,
-//         226, 105, 238, 18, 66, 71, 191, 155, 191, 253, 130, 177, 85, 239, 47,
-//         209, 245,
-//       ]),
-//       usage: { authentication: "Embedded" },
-//     },
-//   ];
-//
-//   const validDidDocument = {
-//     id: "did:example:123",
-//     controller: "did:example:123",
-//     verificationMethods: validVerificationMethodP256,
-//   };
-//
-//   const validTestCases: {
-//     deserializedDocument: LogicDocument;
-//     expected: any;
-//   }[] = [
-//     {
-//       // @ts-ignore
-//       deserializedDocument: validDidDocument,
-//       expected: {
-//         ["@context"]: [
-//           "https://www.w3.org/ns/did/v1",
-//           "https://w3id.org/security/suites/multikey-2021/v1",
-//           "https://w3id.org/security/suites/jws-2020/v1",
-//         ],
-//         id: "did:example:123",
-//         controller: "did:example:123",
-//         verificationMethod: [
-//           {
-//             id: "did:example:123#456",
-//             type: "P256Key2021",
-//             controller: "did:example:123",
-//             publicKeyMultibase:
-//               "zDnaevHyfCfHYFyscLiRMYacaoXFqnA6gSDwgJXoZia5hNM9J",
-//           },
-//         ],
-//         authentication: [
-//           {
-//             id: "did:example:123#678",
-//             type: "JsonWebKey2020",
-//             controller: "did:example:123",
-//             publicKeyJwk: {
-//               crv: "P-256",
-//               kty: "EC",
-//               x: "SkulOE1pAvlGKASBjGEUS5C66Q0VcmYclcmh4_B7n_w",
-//               y: "grXMhxGJU1ASWmE3YaSA4mnuEkJHv5u__YKxVe8v0fU",
-//             },
-//           },
-//         ],
-//         assertionMethod: ["did:example:123#456"],
-//       },
-//     },
-//   ];
-//
-//   validTestCases.forEach((testCase) => {
-//     it(`handles DID Document`, () => {
-//       // @ts-ignore
-//       const document = new DidDocument(
-//         testCase.deserializedDocument.id,
-//         testCase.deserializedDocument.controller,
-//         testCase.deserializedDocument.verificationMethods
-//       );
-//       const serialized = document.serialize();
-//       expect(serialized).toStrictEqual(testCase.expected);
-//     });
-//   });
-// });
-//
-// describe("DID tests suite", () => {
-//   // it('apa', () => {
-//   //     const validVerificationMethodP256: LogicVM[] = [{
-//   //         id: 'did:example:123#456',
-//   //         curve: 'p256',
-//   //         controller: 'did:example:123',
-//   //         usage: { verificationMethod: 'JsonWebKey2020', assertionMethod: 'Reference' },
-//   //         fresh: false,
-//   //         keyMaterial: new Uint8Array([
-//   //             4, 187, 178, 167, 157, 147, 183, 193, 156, 252, 156,
-//   //             128, 185, 164, 120, 150, 130, 195, 151, 149, 21, 35,
-//   //             210, 41, 229, 18, 128, 44, 184, 157, 228, 71, 185,
-//   //             108, 4, 123, 156, 39, 141, 49, 199, 151, 226, 123,
-//   //             29, 225, 122, 177, 76, 38, 1, 247, 166, 27, 20,
-//   //             174, 19, 21, 235, 96, 182, 159, 68, 149, 181
-//   //         ])
-//   //     },
-//   //     {
-//   //         id: 'did:example:123#456',
-//   //         curve: 'p256',
-//   //         fresh: false,
-//   //         controller: 'did:example:123',
-//   //         keyMaterial: new Uint8Array([
-//   //             4, 74, 75, 165, 56, 77, 105, 2, 249, 70, 40,
-//   //             4, 129, 140, 97, 20, 75, 144, 186, 233, 13, 21,
-//   //             114, 102, 28, 149, 201, 161, 227, 240, 123, 159, 252,
-//   //             130, 181, 204, 135, 17, 137, 83, 80, 18, 90, 97,
-//   //             55, 97, 164, 128, 226, 105, 238, 18, 66, 71, 191,
-//   //             155, 191, 253, 130, 177, 85, 239, 47, 209, 245
-//   //         ]),
-//   //         usage: { authentication: 'JsonWebKey2020', verificationMethod: 'Multibase' }
-//   //     }]
-//   //     const validDidDocument: LogicDocument = {
-//   //         id: 'did:example:123',
-//   //         controller: 'did:example:123',
-//   //         verificationMethods: validVerificationMethodP256
-//   //     }
-//   //     const apa = {
-//   //         "didMethod": "did:web",
-//   //         "implementation": "todo",
-//   //         "implementer": "todo",
-//   //         "supportedContentTypes": [
-//   //             "application/did+json"
-//   //         ],
-//   //         "dids": [
-//   //             validDidDocument.id
-//   //         ],
-//   //         "didParameters": {},
-//   //         [validDidDocument.id]: {
-//   //             "didDocumentDataModel": {
-//   //                 "properties": didDocumentSerializer(validDidDocument)
-//   //             },
-//   //             "application/did+json": {
-//   //                 "didDocumentDataModel": {
-//   //                     "representationSpecificEntries": {}
-//   //                 },
-//   //                 "representation": JSON.stringify(didDocumentSerializer(validDidDocument)),
-//   //                 "didDocumentMetadata": {},
-//   //                 "didResolutionMetadata": {
-//   //                     "contentType": "application/did+json"
-//   //                 }
-//   //             }
-//   //         }
-//   //     }
-//   //     console.log(JSON.stringify(apa))
-//   // })
-// });
+import { describe, expect, it } from "vitest";
+import {
+  decodeVerificationRelationship,
+  didDocumentDeserializer,
+} from "./verificationMaterialBuilder";
+import { EmbeddedType } from "../types/dids";
+
+// Fetched from https://www.rfc-editor.org/rfc/rfc8037#appendix-A
+const ed25519PublicKeyBytes = new Uint8Array([
+  0xd7, 0x5a, 0x98, 0x01, 0x82, 0xb1, 0x0a, 0xb7, 0xd5, 0x4b, 0xfe, 0xd3, 0xc9,
+  0x64, 0x07, 0x3a, 0x0e, 0xe1, 0x72, 0xf3, 0xda, 0xa6, 0x23, 0x25, 0xaf, 0x02,
+  0x1a, 0x68, 0xf7, 0x07, 0x51, 0x1a,
+]);
+
+// Fetched from https://www.rfc-editor.org/rfc/rfc7517.html#appendix-A.1
+const p256PublicKeyBytes = new Uint8Array([
+  0x04, 0x30, 0xa0, 0x42, 0x4c, 0xd2, 0x1c, 0x29, 0x44, 0x83, 0x8a, 0x2d, 0x75,
+  0xc9, 0x2b, 0x37, 0xe7, 0x6e, 0xa2, 0x0d, 0x9f, 0x00, 0x89, 0x3a, 0x3b, 0x4e,
+  0xee, 0x8a, 0x3c, 0x0a, 0xaf, 0xec, 0x3e, 0xe0, 0x4b, 0x65, 0xe9, 0x24, 0x56,
+  0xd9, 0x88, 0x8b, 0x52, 0xb3, 0x79, 0xbd, 0xfb, 0xd5, 0x1e, 0xe8, 0x69, 0xef,
+  0x1f, 0x0f, 0xc6, 0x5b, 0x66, 0x59, 0x69, 0x5b, 0x6c, 0xce, 0x08, 0x17, 0x23,
+]);
+
+describe("decodeVerificationRelationship", () => {
+  it("ED25519 - JWK", () => {
+    const material = {
+      id: "#z6MktwupdmLXVVqTzCw4i46r4uGyosGXRnR3XjN4Zq7oMMsw",
+      type: "JsonWebKey2020",
+      controller: "did:web:example.com",
+      publicKeyJwk: {
+        crv: "Ed25519",
+        kty: "OKP",
+        x: "11qYAYKxCrfVS_7TyWQHOg7hcvPapiMlrwIaaPcHURo",
+      },
+    };
+
+    const result = decodeVerificationRelationship(
+      material,
+      "verificationMethod"
+    ).material as EmbeddedType;
+
+    expect(result.format).eq("JsonWebKey2020");
+    expect(result.keyMaterial).toStrictEqual(ed25519PublicKeyBytes);
+    expect(result.curve.capabilities).toStrictEqual([
+      "authentication",
+      "assertionMethod",
+      "capabilityInvocation",
+      "capabilityDelegation",
+    ]);
+  });
+
+  it("ED25519 - Multibase", () => {
+    const material = {
+      id: "#z6MktwupdmLXVVqTzCw4i46r4uGyosGXRnR3XjN4Zq7oMMsw",
+      type: "ED25519Key2020",
+      controller: "did:web:example.com",
+      publicKeyMultibase: "z6MktwupdmLXVVqTzCw4i46r4uGyosGXRnR3XjN4Zq7oMMsw",
+    };
+
+    const result = decodeVerificationRelationship(
+      material,
+      "verificationMethod"
+    ).material as EmbeddedType;
+
+    expect(result.format).eq("Multibase");
+    expect(result.keyMaterial).toStrictEqual(ed25519PublicKeyBytes);
+    expect(result.curve.capabilities).toStrictEqual([
+      "authentication",
+      "assertionMethod",
+      "capabilityInvocation",
+      "capabilityDelegation",
+    ]);
+  });
+
+  it("P-256   - JWK", () => {
+    const material = {
+      id: "#cn-I_WNMClehiVp51i_0VpOENW1upEerA8sEam5hn-s",
+      type: "JsonWebKey2020",
+      controller: "did:web:example.com",
+      publicKeyJwk: {
+        crv: "P-256",
+        kty: "EC",
+        x: "MKBCTNIcKUSDii11ySs3526iDZ8AiTo7Tu6KPAqv7D4",
+        y: "4Etl6SRW2YiLUrN5vfvVHuhp7x8PxltmWWlbbM4IFyM",
+      },
+    };
+
+    const result = decodeVerificationRelationship(
+      material,
+      "verificationMethod"
+    ).material as EmbeddedType;
+
+    expect(result.format).eq("JsonWebKey2020");
+    expect(result.keyMaterial).toStrictEqual(p256PublicKeyBytes);
+    expect(result.curve.capabilities).toStrictEqual([
+      "authentication",
+      "assertionMethod",
+      "keyAgreement",
+      "capabilityInvocation",
+      "capabilityDelegation",
+    ]);
+  });
+
+  it("P-256   - Multibase", () => {
+    const material = {
+      id: "#cn-I_WNMClehiVp51i_0VpOENW1upEerA8sEam5hn-s",
+      type: "P256Key2021",
+      controller: "did:web:example.com",
+      publicKeyMultibase: "zDnaekw6iisW1j4ronMuZagbvVehJK4unit6kvZ8UqJ2LSG1j",
+    };
+
+    const result = decodeVerificationRelationship(
+      material,
+      "verificationMethod"
+    ).material as EmbeddedType;
+
+    expect(result.format).eq("Multibase");
+    expect(result.keyMaterial).toStrictEqual(p256PublicKeyBytes);
+    expect(result.curve.capabilities).toStrictEqual([
+      "authentication",
+      "assertionMethod",
+      "keyAgreement",
+      "capabilityInvocation",
+      "capabilityDelegation",
+    ]);
+  });
+
+  it("Deflates DID ID to fragment", () => {
+    const material = {
+      id: "did:web:example.com#test",
+      type: "P256Key2021",
+      controller: "did:web:example.com",
+      publicKeyMultibase: "zDnaekw6iisW1j4ronMuZagbvVehJK4unit6kvZ8UqJ2LSG1j",
+    };
+    const result = decodeVerificationRelationship(
+      material,
+      "verificationMethod"
+    );
+    expect(result.id).eq("#test");
+  });
+
+  it("Handles DID ID fragment", () => {
+    const material = {
+      id: "#test",
+      type: "P256Key2021",
+      controller: "did:web:example.com:7a2f1910-c345-4085-a71a-5d8dab53d44d",
+      publicKeyMultibase: "zDnaekw6iisW1j4ronMuZagbvVehJK4unit6kvZ8UqJ2LSG1j",
+    };
+    const result = decodeVerificationRelationship(
+      material,
+      "verificationMethod"
+    );
+    expect(result.id).eq("#test");
+  });
+
+  it("Rejects unknown keys", () => {
+    const material = {
+      id: "#test",
+      type: "SSSShard",
+      controller: "did:web:example.com:7a2f1910-c345-4085-a71a-5d8dab53d44d",
+      publicKeyMultibase: "fe2b18129e84befe14002f87091706ea3d1e43bc",
+    };
+    expect(() =>
+      decodeVerificationRelationship(material, "verificationMethod")
+    ).toThrowError("UnsupportedCurveError: SSSShard");
+  });
+});
+
+describe("didDocumentDeserializer", () => {
+  it("Parses empty Document", () => {
+    const document = {
+      "@context": ["https://www.w3.org/ns/did/v1"],
+      id: "did:web:example.com",
+    };
+    const result = didDocumentDeserializer(document);
+    expect(result.id).eq("did:web:example.com");
+    expect(result.verificationMethod.length).eq(0);
+    expect(result.services.length).eq(0);
+    expect(result.controller).toStrictEqual(new Set());
+  });
+
+  it("Parses document with a verification method ", () => {
+    const document = {
+      "@context": [
+        "https://www.w3.org/ns/did/v1",
+        {
+          JsonWebKey2020: "https://w3id.org/security/suites/jws-2020/v1",
+          publicKeyJwk: {
+            "@id": "https://w3id.org/security#publicKeyJwk",
+            "@type": "@json",
+          },
+        },
+      ],
+      id: "did:web:example.com",
+      verificationMethod: [
+        {
+          id: "did:web:example.com#JDzrbHaku0p7UBL5OJZV4qr3MGeLrgGBCy06CBFcXeU",
+          type: "JsonWebKey2020",
+          controller: "did:web:example.com",
+          publicKeyJwk: {
+            crv: "Ed25519",
+            kty: "OKP",
+            x: "PixgV6A3dqXgh7NrvZ0tXJhcqxCQwoxzZF28J8C9idI",
+          },
+        },
+      ],
+      authentication: ["#JDzrbHaku0p7UBL5OJZV4qr3MGeLrgGBCy06CBFcXeU"],
+      assertionMethod: ["#JDzrbHaku0p7UBL5OJZV4qr3MGeLrgGBCy06CBFcXeU"],
+      capabilityInvocation: ["#JDzrbHaku0p7UBL5OJZV4qr3MGeLrgGBCy06CBFcXeU"],
+      capabilityDelegation: ["#JDzrbHaku0p7UBL5OJZV4qr3MGeLrgGBCy06CBFcXeU"],
+    };
+    const result = didDocumentDeserializer(document);
+    expect(result.id).eq("did:web:example.com");
+    expect(result.verificationMethod.length).eq(1);
+    expect(result.verificationMethod[0].getUsage()).toStrictEqual({
+      authentication: "Reference",
+      assertionMethod: "Reference",
+      capabilityInvocation: "Reference",
+      capabilityDelegation: "Reference",
+    });
+    expect(result.services.length).eq(0);
+    expect(result.controller).toStrictEqual(new Set());
+  });
+
+  it("Parses document with an embedded method", () => {
+    const document = {
+      "@context": [
+        "https://www.w3.org/ns/did/v1",
+        {
+          JsonWebKey2020: "https://w3id.org/security/suites/jws-2020/v1",
+          publicKeyJwk: {
+            "@id": "https://w3id.org/security#publicKeyJwk",
+            "@type": "@json",
+          },
+        },
+      ],
+      id: "did:web:example.com",
+      authentication: [
+        {
+          id: "#JDzrbHaku0p7UBL5OJZV4qr3MGeLrgGBCy06CBFcXeU",
+          type: "JsonWebKey2020",
+          controller: "did:web:example.com",
+          publicKeyJwk: {
+            crv: "Ed25519",
+            kty: "OKP",
+            x: "PixgV6A3dqXgh7NrvZ0tXJhcqxCQwoxzZF28J8C9idI",
+          },
+        },
+      ],
+    };
+    const result = didDocumentDeserializer(document);
+    expect(result.id).eq("did:web:example.com");
+    expect(result.verificationMethod.length).eq(1);
+    expect(result.verificationMethod[0].getUsage()).toStrictEqual({
+      authentication: "Embedded",
+    });
+    expect(result.services.length).eq(0);
+    expect(result.controller).toStrictEqual(new Set());
+  });
+
+  it("Parses document with both referenced and embedded methods", () => {
+    const document = {
+      "@context": [
+        "https://www.w3.org/ns/did/v1",
+        {
+          JsonWebKey2020: "https://w3id.org/security/suites/jws-2020/v1",
+          publicKeyJwk: {
+            "@id": "https://w3id.org/security#publicKeyJwk",
+            "@type": "@json",
+          },
+        },
+        "https://w3id.org/security/suites/multikey-2021/v1",
+      ],
+      id: "did:web:example.com",
+      authentication: [
+        {
+          id: "#JDzrbHaku0p7UBL5OJZV4qr3MGeLrgGBCy06CBFcXeU",
+          type: "JsonWebKey2020",
+          controller: "did:web:example.com",
+          publicKeyJwk: {
+            crv: "Ed25519",
+            kty: "OKP",
+            x: "PixgV6A3dqXgh7NrvZ0tXJhcqxCQwoxzZF28J8C9idI",
+          },
+        },
+        "#zDnaed1WWHisZVe3WoDswB1Z2zHhBqWHuGRVVqbTGGQvuH2AC",
+      ],
+      verificationMethod: [
+        {
+          id: "did:web:example.com:#zDnaed1WWHisZVe3WoDswB1Z2zHhBqWHuGRVVqbTGGQvuH2AC",
+          type: "P256Key2021",
+          controller: "did:web:example.com",
+          publicKeyMultibase:
+            "zDnaed1WWHisZVe3WoDswB1Z2zHhBqWHuGRVVqbTGGQvuH2AC",
+        },
+      ],
+      assertionMethod: ["#zDnaed1WWHisZVe3WoDswB1Z2zHhBqWHuGRVVqbTGGQvuH2AC"],
+      keyAgreement: ["#zDnaed1WWHisZVe3WoDswB1Z2zHhBqWHuGRVVqbTGGQvuH2AC"],
+      capabilityInvocation: [
+        "#zDnaed1WWHisZVe3WoDswB1Z2zHhBqWHuGRVVqbTGGQvuH2AC",
+      ],
+      capabilityDelegation: [
+        "#zDnaed1WWHisZVe3WoDswB1Z2zHhBqWHuGRVVqbTGGQvuH2AC",
+      ],
+    };
+    const result = didDocumentDeserializer(document);
+    expect(result.id).eq("did:web:example.com");
+    expect(result.verificationMethod.length).eq(2);
+    expect(result.verificationMethod[0].getUsage()).toStrictEqual({
+      authentication: "Reference",
+      assertionMethod: "Reference",
+      keyAgreement: "Reference",
+      capabilityInvocation: "Reference",
+      capabilityDelegation: "Reference",
+    });
+    expect(result.verificationMethod[1].getUsage()).toStrictEqual({
+      authentication: "Embedded",
+    });
+    expect(result.services.length).eq(0);
+    expect(result.controller).toStrictEqual(new Set());
+  });
+
+  it("Parses document with services", () => {
+    const document = {
+      "@context": [
+        "https://www.w3.org/ns/did/v1",
+        "https://w3id.org/security/suites/multikey-2021/v1",
+      ],
+      id: "did:web:example.com",
+      verificationMethod: [
+        {
+          id: "did:web:example.com#1lp_wdAQL4aZcvbOqKRtb2-VYLjqc8BaWEKZKv0jQ-E",
+          type: "ED25519Key2020",
+          controller: "did:web:example.com",
+          publicKeyMultibase:
+            "z6MkmYS4Z13PFJjnNAL7tYxe2weTvGyVavofXv4xPdRpq6uL",
+        },
+      ],
+      capabilityDelegation: ["#1lp_wdAQL4aZcvbOqKRtb2-VYLjqc8BaWEKZKv0jQ-E"],
+      services: [
+        {
+          id: "did:key:123#linked-domain",
+          type: "LinkedDomains",
+          serviceEndpoint: "https://bar.example.com",
+        },
+      ],
+    };
+    const result = didDocumentDeserializer(document);
+    expect(result.services.length).eq(1);
+    expect(result.services[0]).toStrictEqual({
+      id: "did:key:123#linked-domain",
+      type: "LinkedDomains",
+      serviceEndpoint: "https://bar.example.com",
+    });
+  });
+});

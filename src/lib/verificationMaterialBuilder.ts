@@ -6,7 +6,7 @@ import {
   Representation,
   VerificationRelationship,
   verificationRelationships,
-} from "@/types/dids";
+} from "../types/dids";
 import {
   DidMaterial,
   EmbeddedMaterial,

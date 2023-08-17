@@ -6,6 +6,7 @@ import { Theme } from "react-daisyui";
 import useThemeStorage from "@/utils/use-theme-storage";
 import { ToastContainer } from "react-toastify";
 import { useEffect } from "react";
+import PlausibleProvider from "next-plausible";
 
 function MyApp({ Component, pageProps, router }: AppProps) {
   const { theme } = useThemeStorage("attested");
@@ -20,12 +21,14 @@ function MyApp({ Component, pageProps, router }: AppProps) {
     }
   }, [router.asPath]);
   return (
-    <Theme dataTheme={theme} className="bg-base-300">
-      <ContentLayout>
-        <Component {...pageProps} />
-      </ContentLayout>
-      <ToastContainer />
-    </Theme>
+    <PlausibleProvider domain={"attested.tech"}>
+      <Theme dataTheme={theme} className="bg-base-300">
+        <ContentLayout>
+          <Component {...pageProps} />
+        </ContentLayout>
+        <ToastContainer />
+      </Theme>
+    </PlausibleProvider>
   );
 }
 

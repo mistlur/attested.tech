@@ -28,7 +28,7 @@ import { json } from "react-syntax-highlighter/dist/cjs/languages/hljs";
 import { syntaxHighlightingTheme } from "@/utils/syntaxHighlightingTheme";
 import EditServices from "@/components/dids/EditServices";
 import { Service } from "@/types/dids";
-import { Divider } from "react-daisyui";
+import { usePlausible } from "next-plausible";
 
 SyntaxHighlighter.registerLanguage("json", json);
 
@@ -134,6 +134,23 @@ export default function DidBuilder({
     maybeDocument = new DidDocument(id, new Set([id]), []);
   }
 
+  type MyEvents = {
+    editSubject: never;
+    editSubjectSave: never;
+    editController: never;
+    editControllerSave: never;
+    editServices: never;
+    editServicesSave: never;
+    importDocument: never;
+    importDocumentSave: never;
+    addEmbeddedMaterial: never;
+    addEmbeddedMaterialSave: { curve: string; format: string };
+    addReferencedMaterial: never;
+    addReferencedMaterialSave: never;
+  };
+
+  const plausible = usePlausible<MyEvents>();
+
   const [didDocument, setDidDocument] = useState<DidDocument>(maybeDocument);
   const [showNewEmbeddedMethodModal, setShowNewEmbeddedMethodModal] =
     useState<boolean>(false);
@@ -188,22 +205,46 @@ export default function DidBuilder({
     <div className="bg-base-300">
       <div className="flex gap-x-4 gap-4 p-4 bg-base-300">
         <div>
-          <label htmlFor="editDidSubject" className="btn btn-ghost btn-sm">
+          <label
+            onClick={() => {
+              setShowEditDidSubjectModal(true);
+              plausible("editSubject");
+            }}
+            className="btn btn-ghost btn-sm"
+          >
             Edit DID Subject
           </label>
         </div>
         <div>
-          <label htmlFor="editDidController" className="btn btn-ghost btn-sm">
+          <label
+            onClick={() => {
+              setShowEditDidControllerModal(true);
+              plausible("editController");
+            }}
+            className="btn btn-ghost btn-sm"
+          >
             Edit DID Controller
           </label>
         </div>
         <div>
-          <label htmlFor="editServices" className="btn btn-ghost btn-sm">
+          <label
+            onClick={() => {
+              setShowEditServicesModal(true);
+              plausible("editServices");
+            }}
+            className="btn btn-ghost btn-sm"
+          >
             Edit Services
           </label>
         </div>
         <div className="ml-auto md:inline hidden">
-          <label htmlFor="importDocument" className="btn btn-sm">
+          <label
+            onClick={() => {
+              setShowImportDocumentModal(true);
+              plausible("importDocument");
+            }}
+            className="btn btn-sm"
+          >
             Import Document
           </label>
         </div>
@@ -212,9 +253,10 @@ export default function DidBuilder({
         <div>
           <button
             className="btn btn-outline text-neutral-content btn-default"
-            onClick={() =>
-              setShowNewEmbeddedMethodModal(!showNewEmbeddedMethodModal)
-            }
+            onClick={() => {
+              setShowNewEmbeddedMethodModal(true);
+              plausible("addEmbeddedMaterial");
+            }}
           >
             Add Embedded Material
           </button>
@@ -222,15 +264,22 @@ export default function DidBuilder({
         <div>
           <button
             className="btn btn-outline text-neutral-content btn-default"
-            onClick={() =>
-              setShowNewReferenceMethodModal(!showNewReferenceMethodModal)
-            }
+            onClick={() => {
+              setShowNewReferenceMethodModal(true);
+              plausible("addReferencedMaterial");
+            }}
           >
             Add Referenced Material
           </button>
         </div>
         <div className="ml-auto">
-          <label htmlFor="importDocument" className="btn btn-sm">
+          <label
+            onClick={() => {
+              setShowImportDocumentModal(true);
+              plausible("importDocument");
+            }}
+            className="btn btn-sm"
+          >
             Import Document
           </label>
         </div>
@@ -379,17 +428,19 @@ export default function DidBuilder({
             )}
             <button
               className="btn btn-outline text-neutral-content btn-default my-4 hidden md:block"
-              onClick={() =>
-                setShowNewEmbeddedMethodModal(!showNewEmbeddedMethodModal)
-              }
+              onClick={() => {
+                plausible("addEmbeddedMaterial");
+                setShowNewEmbeddedMethodModal(true);
+              }}
             >
               Add Embedded Material
             </button>
             <button
               className="btn btn-outline text-neutral-content btn-default mb-4 hidden md:block"
-              onClick={() =>
-                setShowNewReferenceMethodModal(!showNewEmbeddedMethodModal)
-              }
+              onClick={() => {
+                plausible("addReferencedMaterial");
+                setShowNewReferenceMethodModal(true);
+              }}
             >
               Add Referenced Material
             </button>
@@ -404,19 +455,20 @@ export default function DidBuilder({
         id={"editDidSubject"}
         className={"max-w-none md:w-1/2"}
         onChange={() => {
-          setShowEditDidSubjectModal(!showEditDidSubjectModal);
+          setShowEditDidSubjectModal(false);
         }}
       >
         <EditDidSubject
           htmlId="editDidSubject"
           existingSubject={didDocument.id}
-          save={(did: string) =>
+          save={(did: string) => {
             setDidDocument(
               produce(didDocument, (draft) => {
                 draft.setIdentifier(did);
               })
-            )
-          }
+            );
+            plausible("editSubjectSave");
+          }}
         />
       </Modal>
       <Modal
@@ -424,20 +476,21 @@ export default function DidBuilder({
         id={"editDidController"}
         className={"max-w-none md:w-1/2"}
         onChange={() => {
-          setShowEditDidControllerModal(!showEditDidControllerModal);
+          setShowEditDidControllerModal(false);
         }}
       >
         <EditDidController
           htmlId="editDidController"
           existingControllers={didDocument.controller}
           subject={didDocument.id}
-          save={(controller: DidController | null) =>
+          save={(controller: DidController | null) => {
             setDidDocument(
               produce(didDocument, (draft) => {
                 draft.setController(controller);
               })
-            )
-          }
+            );
+            plausible("editControllerSave");
+          }}
         />
       </Modal>
       <Modal
@@ -445,69 +498,80 @@ export default function DidBuilder({
         id={"editServices"}
         className={"max-w-none md:w-1/2"}
         onChange={() => {
-          setShowEditServicesModal(!showEditServices);
+          setShowEditServicesModal(false);
         }}
       >
         <EditServices
           htmlId="editServices"
           existingServices={didDocument.services}
-          save={(services: Service[]) =>
+          save={(services: Service[]) => {
             setDidDocument(
               produce(didDocument, (draft) => {
                 draft.setServices(services);
               })
-            )
-          }
+            );
+            plausible("editServicesSave");
+          }}
         />
       </Modal>
       <Modal
         show={showNewEmbeddedMethodModal}
         id={"newVerificationMaterial"}
         onChange={() => {
-          setShowNewEmbeddedMethodModal(!showNewEmbeddedMethodModal);
+          setShowNewEmbeddedMethodModal(false);
         }}
       >
         <NewEmbeddedMethod
           htmlId="newVerificationMaterial"
           didDocument={didDocument}
-          save={(vm: EmbeddedMaterial) =>
+          save={(vm: EmbeddedMaterial) => {
             setDidDocument(
               produce(didDocument, (draft) => {
                 draft.addVerificationMethod(vm);
               })
-            )
-          }
+            );
+            plausible("addEmbeddedMaterialSave", {
+              props: {
+                curve: vm.material.curve.name.display,
+                format: vm.material.format,
+              },
+            });
+          }}
         />
       </Modal>
       <Modal
         show={showNewReferenceMethodModal}
         id={"newReferenceVerificationMaterial"}
         onChange={() => {
-          setShowNewReferenceMethodModal(!showNewReferenceMethodModal);
+          setShowNewReferenceMethodModal(false);
         }}
       >
         <NewReferenceMethod
           htmlId="newReferenceVerificationMaterial"
           didDocument={didDocument}
-          save={(vm: ReferencedMaterial) =>
+          save={(vm: ReferencedMaterial) => {
             setDidDocument(
               produce(didDocument, (draft) => {
                 draft.addVerificationMethod(vm);
               })
-            )
-          }
+            );
+            plausible("addReferencedMaterialSave");
+          }}
         />
       </Modal>
       <Modal
         show={showImportDocumentModal}
         id={"importDocument"}
         onChange={() => {
-          setShowImportDocumentModal(!showImportDocumentModal);
+          setShowImportDocumentModal(false);
         }}
       >
         <ImportDocument
           htmlId="importDocument"
-          save={(document: DidDocument) => setDidDocument(document)}
+          save={(document: DidDocument) => {
+            setDidDocument(document);
+            plausible("importDocumentSave");
+          }}
         />
       </Modal>
     </div>

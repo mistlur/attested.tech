@@ -18,7 +18,7 @@ const ContentMeta = ({
     <Head>
       <title>{title}</title>
       <link
-        href="https://fonts.googleapis.com/css2?family=Abel&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500;600&family=Abel&display=swap"
         rel="stylesheet"
       />
       <link

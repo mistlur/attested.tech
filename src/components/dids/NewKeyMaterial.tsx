@@ -7,8 +7,8 @@ import Link from "next/link";
 import {
   Curve,
   CurveEd25519,
-  CurveP256,
   curveFromName,
+  CurveP256,
   isEd25519,
   isP256,
 } from "@/lib/curves";
@@ -28,6 +28,7 @@ export default function NewKeyMaterial({
   const [keyMaterial, setKeyMaterial] = useState<Uint8Array | undefined>(
     undefined
   );
+
   function completeSetup() {
     if (!keyMaterial) throw Error("KeyMaterial is undefined");
     const format = "JsonWebKey2020";
@@ -68,15 +69,15 @@ export default function NewKeyMaterial({
           <div>
             <div className="prose text-xs">
               <p>
-                Generate a new cryptographic key to be used as{" "}
+                Generate a cryptographic key to be used as{" "}
                 <Link
                   className={"underline"}
                   href={"https://w3c.github.io/did-core/#verification-material"}
                   passHref
                   target={"_blank"}
                 >
-                  verification material.
-                </Link>{" "}
+                  verification material
+                </Link>
               </p>
               <p>Select curve:</p>
             </div>

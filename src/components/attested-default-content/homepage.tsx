@@ -17,18 +17,16 @@ const AttestedHomepage = () => {
 
   return (
     <>
-      <div className="bg-base-200">
+      <div className="bg-accent">
         <ContentMeta
           title="ATTESTED.TECH"
           description="Playground for decentralized identifiers"
           socialImage={`/meta_banner.png`}
         />
-        <div className="p-8 pt-8 md:pb-16 md:pt-16 md:36 flex flex-col items-center gap-8 max-w-screen-xl mx-auto">
+        <div className="bg-accent/100 p-8 pt-8 md:pb-16 md:pt-16 md:36 flex flex-col items-center gap-8 max-w-screen-xl mx-auto">
           {/*<Logo size="lg" className="mx-auto" />*/}
-          <h2 className="h2 text-center">
-            <span className="text-accent">
-              Decentralized identifiers (DIDs)
-            </span>{" "}
+          <h2 className="h2 text-center text-black">
+            <span className="font-black">Decentralized identifiers (DIDs)</span>{" "}
             is an&nbsp;
             <Link
               className={"underline"}
@@ -40,13 +38,13 @@ const AttestedHomepage = () => {
             </Link>
             &nbsp;that enables verifiable, decentralized digital identity.
           </h2>
-          <h2 className="h2 text-center">
-            <span className={"font-black mt-4"}>Attested.tech</span> is a
+          <h2 className="h2 text-center text-black">
+            <span className={"mt-4 font-extrabold"}>Attested.tech</span> is a
             playground for DID Documents.
           </h2>
         </div>
       </div>
-      <div className="bg-base-300">
+      <div className="bg-base-300 py-12">
         <div id="#dids" className="max-w-screen-xl mx-auto">
           {id && (
             <DidBuilder
@@ -57,7 +55,7 @@ const AttestedHomepage = () => {
           )}
         </div>
       </div>
-      <div className="bg-base-200">
+      <div className="bg-accent text-black">
         <div className="p-8 pt-8 md:pb-16 md:pt-16 md:36 flex flex-col items-center gap-8 max-w-screen-xl mx-auto">
           <p className="text-center">
             Attested.tech is maintained by{" "}

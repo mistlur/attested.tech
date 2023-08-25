@@ -88,7 +88,7 @@ export default function EmbeddedMethodSettings({
                 <div className="btn-group">
                   <button
                     className={`btn btn-xs ${
-                      methods[method] === "Embedded" ? "btn-primary" : ""
+                      methods[method] === "Embedded" ? "btn-success" : ""
                     }`}
                     onClick={() => {
                       setMethods({
@@ -101,7 +101,7 @@ export default function EmbeddedMethodSettings({
 
                   <button
                     className={`btn btn-xs ${
-                      methods[method] === "Reference" ? "btn-secondary" : ""
+                      methods[method] === "Reference" ? "btn-success" : ""
                     }`}
                     onClick={() => {
                       const embeddedMethodsToUpdate = Object.entries(

@@ -19,7 +19,7 @@ const ContentHeader = ({ toggleSidebar }: Props) => {
   const navigation = useHeaderNavigation();
 
   return (
-    <div className="bg-neutral text-neutral-content">
+    <div className="bg-base-300 text-neutral-content">
       <Navbar className="flex md:justify-between items-center px-5 py-4 max-w-screen-xl">
         <Link href="/" passHref className="cursor-pointer">
           <Logo size="lg" />

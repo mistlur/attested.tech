@@ -32,7 +32,7 @@ const ThemeSelector = () => {
           <selectedTheme.Icon className="h-5 w-5" />
         )}
       </Button>
-      <Dropdown.Menu className="w-56 bg-base-100 text-base-content">
+      <Dropdown.Menu className="w-56 bg-base-300 text-base-content">
         {Object.values(AVAILABLE_THEMES).map((themeOption) => (
           <Button
             key={`theme-${themeOption.id}`}

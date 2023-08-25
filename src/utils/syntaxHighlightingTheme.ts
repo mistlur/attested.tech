@@ -3,20 +3,20 @@ export const syntaxHighlightingTheme = {
     display: "block",
     overflowX: "auto",
     padding: "0em",
-    background: "#2f3238",
-    color: "#4b555b",
+    background: "#262b2e",
+    color: "rgba(205,226,239,0.5)",
   },
   "hljs-keyword": {
-    color: "#EA8136",
+    color: "#fc7d1d",
   },
   "hljs-literal": {
-    color: "#EA8136",
+    color: "#fc7d1d",
   },
   "hljs-symbol": {
-    color: "#EA8136",
+    color: "#fc7d1d",
   },
   "hljs-name": {
-    color: "#EA8136",
+    color: "#fc7d1d",
   },
   "hljs-link": {
     color: "#efeeec",
@@ -35,10 +35,10 @@ export const syntaxHighlightingTheme = {
     color: "#B8D7A3",
   },
   "hljs-string": {
-    color: "#D69D85",
+    color: "#ffcca5",
   },
   "hljs-meta-string": {
-    color: "#D69D85",
+    color: "#ffcca5",
   },
   "hljs-regexp": {
     color: "#9A5334",
@@ -88,13 +88,13 @@ export const syntaxHighlightingTheme = {
     color: "#BD63C5",
   },
   "hljs-attr": {
-    color: "#ea8136",
+    color: "#fc7d1d",
   },
   "hljs-attribute": {
-    color: "#ea8136",
+    color: "#fc7d1d",
   },
   "hljs-builtin-name": {
-    color: "#ea8136",
+    color: "#fc7d1d",
   },
   "hljs-section": {
     color: "gold",

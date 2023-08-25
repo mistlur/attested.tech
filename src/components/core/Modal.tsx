@@ -1,3 +1,5 @@
+import FeatherIcon from "feather-icons-react";
+
 export default function Modal({
   show,
   className,
@@ -25,9 +27,9 @@ export default function Modal({
           <div className={`modal-box relative ${className}`}>
             <label
               htmlFor={id}
-              className="btn btn-sm btn-circle absolute right-4 top-4"
+              className="btn btn-sm btn-square absolute right-4 top-4"
             >
-              ✕
+              <FeatherIcon icon="x" size="18" />
             </label>
             {children}
           </div>

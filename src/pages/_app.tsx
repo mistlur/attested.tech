@@ -22,7 +22,7 @@ function MyApp({ Component, pageProps, router }: AppProps) {
   }, [router.asPath]);
   return (
     <PlausibleProvider domain={"attested.tech"}>
-      <Theme dataTheme={theme} className="bg-base-300">
+      <Theme dataTheme={theme} className="bg-base">
         <ContentLayout>
           <Component {...pageProps} />
         </ContentLayout>

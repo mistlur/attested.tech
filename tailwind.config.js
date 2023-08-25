@@ -10,7 +10,7 @@ module.exports = {
   ],
   theme: {
     fontFamily: {
-      sans: ['"Abel"', "sans-serif"],
+      sans: ['"Roboto Mono"', "sans-serif"],
       ultrablack: ['"Unbounded"', "sans-serif"],
     },
   },
@@ -35,36 +35,36 @@ module.exports = {
       const headings = {
         ".h1": {
           fontSize: theme("fontSize.2xl"),
-          fontWeight: theme("fontWeight.medium"),
+          fontWeight: theme("fontWeight.light"),
         },
         ".h2": {
           fontSize: theme("fontSize.xl"),
-          fontWeight: theme("fontWeight.medium"),
+          fontWeight: theme("fontWeight.light"),
         },
         ".h3": {
           fontSize: theme("fontSize.lg"),
-          fontWeight: theme("fontWeight.medium"),
+          fontWeight: theme("fontWeight.light"),
         },
         ".h4": {
           fontSize: theme("fontSize.lg"),
-          fontWeight: theme("fontWeight.medium"),
+          fontWeight: theme("fontWeight.light"),
         },
         "@screen md": {
           ".h1": {
             fontSize: theme("fontSize.3xl"),
-            fontWeight: theme("fontWeight.medium"),
+            fontWeight: theme("fontWeight.light"),
           },
           ".h2": {
             fontSize: theme("fontSize.2xl"),
-            fontWeight: theme("fontWeight.medium"),
+            fontWeight: theme("fontWeight.light"),
           },
           ".h3": {
             fontSize: theme("fontSize.xl"),
-            fontWeight: theme("fontWeight.medium"),
+            fontWeight: theme("fontWeight.light"),
           },
           ".h4": {
             fontSize: theme("fontSize.lg"),
-            fontWeight: theme("fontWeight.medium"),
+            fontWeight: theme("fontWeight.light"),
           },
         },
       };
@@ -80,9 +80,11 @@ module.exports = {
           ...require("daisyui/src/colors/themes")["[data-theme=business]"],
           primary: "#efeeec",
           secondary: "#a4cbc4",
-          accent: "#ea8136",
+          accent: "#fc7d1d",
           neutral: "#4b555b",
-          "base-100": "#2f3238",
+          ["base-100"]: "#000000",
+          ["base-200"]: "#262b2e",
+          ["base-300"]: "#000000",
           info: "#0B8098",
           success: "#36D399",
           warning: "#FBBD23",

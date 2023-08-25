@@ -42,7 +42,7 @@ export default function ImportDocument({
           </span>
         </label>
         <textarea
-          className={`textarea bg-base-300 textarea-bordered w-full h-36 font-mono text-xs ${
+          className={`textarea bg-base-300 textarea-bordered w-full h-64 font-mono text-xs ${
             importedDocumentValidationStatus === "Valid"
               ? "textarea-success"
               : ""

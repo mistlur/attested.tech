@@ -52,8 +52,8 @@ function AttemptSerialization({ didDocument }: { didDocument: DidDocument }) {
   }
 
   return (
-    <div className="bg-base-100">
-      <div className="bg-base-300 text-base-content p-4 flex justify-between">
+    <div className="bg-base-300">
+      <div className="text-base-content p-4 flex justify-between">
         <div>
           <h2 className="font-bold text-lg">DID Document</h2>
           <div className="flex gap-x-2">
@@ -101,9 +101,9 @@ function AttemptSerialization({ didDocument }: { didDocument: DidDocument }) {
         </div>
       )}
       {validDocument && (
-        <div className="bg-base-300 md:pr-4">
-          <div className="bg-base-100">
-            <pre className="p-4 md:min-h-[144px] text-xs overflow-scroll">
+        <div className="bg-base-300 px-4 md:pr-4">
+          <div className="bg-base-200">
+            <pre className="p-4 text-xs overflow-scroll">
               <SyntaxHighlighter
                 language="json"
                 style={syntaxHighlightingTheme}
@@ -203,14 +203,14 @@ export default function DidBuilder({
 
   return (
     <div className="bg-base-300">
-      <div className="flex gap-x-4 gap-4 p-4 bg-base-300">
+      <div className="flex gap-x-4 gap-4 px-4 pb-4 bg-base-300">
         <div>
           <label
             onClick={() => {
               setShowEditDidSubjectModal(true);
               plausible("editSubject");
             }}
-            className="btn btn-ghost btn-sm"
+            className="btn btn-outline btn-default"
           >
             Edit DID Subject
           </label>
@@ -221,7 +221,7 @@ export default function DidBuilder({
               setShowEditDidControllerModal(true);
               plausible("editController");
             }}
-            className="btn btn-ghost btn-sm"
+            className="btn btn-outline btn-default"
           >
             Edit DID Controller
           </label>
@@ -232,7 +232,7 @@ export default function DidBuilder({
               setShowEditServicesModal(true);
               plausible("editServices");
             }}
-            className="btn btn-ghost btn-sm"
+            className="btn btn-outline btn-default"
           >
             Edit Services
           </label>
@@ -243,7 +243,7 @@ export default function DidBuilder({
               setShowImportDocumentModal(true);
               plausible("importDocument");
             }}
-            className="btn btn-sm"
+            className="btn btn-default"
           >
             Import Document
           </label>
@@ -252,7 +252,7 @@ export default function DidBuilder({
       <div className="flex gap-x-4 gap-4 px-4 pb-4 bg-base-300 md:hidden">
         <div>
           <button
-            className="btn btn-outline text-neutral-content btn-default"
+            className="btn btn-outline btn-default"
             onClick={() => {
               setShowNewEmbeddedMethodModal(true);
               plausible("addEmbeddedMaterial");
@@ -263,7 +263,7 @@ export default function DidBuilder({
         </div>
         <div>
           <button
-            className="btn btn-outline text-neutral-content btn-default"
+            className="btn btn-outline btn-default"
             onClick={() => {
               setShowNewReferenceMethodModal(true);
               plausible("addReferencedMaterial");
@@ -278,15 +278,15 @@ export default function DidBuilder({
               setShowImportDocumentModal(true);
               plausible("importDocument");
             }}
-            className="btn btn-sm"
+            className="btn btn-default"
           >
             Import Document
           </label>
         </div>
       </div>
 
-      <div className="flex justify-between md:pl-4">
-        <div className="w-1/3 bg-neutral text-neutral-content shadow-[inset_-147px_0px_180px_-180px_rgba(0,0,0,1)]">
+      <div className="flex justify-between pl-4">
+        <div className="w-1/3 bg-base-200 text-neutral-content p-0">
           <div className="flex flex-col p-4">
             {!didDocument.verificationMethod.length && (
               <div className="text-center py-4 text-sm opacity-50">
@@ -436,7 +436,7 @@ export default function DidBuilder({
               Add Embedded Material
             </button>
             <button
-              className="btn btn-outline text-neutral-content btn-default mb-4 hidden md:block"
+              className="btn btn-outline text-neutral-content btn-default hidden md:block"
               onClick={() => {
                 plausible("addReferencedMaterial");
                 setShowNewReferenceMethodModal(true);
@@ -453,7 +453,7 @@ export default function DidBuilder({
       <Modal
         show={showEditDidSubjectModal}
         id={"editDidSubject"}
-        className={"max-w-none md:w-1/2"}
+        className={"max-w-none lg:w-2/3"}
         onChange={() => {
           setShowEditDidSubjectModal(false);
         }}
@@ -474,7 +474,7 @@ export default function DidBuilder({
       <Modal
         show={showEditDidControllerModal}
         id={"editDidController"}
-        className={"max-w-none md:w-1/2"}
+        className={"max-w-none lg:w-2/3"}
         onChange={() => {
           setShowEditDidControllerModal(false);
         }}
@@ -496,7 +496,7 @@ export default function DidBuilder({
       <Modal
         show={showEditServices}
         id={"editServices"}
-        className={"max-w-none md:w-1/2"}
+        className={"max-w-none lg:w-2/3"}
         onChange={() => {
           setShowEditServicesModal(false);
         }}
@@ -560,6 +560,7 @@ export default function DidBuilder({
         />
       </Modal>
       <Modal
+        className={"max-w-none lg:w-2/3"}
         show={showImportDocumentModal}
         id={"importDocument"}
         onChange={() => {

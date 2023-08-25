@@ -56,7 +56,7 @@ export default function ReferenceMethodSettings({
                   <div className="btn-group">
                     <button
                       className={`btn btn-xs ${
-                        methods[method] === "Reference" ? "btn-secondary" : ""
+                        methods[method] === "Reference" ? "btn-success" : ""
                       }`}
                       onClick={() => {
                         setMethods({

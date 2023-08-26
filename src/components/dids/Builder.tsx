@@ -52,29 +52,26 @@ function AttemptSerialization({ didDocument }: { didDocument: DidDocument }) {
   }
 
   return (
-    <div className="bg-base-300">
-      <div className="text-base-content p-4 flex justify-between">
+    <div className="bg-base-300 h-full">
+      <div className="text-base-content py-4 pl-4 flex justify-between items-center">
         <div>
-          <h2 className="font-bold text-lg">DID Document</h2>
-          <div className="flex gap-x-2">
-            <h3 className="text-sm">Format</h3>
-            <div className="btn-group">
-              <button
-                className={`btn btn-xs ${isJsonLd ? "btn-success" : ""}`}
-                onClick={() => setIsJsonLd(!isJsonLd)}
-              >
-                JSON-LD
-              </button>
-              <button
-                className={`btn btn-xs ${isJsonLd ? "" : "btn-success"}`}
-                onClick={() => setIsJsonLd(!isJsonLd)}
-              >
-                JSON
-              </button>
-            </div>
-          </div>
+          <h2 className="font-bold hidden sm:block sm:text-lg">DID Document</h2>
         </div>
-        <div>
+        <div className="flex gap-4 items-center">
+          <div className="btn-group">
+            <button
+              className={`btn btn-sm ${isJsonLd ? "btn-success" : ""}`}
+              onClick={() => setIsJsonLd(!isJsonLd)}
+            >
+              JSON-LD
+            </button>
+            <button
+              className={`btn btn-sm ${isJsonLd ? "" : "btn-success"}`}
+              onClick={() => setIsJsonLd(!isJsonLd)}
+            >
+              JSON
+            </button>
+          </div>
           <button
             className="btn btn-square btn-sm"
             onClick={() => {
@@ -101,7 +98,7 @@ function AttemptSerialization({ didDocument }: { didDocument: DidDocument }) {
         </div>
       )}
       {validDocument && (
-        <div className="bg-base-300 px-4 md:pr-4">
+        <div className="bg-base-300 pl-4">
           <div className="bg-base-200">
             <pre className="p-4 text-xs overflow-scroll">
               <SyntaxHighlighter
@@ -202,8 +199,8 @@ export default function DidBuilder({
   }, []);
 
   return (
-    <div className="bg-base-300">
-      <div className="flex gap-x-4 gap-4 px-4 pb-4 bg-base-300">
+    <div className="bg-base-300 p-4 sm:p-8 xl:p-16">
+      <div className="flex gap-4 pb-4 bg-base-300">
         <div>
           <label
             onClick={() => {
@@ -249,7 +246,7 @@ export default function DidBuilder({
           </label>
         </div>
       </div>
-      <div className="flex gap-x-4 gap-4 px-4 pb-4 bg-base-300 md:hidden">
+      <div className="flex gap-4 pb-4 bg-base-300 md:hidden">
         <div>
           <button
             className="btn btn-outline btn-default"
@@ -284,13 +281,12 @@ export default function DidBuilder({
           </label>
         </div>
       </div>
-
-      <div className="flex justify-between pl-4">
+      <div className="flex justify-between">
         <div className="w-1/3 bg-base-200 text-neutral-content p-0">
           <div className="flex flex-col p-4">
             {!didDocument.verificationMethod.length && (
               <div className="text-center py-4 text-sm opacity-50">
-                No material associated with DID
+                No material added
               </div>
             )}
             {didDocument.verificationMethod.map(

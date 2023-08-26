@@ -23,7 +23,7 @@ const AttestedHomepage = () => {
           description="Playground for decentralized identifiers"
           socialImage={`/meta_banner.png`}
         />
-        <div className="bg-accent/100 p-8 pt-8 md:pb-16 md:pt-16 md:36 flex flex-col items-center gap-8 max-w-screen-xl mx-auto">
+        <div className="bg-accent/100 p-8 md:py-16 flex flex-col items-center gap-8 max-w-screen-lg mx-auto">
           {/*<Logo size="lg" className="mx-auto" />*/}
           <h2 className="h2 text-center text-black">
             <span className="font-black">Decentralized identifiers (DIDs)</span>{" "}
@@ -44,7 +44,7 @@ const AttestedHomepage = () => {
           </h2>
         </div>
       </div>
-      <div className="bg-base-300 py-12">
+      <div className="bg-accent">
         <div id="#dids" className="max-w-screen-xl mx-auto">
           {id && (
             <DidBuilder
@@ -56,7 +56,7 @@ const AttestedHomepage = () => {
         </div>
       </div>
       <div className="bg-accent text-black">
-        <div className="p-8 pt-8 md:pb-16 md:pt-16 md:36 flex flex-col items-center gap-8 max-w-screen-xl mx-auto">
+        <div className="p-8 pt-8 md:pb-16 md:pt-16 md:36 flex flex-col items-center gap-8 max-w-screen-lg mx-auto">
           <p className="text-center">
             Attested.tech is maintained by{" "}
             <Link

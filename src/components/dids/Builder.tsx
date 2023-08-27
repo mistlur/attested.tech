@@ -100,7 +100,7 @@ function AttemptSerialization({ didDocument }: { didDocument: DidDocument }) {
       {validDocument && (
         <div className="bg-base-300 pl-4">
           <div className="bg-base-200">
-            <pre className="p-4 text-xs overflow-scroll">
+            <pre className="p-4 text-xs overflow-scroll md:min-h-[148px]">
               <SyntaxHighlighter
                 language="json"
                 style={syntaxHighlightingTheme}

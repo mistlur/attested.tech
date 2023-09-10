@@ -27,8 +27,9 @@ import { Light as SyntaxHighlighter } from "react-syntax-highlighter";
 import { json } from "react-syntax-highlighter/dist/cjs/languages/hljs";
 import { syntaxHighlightingTheme } from "@/utils/syntaxHighlightingTheme";
 import EditServices from "@/components/dids/EditServices";
-import { Service } from "@/types/dids";
+import { Service, URI } from "@/types/dids";
 import { usePlausible } from "next-plausible";
+import EditAlsoKnownAs from "./EditAlsoKnownAs";
 
 SyntaxHighlighter.registerLanguage("json", json);
 
@@ -134,6 +135,8 @@ export default function DidBuilder({
   type MyEvents = {
     editSubject: never;
     editSubjectSave: never;
+    editAlsoKnownAs: never;
+    editAlsoKnownAsSave: never;
     editController: never;
     editControllerSave: never;
     editServices: never;
@@ -158,6 +161,7 @@ export default function DidBuilder({
   const [showEditDidSubjectModal, setShowEditDidSubjectModal] =
     useState<boolean>(false);
   const [showEditServices, setShowEditServicesModal] = useState<boolean>(false);
+  const [showAlsoKnownAs, setShowAlsoKnownAsModal] = useState<boolean>(false);
   const [showEditModal, setShowEditModal] = useState<string | null>(null);
   const [showImportDocumentModal, setShowImportDocumentModal] =
     useState<boolean>(false);
@@ -171,6 +175,7 @@ export default function DidBuilder({
         setShowEditDidSubjectModal(false);
         setShowImportDocumentModal(false);
         setShowEditServicesModal(false);
+        setShowAlsoKnownAsModal(false);
       }
     };
     window.addEventListener("keydown", handleEsc);
@@ -210,6 +215,17 @@ export default function DidBuilder({
             className="btn btn-outline btn-default"
           >
             Edit DID Subject
+          </label>
+        </div>
+        <div>
+          <label
+            onClick={() => {
+              setShowAlsoKnownAsModal(true);
+              plausible("editAlsoKnownAs");
+            }}
+            className="btn btn-outline btn-default"
+          >
+            Edit Also-Known-As
           </label>
         </div>
         <div>
@@ -507,6 +523,27 @@ export default function DidBuilder({
               })
             );
             plausible("editServicesSave");
+          }}
+        />
+      </Modal>
+      <Modal
+        show={showAlsoKnownAs}
+        id={"editAlsoKnownAs"}
+        className={"max-w-none lg:w-2/3"}
+        onChange={() => {
+          setShowAlsoKnownAsModal(false);
+        }}
+      >
+        <EditAlsoKnownAs
+          htmlId="editAlsoKnownAs"
+          existingAliases={didDocument.alsoKnownAs}
+          save={(aliases: URI[]) => {
+            setDidDocument(
+              produce(didDocument, (draft) => {
+                draft.setAlsoKnownAs(aliases);
+              })
+            );
+            plausible("editAlsoKnownAsSave");
           }}
         />
       </Modal>

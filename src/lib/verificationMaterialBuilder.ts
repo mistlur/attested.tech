@@ -10,7 +10,6 @@ import {
 import {
   DidMaterial,
   EmbeddedMaterial,
-  isEmbeddedType,
   ReferencedMaterial,
 } from "./DidMaterial";
 import { DidDocument } from "./DidDocument";
@@ -78,6 +77,7 @@ export const decodeVerificationRelationship = (
 export const didDocumentDeserializer = (
   document: z.infer<typeof documentSchema>
 ): DidDocument => {
+  documentSchema.parse(document);
   const relationships: DidMaterial[] = [];
   const verificationMethods: DidMaterial[] = [];
 
@@ -121,7 +121,8 @@ export const didDocumentDeserializer = (
     document.id,
     new Set<string>(document.controller),
     [...verificationMethods, ...refs],
-    // @ts-ignore
+    document.alsoKnownAs,
+    //@ts-ignore
     document.services
   );
 };

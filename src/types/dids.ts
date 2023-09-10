@@ -6,6 +6,9 @@ export type Service = {
   serviceEndpoint: string | string[];
 };
 
+export type URI = string;
+export const uriValidationExpr = new RegExp(/\w+:(\/?\/?)[^\s]+/);
+
 export const verificationRelationships = [
   "authentication",
   "assertionMethod",

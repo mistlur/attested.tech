@@ -1,4 +1,4 @@
-import { Service, VerificationRelationship } from "@/types/dids";
+import { Service, URI, VerificationRelationship } from "@/types/dids";
 import { immerable } from "immer";
 import { z } from "zod";
 import {
@@ -21,6 +21,7 @@ export class DidDocument {
   public id: string | undefined;
   public controller: DidController | undefined;
   public verificationMethod: DidMaterial[];
+  public alsoKnownAs: URI[] = [];
 
   public services: Service[] = [];
 
@@ -28,12 +29,14 @@ export class DidDocument {
     id: string | undefined,
     controller: DidController | null,
     verificationMethod: DidMaterial[],
+    alsoKnownAs?: URI[],
     services?: Service[]
   ) {
     this.id = id;
     this.controller = controller || new Set([]);
     this.verificationMethod = verificationMethod;
     this.services = services || [];
+    this.alsoKnownAs = alsoKnownAs || [];
   }
 
   addVerificationMethod(material: DidMaterial) {
@@ -50,6 +53,10 @@ export class DidDocument {
 
   setServices(services: Service[]) {
     this.services = services;
+  }
+
+  setAlsoKnownAs(alsoKnownAs: URI[]) {
+    this.alsoKnownAs = alsoKnownAs;
   }
 
   serializeController() {
@@ -133,6 +140,7 @@ export class DidDocument {
     return {
       ...(representation === "JSONLD" && { ["@context"]: this.getContexts() }),
       id: this.id,
+      ...(this.alsoKnownAs.length && { alsoKnownAs: this.alsoKnownAs }),
       ...(controller && { controller }),
       ...relationships,
       ...(this.services.length && { services: this.services }),

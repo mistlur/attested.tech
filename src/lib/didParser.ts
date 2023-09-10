@@ -1,3 +1,4 @@
+import { uriValidationExpr } from "../types/dids";
 import { z } from "zod";
 
 export const publicKeyJwkSchema = z.object({
@@ -44,7 +45,9 @@ export const documentSchema = z.object({
     .or(z.array(z.string().or(z.record(z.string(), z.any()))))
     .optional(),
   id: z.string(),
-  alsoKnownAs: z.string().optional(),
+  alsoKnownAs: z
+    .array(z.string().regex(uriValidationExpr, { message: "Invalid URI" }))
+    .optional(),
   controller: z.string().or(z.array(z.string())).optional(),
   verificationMethod: verificationMethodsSchema.optional(),
   authentication: verificationRelationshipsSchema.optional(),

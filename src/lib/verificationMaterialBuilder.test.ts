@@ -320,6 +320,50 @@ describe("didDocumentDeserializer", () => {
     expect(result.controller).toStrictEqual(new Set());
   });
 
+  it("Parses document with also-known-as", () => {
+    const document = {
+      "@context": [
+        "https://www.w3.org/ns/did/v1",
+        "https://w3id.org/security/suites/multikey-2021/v1",
+      ],
+      id: "did:web:example.com",
+      alsoKnownAs: ["https://example.com"],
+      verificationMethod: [
+        {
+          id: "did:web:example.com#1lp_wdAQL4aZcvbOqKRtb2-VYLjqc8BaWEKZKv0jQ-E",
+          type: "ED25519Key2020",
+          controller: "did:web:example.com",
+          publicKeyMultibase:
+            "z6MkmYS4Z13PFJjnNAL7tYxe2weTvGyVavofXv4xPdRpq6uL",
+        },
+      ],
+    };
+    const result = didDocumentDeserializer(document);
+    expect(result.alsoKnownAs.length).eq(1);
+    expect(result.alsoKnownAs[0]).toEqual("https://example.com");
+  });
+
+  it("Rejects document with malformed also-known-as", () => {
+    const document = {
+      "@context": [
+        "https://www.w3.org/ns/did/v1",
+        "https://w3id.org/security/suites/multikey-2021/v1",
+      ],
+      id: "did:web:example.com",
+      alsoKnownAs: ["notanuri"],
+      verificationMethod: [
+        {
+          id: "did:web:example.com#1lp_wdAQL4aZcvbOqKRtb2-VYLjqc8BaWEKZKv0jQ-E",
+          type: "ED25519Key2020",
+          controller: "did:web:example.com",
+          publicKeyMultibase:
+            "z6MkmYS4Z13PFJjnNAL7tYxe2weTvGyVavofXv4xPdRpq6uL",
+        },
+      ],
+    };
+    expect(() => didDocumentDeserializer(document)).toThrowError();
+  });
+
   it("Parses document with services", () => {
     const document = {
       "@context": [

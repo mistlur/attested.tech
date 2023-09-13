@@ -205,8 +205,8 @@ export default function DidBuilder({
 
   return (
     <div className="bg-base-300 p-4 sm:p-8 xl:p-16">
-      <div className="flex gap-4 pb-4 bg-base-300">
-        <div>
+      <div className="flex flex-wrap gap-4 pb-4 bg-base-300">
+        <div className="w-2/5 lg:w-auto">
           <label
             onClick={() => {
               setShowEditDidSubjectModal(true);
@@ -217,7 +217,7 @@ export default function DidBuilder({
             Edit DID Subject
           </label>
         </div>
-        <div>
+        <div className="w-2/5 lg:w-auto">
           <label
             onClick={() => {
               setShowAlsoKnownAsModal(true);
@@ -228,7 +228,7 @@ export default function DidBuilder({
             Edit Also-Known-As
           </label>
         </div>
-        <div>
+        <div className="w-2/5 lg:w-auto">
           <label
             onClick={() => {
               setShowEditDidControllerModal(true);
@@ -239,7 +239,7 @@ export default function DidBuilder({
             Edit DID Controller
           </label>
         </div>
-        <div>
+        <div className="w-2/5 lg:w-auto">
           <label
             onClick={() => {
               setShowEditServicesModal(true);

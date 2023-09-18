@@ -30,10 +30,18 @@ import EditServices from "@/components/dids/EditServices";
 import { Service, URI } from "@/types/dids";
 import { usePlausible } from "next-plausible";
 import EditAlsoKnownAs from "./EditAlsoKnownAs";
+import Tooltip from "@/components/core/Tooltip";
+import helpSteps from "@/utils/helpSteps";
 
 SyntaxHighlighter.registerLanguage("json", json);
 
-function AttemptSerialization({ didDocument }: { didDocument: DidDocument }) {
+function AttemptSerialization({
+  didDocument,
+  showToolTip,
+}: {
+  didDocument: DidDocument;
+  showToolTip: boolean;
+}) {
   const [isJsonLd, setIsJsonLd] = useState<boolean>(true);
 
   let result: string;
@@ -99,17 +107,19 @@ function AttemptSerialization({ didDocument }: { didDocument: DidDocument }) {
         </div>
       )}
       {validDocument && (
-        <div className="bg-base-300 pl-4">
-          <div className="bg-base-200">
-            <pre className="p-4 text-xs overflow-scroll md:min-h-[148px]">
-              <SyntaxHighlighter
-                language="json"
-                style={syntaxHighlightingTheme}
-              >
-                {result}
-              </SyntaxHighlighter>
-            </pre>
-          </div>
+        <div className="bg-base-300 pl-4 relative">
+          <Tooltip show={showToolTip} tooltip={helpSteps[0]}>
+            <div className="bg-base-200">
+              <pre className="p-4 text-xs overflow-scroll md:min-h-[148px]">
+                <SyntaxHighlighter
+                  language="json"
+                  style={syntaxHighlightingTheme}
+                >
+                  {result}
+                </SyntaxHighlighter>
+              </pre>
+            </div>
+          </Tooltip>
         </div>
       )}
     </div>
@@ -120,10 +130,12 @@ export default function DidBuilder({
   id,
   name,
   document,
+  setShowOverlay,
 }: {
   id: string;
   name: string;
   document: Record<string, any>;
+  setShowOverlay: (show: boolean) => void;
 }) {
   let maybeDocument: DidDocument;
   try {
@@ -151,6 +163,8 @@ export default function DidBuilder({
 
   const plausible = usePlausible<MyEvents>();
 
+  const [isHelpMode, setIsHelpMode] = useState<boolean>(false);
+  const [helpStep, setHelpStep] = useState<number>(0);
   const [didDocument, setDidDocument] = useState<DidDocument>(maybeDocument);
   const [showNewEmbeddedMethodModal, setShowNewEmbeddedMethodModal] =
     useState<boolean>(false);
@@ -166,9 +180,15 @@ export default function DidBuilder({
   const [showImportDocumentModal, setShowImportDocumentModal] =
     useState<boolean>(false);
 
+  function handleShowHelpMode(show: boolean) {
+    setShowOverlay(show);
+    setIsHelpMode(show);
+  }
+
   useEffect(() => {
     const handleEsc = (event) => {
       if (event.key === "Escape") {
+        handleShowHelpMode(false);
         setShowNewEmbeddedMethodModal(false);
         setShowNewReferenceMethodModal(false);
         setShowEditDidControllerModal(false);
@@ -206,50 +226,58 @@ export default function DidBuilder({
   return (
     <div className="bg-base-300 p-4 sm:p-8 xl:p-16">
       <div className="flex flex-wrap gap-4 pb-4 bg-base-300">
-        <div className="w-2/5 lg:w-auto">
-          <label
-            onClick={() => {
-              setShowEditDidSubjectModal(true);
-              plausible("editSubject");
-            }}
-            className="btn btn-outline btn-default"
-          >
-            Edit DID Subject
-          </label>
-        </div>
-        <div className="w-2/5 lg:w-auto">
-          <label
-            onClick={() => {
-              setShowAlsoKnownAsModal(true);
-              plausible("editAlsoKnownAs");
-            }}
-            className="btn btn-outline btn-default"
-          >
-            Edit Also-Known-As
-          </label>
-        </div>
-        <div className="w-2/5 lg:w-auto">
-          <label
-            onClick={() => {
-              setShowEditDidControllerModal(true);
-              plausible("editController");
-            }}
-            className="btn btn-outline btn-default"
-          >
-            Edit DID Controller
-          </label>
-        </div>
-        <div className="w-2/5 lg:w-auto">
-          <label
-            onClick={() => {
-              setShowEditServicesModal(true);
-              plausible("editServices");
-            }}
-            className="btn btn-outline btn-default"
-          >
-            Edit Services
-          </label>
-        </div>
+        <Tooltip tooltip={helpSteps[3]} show={isHelpMode && helpStep === 3}>
+          <div className="flex w-2/5 lg:w-auto">
+            <button
+              onClick={() => {
+                setShowEditDidSubjectModal(true);
+                plausible("editSubject");
+              }}
+              className="btn btn-outline btn-default"
+            >
+              Edit DID Subject
+            </button>
+          </div>
+        </Tooltip>
+        <Tooltip tooltip={helpSteps[4]} show={isHelpMode && helpStep === 4}>
+          <div className="flex w-2/5 lg:w-auto">
+            <button
+              onClick={() => {
+                setShowEditDidControllerModal(true);
+                plausible("editController");
+              }}
+              className="btn btn-outline btn-default"
+            >
+              Edit DID Controller
+            </button>
+          </div>
+        </Tooltip>
+        <Tooltip tooltip={helpSteps[5]} show={isHelpMode && helpStep === 5}>
+          <div className="flex w-2/5 lg:w-auto">
+            <button
+              onClick={() => {
+                setShowEditServicesModal(true);
+                plausible("editServices");
+              }}
+              className="btn btn-outline btn-default"
+            >
+              Edit Services
+            </button>
+          </div>
+        </Tooltip>
+        <Tooltip tooltip={helpSteps[6]} show={isHelpMode && helpStep === 6}>
+          <div className="flex w-2/5 lg:w-auto">
+            <button
+              onClick={() => {
+                setShowAlsoKnownAsModal(true);
+                plausible("editAlsoKnownAs");
+              }}
+              className="btn btn-outline btn-default"
+            >
+              Edit Also-Known-As
+            </button>
+          </div>
+        </Tooltip>
         <div className="ml-auto md:inline hidden">
           <label
             onClick={() => {
@@ -263,28 +291,32 @@ export default function DidBuilder({
         </div>
       </div>
       <div className="flex gap-4 pb-4 bg-base-300 md:hidden">
-        <div>
-          <button
-            className="btn btn-outline btn-default"
-            onClick={() => {
-              setShowNewEmbeddedMethodModal(true);
-              plausible("addEmbeddedMaterial");
-            }}
-          >
-            Add Embedded Material
-          </button>
-        </div>
-        <div>
-          <button
-            className="btn btn-outline btn-default"
-            onClick={() => {
-              setShowNewReferenceMethodModal(true);
-              plausible("addReferencedMaterial");
-            }}
-          >
-            Add Referenced Material
-          </button>
-        </div>
+        <Tooltip tooltip={helpSteps[1]} show={isHelpMode && helpStep === 1}>
+          <div>
+            <button
+              className="btn btn-info"
+              onClick={() => {
+                setShowNewEmbeddedMethodModal(true);
+                plausible("addEmbeddedMaterial");
+              }}
+            >
+              Add Embedded Material
+            </button>
+          </div>
+        </Tooltip>
+        <Tooltip tooltip={helpSteps[2]} show={isHelpMode && helpStep === 2}>
+          <div>
+            <button
+              className="btn btn-info"
+              onClick={() => {
+                setShowNewReferenceMethodModal(true);
+                plausible("addReferencedMaterial");
+              }}
+            >
+              Add Referenced Material
+            </button>
+          </div>
+        </Tooltip>
         <div className="ml-auto">
           <label
             onClick={() => {
@@ -438,28 +470,50 @@ export default function DidBuilder({
                   </div>
                 ))
             )}
-            <button
-              className="btn btn-outline text-neutral-content btn-default my-4 hidden md:block"
-              onClick={() => {
-                plausible("addEmbeddedMaterial");
-                setShowNewEmbeddedMethodModal(true);
-              }}
-            >
-              Add Embedded Material
-            </button>
-            <button
-              className="btn btn-outline text-neutral-content btn-default hidden md:block"
-              onClick={() => {
-                plausible("addReferencedMaterial");
-                setShowNewReferenceMethodModal(true);
-              }}
-            >
-              Add Referenced Material
-            </button>
+            <div className="hidden md:block">
+              <Tooltip
+                tooltip={helpSteps[1]}
+                show={isHelpMode && helpStep === 1}
+              >
+                <div className="flex flex-col">
+                  <button
+                    className="btn btn-outline text-neutral-content btn-default my-4"
+                    onClick={() => {
+                      plausible("addEmbeddedMaterial");
+                      setShowNewEmbeddedMethodModal(true);
+                    }}
+                  >
+                    Add Embedded Material
+                  </button>
+                </div>
+              </Tooltip>
+            </div>
+            <div className="hidden md:block">
+              <Tooltip
+                tooltip={helpSteps[2]}
+                show={isHelpMode && helpStep === 2}
+              >
+                <div className="flex flex-col">
+                  <button
+                    className="btn btn-outline text-neutral-content btn-default"
+                    onClick={() => {
+                      plausible("addReferencedMaterial");
+                      setShowNewReferenceMethodModal(true);
+                    }}
+                  >
+                    Add Referenced Material
+                  </button>
+                </div>
+              </Tooltip>
+            </div>
           </div>
         </div>
+
         <div className="w-2/3">
-          <AttemptSerialization didDocument={didDocument} />
+          <AttemptSerialization
+            didDocument={didDocument}
+            showToolTip={isHelpMode && helpStep === 0}
+          />
         </div>
       </div>
       <Modal
@@ -608,6 +662,42 @@ export default function DidBuilder({
           }}
         />
       </Modal>
+      <div className="w-fit">
+        <div className="form-control mt-2 mb-0">
+          <label className="label justify-start cursor-pointer z-20">
+            <span className="label-text pr-4">Tutorial Mode</span>
+            <input
+              onClick={() => handleShowHelpMode(!isHelpMode)}
+              checked={isHelpMode}
+              type="checkbox"
+              className="toggle"
+            />
+          </label>
+        </div>
+        {isHelpMode && (
+          <div>
+            <p className="text-xs text-primary z-20">{`Step ${
+              helpStep + 1
+            } of ${helpSteps.length}`}</p>
+            <div className="join grid grid-cols-2 mt-4">
+              <button
+                className="join-item btn btn-outline z-20"
+                onClick={() => setHelpStep(helpStep - 1)}
+                disabled={helpStep === 0}
+              >
+                Prev
+              </button>
+              <button
+                className="join-item btn btn-outline z-20"
+                onClick={() => setHelpStep(helpStep + 1)}
+                disabled={helpStep === helpSteps.length - 1}
+              >
+                Next
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

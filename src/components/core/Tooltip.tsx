@@ -1,15 +1,17 @@
 import React from "react";
 export default function Tooltip({
+  className = "",
   children,
   tooltip,
   show,
 }: {
+  className?: string;
   children: React.ReactNode;
   tooltip: { label: string; description: string };
   show?: boolean;
 }) {
   return (
-    <div className={`relative${show ? " z-20" : ""}`}>
+    <div className={`relative${show ? " z-20" : ""} ${className}`}>
       {children}
       <div
         className={`absolute bottom-full flex flex-col ${

@@ -225,58 +225,66 @@ export default function DidBuilder({
 
   return (
     <div className="bg-base-300 p-4 sm:p-8 xl:p-16">
-      <div className="flex flex-wrap gap-4 pb-4 bg-base-300">
-        <Tooltip tooltip={helpSteps[3]} show={isHelpMode && helpStep === 3}>
-          <div className="flex w-2/5 lg:w-auto">
-            <button
-              onClick={() => {
-                setShowEditDidSubjectModal(true);
-                plausible("editSubject");
-              }}
-              className="btn btn-outline btn-default"
-            >
-              Edit DID Subject
-            </button>
-          </div>
+      <div className="flex flex-wrap gap-y-4 sm:gap-4 pb-4 bg-base-300">
+        <Tooltip
+          className="w-1/2 sm:w-auto"
+          tooltip={helpSteps[1]}
+          show={isHelpMode && helpStep === 1}
+        >
+          <button
+            onClick={() => {
+              setShowEditDidSubjectModal(true);
+              plausible("editSubject");
+            }}
+            className="btn btn-outline btn-default w-[calc(100%-16px)] sm:w-auto"
+          >
+            Edit DID Subject
+          </button>
         </Tooltip>
-        <Tooltip tooltip={helpSteps[4]} show={isHelpMode && helpStep === 4}>
-          <div className="flex w-2/5 lg:w-auto">
-            <button
-              onClick={() => {
-                setShowEditDidControllerModal(true);
-                plausible("editController");
-              }}
-              className="btn btn-outline btn-default"
-            >
-              Edit DID Controller
-            </button>
-          </div>
+        <Tooltip
+          className="w-1/2 sm:w-auto"
+          tooltip={helpSteps[4]}
+          show={isHelpMode && helpStep === 4}
+        >
+          <button
+            onClick={() => {
+              setShowEditDidControllerModal(true);
+              plausible("editController");
+            }}
+            className="btn btn-outline btn-default w-full sm:w-auto"
+          >
+            Edit DID Controller
+          </button>
         </Tooltip>
-        <Tooltip tooltip={helpSteps[5]} show={isHelpMode && helpStep === 5}>
-          <div className="flex w-2/5 lg:w-auto">
-            <button
-              onClick={() => {
-                setShowEditServicesModal(true);
-                plausible("editServices");
-              }}
-              className="btn btn-outline btn-default"
-            >
-              Edit Services
-            </button>
-          </div>
+        <Tooltip
+          className="w-1/2 sm:w-auto"
+          tooltip={helpSteps[5]}
+          show={isHelpMode && helpStep === 5}
+        >
+          <button
+            onClick={() => {
+              setShowEditServicesModal(true);
+              plausible("editServices");
+            }}
+            className="btn btn-outline btn-default w-[calc(100%-16px)] sm:w-auto"
+          >
+            Edit Services
+          </button>
         </Tooltip>
-        <Tooltip tooltip={helpSteps[6]} show={isHelpMode && helpStep === 6}>
-          <div className="flex w-2/5 lg:w-auto">
-            <button
-              onClick={() => {
-                setShowAlsoKnownAsModal(true);
-                plausible("editAlsoKnownAs");
-              }}
-              className="btn btn-outline btn-default"
-            >
-              Edit Also-Known-As
-            </button>
-          </div>
+        <Tooltip
+          className="w-1/2 sm:w-auto"
+          tooltip={helpSteps[6]}
+          show={isHelpMode && helpStep === 6}
+        >
+          <button
+            onClick={() => {
+              setShowAlsoKnownAsModal(true);
+              plausible("editAlsoKnownAs");
+            }}
+            className="btn btn-outline btn-default w-full sm:w-auto"
+          >
+            Edit Also-Known-As
+          </button>
         </Tooltip>
         <div className="ml-auto md:inline hidden">
           <label
@@ -291,7 +299,7 @@ export default function DidBuilder({
         </div>
       </div>
       <div className="flex gap-4 pb-4 bg-base-300 md:hidden">
-        <Tooltip tooltip={helpSteps[1]} show={isHelpMode && helpStep === 1}>
+        <Tooltip tooltip={helpSteps[2]} show={isHelpMode && helpStep === 2}>
           <div>
             <button
               className="btn btn-info"
@@ -304,7 +312,7 @@ export default function DidBuilder({
             </button>
           </div>
         </Tooltip>
-        <Tooltip tooltip={helpSteps[2]} show={isHelpMode && helpStep === 2}>
+        <Tooltip tooltip={helpSteps[3]} show={isHelpMode && helpStep === 3}>
           <div>
             <button
               className="btn btn-info"
@@ -472,8 +480,8 @@ export default function DidBuilder({
             )}
             <div className="hidden md:block">
               <Tooltip
-                tooltip={helpSteps[1]}
-                show={isHelpMode && helpStep === 1}
+                tooltip={helpSteps[2]}
+                show={isHelpMode && helpStep === 2}
               >
                 <div className="flex flex-col">
                   <button
@@ -490,8 +498,8 @@ export default function DidBuilder({
             </div>
             <div className="hidden md:block">
               <Tooltip
-                tooltip={helpSteps[2]}
-                show={isHelpMode && helpStep === 2}
+                tooltip={helpSteps[3]}
+                show={isHelpMode && helpStep === 3}
               >
                 <div className="flex flex-col">
                   <button

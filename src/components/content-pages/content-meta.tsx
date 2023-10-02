@@ -8,8 +8,6 @@ type Props = {
 };
 
 const ContentMeta = ({ title, description, socialDescription }: Props) => {
-  console.log(getFullRedirectUrl("/static/apple-icon-180x180.png"));
-
   return (
     <Head>
       <title>{title}</title>

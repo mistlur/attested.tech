@@ -16,7 +16,7 @@ const BlogShow = ({ content, title, meta }) => {
         title={title}
         description={meta?.description}
         socialDescription={meta?.socialDescription}
-        socialImage={`/api/og?title=${title}`}
+        // socialImage={`/api/og?title=${title}`}
       />
       <div className="breadcrumbs text-sm mb-4">
         <ul className="m-0 p-0">

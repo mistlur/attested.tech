@@ -5,15 +5,11 @@ type Props = {
   title: string;
   description: string;
   socialDescription?: string;
-  socialImage?: string;
 };
 
-const ContentMeta = ({
-  title,
-  description,
-  socialDescription,
-  socialImage,
-}: Props) => {
+const ContentMeta = ({ title, description, socialDescription }: Props) => {
+  console.log(getFullRedirectUrl("/static/apple-icon-180x180.png"));
+
   return (
     <Head>
       <title>{title}</title>
@@ -94,7 +90,7 @@ const ContentMeta = ({
         sizes="16x16"
         href="/static/favicon-16x16.png"
       />
-      <meta name="twitter:card" content="summary_large_image" />
+      <meta name="twitter:card" content="summary" />
       <meta name="description" content={description} key="desc" />
       <meta property="og:title" content={title} />
       <meta name="twitter:title" content={title} />
@@ -106,15 +102,16 @@ const ContentMeta = ({
         name="twitter:description"
         content={socialDescription || description}
       />
-      {!!socialImage && (
-        <>
-          <meta property="og:image" content={getFullRedirectUrl(socialImage)} />
-          <meta
-            name="twitter:image"
-            content={getFullRedirectUrl(socialImage)}
-          />
-        </>
-      )}
+      <>
+        <meta
+          property="og:image"
+          content={getFullRedirectUrl("/static/apple-icon-180x180.png")}
+        />
+        <meta
+          name="twitter:image"
+          content={getFullRedirectUrl("/static/apple-icon-180x180.png")}
+        />
+      </>
     </Head>
   );
 };

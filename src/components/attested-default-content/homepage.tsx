@@ -26,7 +26,7 @@ const AttestedHomepage = () => {
         <ContentMeta
           title="ATTESTED.TECH"
           description="Playground for decentralized identifiers"
-          socialImage={`/meta_banner.png`}
+          // socialImage={`/meta_banner.png`}
         />
         <div className="alert alert-warning gap-0 sm:hidden">
           <svg
